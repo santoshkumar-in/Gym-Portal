@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Be Active",
-  description: "Built using NextJS, Typescript, Tailwind.css",
+  description: "Built using NextJS, Typescript, Tailwind.css, Shruti Sachan",
 };
 
 export default function RootLayout({
