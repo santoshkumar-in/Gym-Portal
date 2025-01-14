@@ -1,11 +1,10 @@
 "use client";
-import { useActionState } from "react";
-import classNames from "classnames";
-import { doSignIn } from "@/actions/auth.ts";
+import React from "react";
+//import classNames from "classnames";
+import { doSignIn } from "@/actions/auth";
 import Link from "next/link";
 
 const SignInForm: React.FC = () => {
-  const [state, action, pending] = useActionState(doSignIn, undefined);
   return (
     <form action={doSignIn}>
       <div className="mb-4">
@@ -79,7 +78,6 @@ const SignInForm: React.FC = () => {
       <div className="mb-5">
         <button
           type="submit"
-          disabled={pending}
           className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
         >
           Sign In

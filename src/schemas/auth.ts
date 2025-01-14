@@ -41,4 +41,6 @@ export type SignInFormState =
       };
       message?: string;
     }
-  | undefined;
+  | undefined
+  | string
+  | never;

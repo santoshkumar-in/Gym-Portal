@@ -1,9 +1,15 @@
-import React from "react";
 import Link from "next/link";
 import SidebarDropdown from "@/components/Sidebar/SidebarDropdown";
 import { usePathname } from "next/navigation";
+import { MenuItem } from "@/types/menu";
 
-const SidebarItem = ({ item, pageName, setPageName }: any) => {
+interface Props {
+  item: MenuItem;
+  pageName: string;
+  setPageName: (arg: string) => void;
+}
+
+const SidebarItem = ({ item, pageName, setPageName }: Props) => {
   const handleClick = () => {
     const updatedPageName =
       pageName !== item.label.toLowerCase() ? item.label.toLowerCase() : "";
@@ -12,10 +18,10 @@ const SidebarItem = ({ item, pageName, setPageName }: any) => {
 
   const pathname = usePathname();
 
-  const isActive = (item: any) => {
+  const isActive = (item: MenuItem): boolean => {
     if (item.route === pathname) return true;
     if (item.children) {
-      return item.children.some((child: any) => isActive(child));
+      return item.children.some((child) => isActive(child));
     }
     return false;
   };

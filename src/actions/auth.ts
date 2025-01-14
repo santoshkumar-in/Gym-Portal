@@ -2,8 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { SigninFormSchema, SignInFormState } from "@/lib/definitions";
-export async function signup(formData: FormData) {}
+import { SigninFormSchema } from "@/schemas/auth";
 
 export async function doSignIn(formData: FormData) {
   const validatedFields = SigninFormSchema.safeParse({
@@ -13,9 +12,7 @@ export async function doSignIn(formData: FormData) {
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
+    redirect("/auth/signin");
   }
 
   // If email/pass correct, return early
@@ -25,9 +22,7 @@ export async function doSignIn(formData: FormData) {
       validatedFields.data.password === "12345"
     )
   ) {
-    return {
-      errors: ["incorrect email/password"],
-    };
+    redirect("/auth/signin");
   }
 
   console.log("validated", validatedFields.data);
