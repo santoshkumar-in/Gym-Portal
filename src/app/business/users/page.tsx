@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const BusinessUsers = () => {
   return (
     <DefaultLayout>
-      <Modal modalIsOpen={true}>
+      <Modal modalIsOpen={false}>
         <h3 className="pb-2 text-xl font-bold text-black dark:text-white sm:text-2xl">
           Your Message Sent Successfully
         </h3>
