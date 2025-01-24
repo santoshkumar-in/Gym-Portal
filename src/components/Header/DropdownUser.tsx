@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
+import { getUserDetails } from "@/actions/auth";
+import { CURRENT_USER } from "@/types/auth";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState<CURRENT_USER>({});
+
+  useEffect(() => {
+    async function getUser() {
+      const currentUser = await getUserDetails();
+      setUser(currentUser);
+    }
+    getUser();
+  }, []);
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -15,9 +26,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            John Doe
+            {user?.firstName || "NA"}
           </span>
-          <span className="block text-xs">Admin</span>
+          <span className="block text-xs">{user?.role || "NA"}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">

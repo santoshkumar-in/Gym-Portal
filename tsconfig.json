@@ -35,7 +35,7 @@
     "fjfjf.next/types/**/*.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-  ],
+    ],
   "exclude": [
     "node_modules"
   ]

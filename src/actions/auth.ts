@@ -22,7 +22,7 @@ export async function doSignIn(formData: FormData) {
       validatedFields.data.password === "12345"
     )
   ) {
-    redirect("/auth/signin");
+    redirect("/business");
   }
 
   console.log("validated", validatedFields.data);
@@ -36,7 +36,7 @@ export async function doSignIn(formData: FormData) {
     sameSite: "lax",
     path: "/",
   });
-  redirect("/");
+  redirect("/business");
 }
 
 export const verifySession = cache(async () => {
@@ -45,4 +45,31 @@ export const verifySession = cache(async () => {
     redirect("/auth/signin");
   }
   return { isAuth: true, userId: cookie };
+});
+
+export const getUserDetails = cache(async () => {
+  const cookie = (await cookies()).get("session")?.value;
+  return {
+    id: 1,
+    userId: cookie,
+    username: "superadmin",
+    email: "business@gmail.com",
+    mobile: "9910062638",
+    isd: "+91",
+    firstName: "Super Admin",
+    businessId: 1,
+    businessName: "Progmmatic Soft",
+    logoUrl: null,
+    role: "ROLE_SUPER",
+    menu: [
+      {
+        menuItem: "Business Management",
+        viewOnly: "N",
+      },
+      {
+        menuItem: "User Management",
+        viewOnly: "N",
+      },
+    ],
+  };
 });
