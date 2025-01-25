@@ -293,7 +293,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
       const mGroups = [
         {
-          name: currentUser.businessName,
+          name: "v0.1.0",
           menuItems: [
             {
               icon: (
