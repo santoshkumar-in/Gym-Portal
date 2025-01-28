@@ -1,9 +1,0 @@
-.fitnxt-masonry-gallery:after {
-    content: '';
-    display: block;
-    clear: both;
-}
-
-.gallery-item{
-    margin-bottom: 3px;
-}

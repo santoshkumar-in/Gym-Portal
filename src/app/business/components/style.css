@@ -1,0 +1,10 @@
+/* the slides */
+.service-package-slick-slider .slick-track .slick-active {
+    padding-right: 4px;
+}
+/* .service-package-slick-slider .slick-active:nth-of-type(1) {
+    padding-left: 0;
+} */
+ .service-package-slick-slider .slick-track .slick-slide.slick-active:last-of-type {
+    padding-right: 0 !important;
+}
