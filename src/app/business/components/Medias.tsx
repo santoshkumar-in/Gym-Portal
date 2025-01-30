@@ -17,7 +17,7 @@ const Medias = ({ businessId }: Props) => {
       setMedias(response.data);
     }
     getData();
-  }, []);
+  }, [businessId]);
 
   if (!medias) {
     return "Loading...";

@@ -197,7 +197,7 @@ export const getMedias = cache(
           {
             id: "136",
             type: "image",
-            url: "https://plus.unsplash.com/premium_photo-1677361513506-c27dbaf9369e?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            url: "https://images.unsplash.com/photo-1603734220970-25a0b335ca01?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             category: "zumba",
           },
           {

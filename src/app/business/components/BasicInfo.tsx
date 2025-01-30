@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,8 +10,11 @@ import {
   faYoutube,
   faSnapchat,
 } from "@fortawesome/free-brands-svg-icons";
-import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import EditDropdown from "@/components/Dropdowns/EditDropdown";
+import {
+  faLocationDot,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons";
+import FitNxtDropDowns from "@/components/Dropdowns/FitNxtDropDowns";
 
 import { getBusinessDetails } from "@/actions/business";
 import { BUSINESS } from "@/types/business";
@@ -28,7 +32,11 @@ const BasicInfo = ({ businessId }: Props) => {
       setBusinessData(data);
     }
     getData();
-  }, []);
+  }, [businessId]);
+
+  const onEdit = () => {
+    redirect(`/business/${businessId}/edit/basicInfo`);
+  };
 
   if (!businessData) {
     return "Loading...";
@@ -125,7 +133,15 @@ const BasicInfo = ({ businessId }: Props) => {
         </div>
         <div className="relative mt-4">
           <div className="absolute -top-18 right-1 z-10 xsm:bottom-4 xsm:right-4">
-            <EditDropdown />
+            <FitNxtDropDowns>
+              <button
+                onClick={onEdit}
+                className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
+              >
+                <FontAwesomeIcon icon={faPenToSquare} />
+                Edit
+              </button>
+            </FitNxtDropDowns>
           </div>
           <div className="flex items-center justify-center">
             <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">

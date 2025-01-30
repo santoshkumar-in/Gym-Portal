@@ -1,6 +1,5 @@
 "use client";
 import Modal from "react-modal";
-import { toastError } from "@/helpers/toast";
 
 Modal.setAppElement(document.body);
 interface ModalProps {
@@ -17,13 +16,6 @@ const FitNxtModal = ({ children, modalIsOpen }: ModalProps) => {
       isOpen={modalIsOpen}
       contentLabel="Example Modal"
     >
-      <button
-        onClick={() => {
-          toastError("🦄 Wow so easy!!");
-        }}
-      >
-        Test notification
-      </button>
       {children}
     </Modal>
   );
