@@ -1,6 +1,6 @@
-//import ECommerce from "@/components/Dashboard/E-commerce";
+import ECommerce from "@/components/Dashboard/E-commerce";
 import { Metadata } from "next";
-//import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "FitNxt Dashboard",
@@ -10,10 +10,9 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      Home Page
-      {/* <DefaultLayout>
+      <DefaultLayout>
         <ECommerce />
-      </DefaultLayout> */}
+      </DefaultLayout>
     </>
   );
 }

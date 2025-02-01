@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { redirect } from "next/navigation";
-
+//import { redirect } from "next/navigation";
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquareFacebook,
@@ -34,9 +34,9 @@ const BasicInfo = ({ businessId }: Props) => {
     getData();
   }, [businessId]);
 
-  const onEdit = () => {
-    redirect(`/business/${businessId}/edit/basicInfo`);
-  };
+  // const onEdit = () => {
+  //   redirect(`/business/${businessId}/edit/basicInfo`);
+  // };
 
   if (!businessData) {
     return "Loading...";
@@ -134,13 +134,13 @@ const BasicInfo = ({ businessId }: Props) => {
         <div className="relative mt-4">
           <div className="absolute -top-18 right-1 z-10 xsm:bottom-4 xsm:right-4">
             <FitNxtDropDowns>
-              <button
-                onClick={onEdit}
+              <Link
+                href={`/business/${businessId}/edit/basicInfo`}
                 className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
               >
                 <FontAwesomeIcon icon={faPenToSquare} />
                 Edit
-              </button>
+              </Link>
             </FitNxtDropDowns>
           </div>
           <div className="flex items-center justify-center">

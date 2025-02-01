@@ -3,5 +3,5 @@ import { redirect } from "next/navigation";
 export async function GET() {
   const cookieStore = await cookies();
   cookieStore.delete("jwtToken");
-  redirect("/auth/signin");
+  redirect("/signin");
 }

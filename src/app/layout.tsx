@@ -1,44 +1,54 @@
 "use client";
-import "jsvectormap/dist/jsvectormap.css";
-import "flatpickr/dist/flatpickr.min.css";
-import "@/css/satoshi.css";
-import "@/css/style.css";
-import React, { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
-import Loader from "@/components/common/Loader";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import FitNxtRootLayout from "@/components/Layouts/RootLayout";
+
+import { getUserDetails } from "@/actions/auth";
 
 export default function RootLayout({
+  business,
+  super_admin,
   children,
+  modal,
 }: Readonly<{
+  business: React.ReactNode;
+  super_admin: React.ReactNode;
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // const pathname = usePathname();
+  const path = usePathname();
+  const [currentRole, setCurrentRole] = useState<string>("");
+  const [currentComponent, setCurrentComponent] =
+    useState<React.ReactNode>(null);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
+    async function getUser() {
+      const { role } = await getUserDetails();
+      setCurrentRole(role);
+    }
+    getUser();
   }, []);
 
+  useEffect(() => {
+    console.log("current path", path);
+    if (path !== "/") {
+      setCurrentComponent(null);
+    } else {
+      if (currentRole === "ROLE_BUSINESS") {
+        console.log("ROLE_BUSINESS");
+        setCurrentComponent(business);
+      } else if (currentRole === "ROLE_SUPER") {
+        console.log("ROLE_SUPER");
+        setCurrentComponent(super_admin);
+      }
+    }
+  }, [path, currentRole]);
+
   return (
-    <html lang="en">
-      <body suppressHydrationWarning>
-        <div className="dark:bg-boxdark-2 dark:text-bodydark">
-          {loading ? <Loader /> : children}
-        </div>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-      </body>
-    </html>
+    <FitNxtRootLayout>
+      {currentComponent}
+      {!currentComponent && children}
+      {modal}
+    </FitNxtRootLayout>
   );
 }
