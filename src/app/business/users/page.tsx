@@ -1,7 +1,5 @@
-import Users from "@/components/Tables/BusinessUsers";
-
 import { Metadata } from "next";
-
+import Users from "@/components/Tables/BusinessUsers";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 

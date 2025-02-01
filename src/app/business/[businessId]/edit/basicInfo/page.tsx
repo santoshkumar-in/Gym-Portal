@@ -1,7 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import BasicInfoForm from "@/components/Business/Forms/BasicInfo";
 
 const EditBasicInfo = ({
   params,
@@ -16,13 +19,22 @@ const EditBasicInfo = ({
       setBusinessId(bId);
     }
     getParams();
+    console.log(businessId);
   }, []);
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-242.5">
-        <h4>Edit Basic info of {businessId}</h4>
-        <button onClick={() => router.back()}>close</button>
+      <div className="mx-auto max-w-3xl">
+        <div className="flex">
+          <a
+            className="mb-2 cursor-pointer font-medium"
+            onClick={() => router.back()}
+          >
+            <FontAwesomeIcon icon={faArrowRotateLeft} /> Back
+          </a>
+        </div>
+
+        <BasicInfoForm />
       </div>
     </DefaultLayout>
   );

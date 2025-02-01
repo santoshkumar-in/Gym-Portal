@@ -1,7 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/components/Modal";
+import BasicInfoForm from "@/components/Business/Forms/BasicInfo";
 
 const EditBasicInfo = ({
   params,
@@ -16,13 +19,14 @@ const EditBasicInfo = ({
       setBusinessId(bId);
     }
     getParams();
+    console.log(businessId);
   }, []);
   return (
-    <Modal modalIsOpen={true}>
-      <div className="mx-auto max-w-242.5">
-        <h4>Edit Basic info of {businessId}</h4>
-        <button onClick={() => router.back()}>close</button>
-      </div>
+    <Modal modalIsOpen={true} className="relative max-w-3xl">
+      <button className="absolute right-5 top-10" onClick={() => router.back()}>
+        <FontAwesomeIcon icon={faXmark} />
+      </button>
+      <BasicInfoForm />
     </Modal>
   );
 };

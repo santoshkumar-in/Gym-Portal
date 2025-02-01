@@ -1,7 +1,7 @@
 import Business from "@/components/Business";
 
-const BusinessDetails = () => {
+const BusinessDashboard = () => {
   return <Business />;
 };
 
-export default BusinessDetails;
+export default BusinessDashboard;

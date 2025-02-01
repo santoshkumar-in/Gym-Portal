@@ -1,19 +1,22 @@
-//import ECommerce from "@/components/Dashboard/E-commerce";
-import { Metadata } from "next";
-//import DefaultLayout from "@/components/Layouts/DefaultLayout";
-
-export const metadata: Metadata = {
-  title: "FitNxt Dashboard",
-  description: "This is FitNxt Dashboard",
-};
+"use client";
+import { useEffect, useState } from "react";
+import { getUserDetails } from "@/actions/auth";
+import BusinessDashboard from "@/components/Dashboards/Business";
+import SuperAdminDashboard from "@/components/Dashboards/SuperAdmin";
 
 export default function Home() {
-  return (
-    <>
-      Home Page
-      {/* <DefaultLayout>
-        <ECommerce />
-      </DefaultLayout> */}
-    </>
-  );
+  const [currentComponent, setCurrentComponent] =
+    useState<React.ReactNode>(null);
+  useEffect(() => {
+    async function getUser() {
+      const { role } = await getUserDetails();
+      if (role === "ROLE_SUPER") {
+        setCurrentComponent(<SuperAdminDashboard />);
+      } else if (role === "ROLE_BUSINESS") {
+        setCurrentComponent(<BusinessDashboard />);
+      }
+    }
+    getUser();
+  }, []);
+  return currentComponent;
 }

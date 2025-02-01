@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { getMedias } from "@/actions/business";
 import { MEDIAS } from "@/types/business";
 import Gallery from "./Gallery";
@@ -10,6 +12,7 @@ interface Props {
 
 const Medias = ({ businessId }: Props) => {
   const [medias, setMedias] = useState<MEDIAS>();
+  const [deleteMode, setDeleteMode] = useState<boolean>(false);
 
   useEffect(() => {
     async function getData() {
@@ -19,18 +22,29 @@ const Medias = ({ businessId }: Props) => {
     getData();
   }, [businessId]);
 
+  const toggle = () => {
+    setDeleteMode(!deleteMode);
+  };
+
   if (!medias) {
     return "Loading...";
   }
 
   return (
     <div className="mt-4">
-      <div className="mb-4 flex rounded-sm bg-white px-4 py-4 shadow-default sm:px-6 xl:px-7.5">
+      <div className="mb-4 flex items-center rounded-sm bg-white px-4 py-4 shadow-default sm:px-6 xl:px-7.5">
         <h3 className="font-bold text-black dark:text-white">Image gallery</h3>
-        <div className="ml-auto">
+        <button
+          onClick={toggle}
+          className="ml-auto rounded bg-red-500 px-5 py-1 text-center font-medium text-white hover:bg-opacity-90"
+        >
+          <FontAwesomeIcon icon={faTrashCan} />{" "}
+          {deleteMode ? "Exit Delete Mode" : "Enter Delete Mode"}
+        </button>
+        <div className="ml-2">
           <label
             htmlFor="upload-image-in-gallery"
-            className="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary px-2 py-1 text-sm font-medium text-white hover:bg-opacity-80 xsm:px-4"
+            className="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary px-2 py-2 text-sm font-medium text-white hover:bg-opacity-80 xsm:px-4"
           >
             <input
               type="file"
@@ -65,7 +79,7 @@ const Medias = ({ businessId }: Props) => {
           </label>
         </div>
       </div>
-      <Gallery medias={medias} />
+      <Gallery medias={medias} deleteMode={deleteMode} />
     </div>
   );
 };

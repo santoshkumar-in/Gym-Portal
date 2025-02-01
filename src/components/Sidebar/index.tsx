@@ -4,6 +4,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
+import { faPhone } from "@fortawesome/free-solid-svg-icons";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -441,6 +444,21 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             ))}
           </nav>
           {/* <!-- Sidebar Menu --> */}
+        </div>
+        <div className="absolute bottom-0 left-0 ml-6 flex py-4">
+          <a
+            className="cursor-pointer text-xs text-gray-400"
+            href="tel:011123456789"
+          >
+            <FontAwesomeIcon icon={faPhone} /> 011-123456789
+          </a>
+
+          <a
+            className="ml-3 cursor-pointer text-xs text-gray-400"
+            href="mailto:support@fitnxt.in"
+          >
+            <FontAwesomeIcon icon={faEnvelope} /> support@fitnxt.in
+          </a>
         </div>
       </aside>
     </ClickOutside>

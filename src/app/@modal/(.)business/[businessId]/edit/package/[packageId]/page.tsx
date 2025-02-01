@@ -1,8 +1,10 @@
 "use client";
-import Modal from "@/components/Modal";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import PackageForm from "@/components/Business/Forms/Package";
+import Modal from "@/components/Modal";
 interface Props {
   params: Promise<{ businessId: string; packageId: string }>;
 }
@@ -17,16 +19,15 @@ const EditPackage = ({ params }: Props) => {
       setPackageId(pId);
     }
     getParams();
+    console.log(businessId, packageId);
   }, []);
 
   return (
-    <Modal modalIsOpen={true}>
-      <div className="mx-auto max-w-242.5">
-        <h4>
-          Edit Package info of {businessId} : {packageId}
-        </h4>
-        <button onClick={() => router.back()}>close</button>
-      </div>
+    <Modal modalIsOpen={true} className="relative max-w-3xl">
+      <button className="absolute right-5 top-10" onClick={() => router.back()}>
+        <FontAwesomeIcon icon={faXmark} />
+      </button>
+      <PackageForm />
     </Modal>
   );
 };

@@ -13,11 +13,37 @@ import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-zoom.css";
 import "lightgallery/css/lg-thumbnail.css";
 
-interface Props {
-  medias: MEDIAS;
+function LGWrapper({
+  children,
+  deleteMode,
+}: {
+  children: React.ReactNode;
+  deleteMode: boolean;
+}) {
+  if (deleteMode) {
+    return <div className="fitnxt-masonry-gallery mx-auto">{children}</div>;
+  } else {
+    return (
+      <LightGallery
+        //onInit={onInit}
+        speed={500}
+        download={false}
+        elementClassNames="fitnxt-masonry-gallery mx-auto"
+        addClass="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5 block"
+        //plugins={[lgThumbnail, lgZoom]}
+      >
+        {children}
+      </LightGallery>
+    );
+  }
 }
 
-function Gallery({ medias }: Props) {
+interface Props {
+  medias: MEDIAS;
+  deleteMode: boolean;
+}
+
+function Gallery({ medias, deleteMode }: Props) {
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("");
 
@@ -40,7 +66,7 @@ function Gallery({ medias }: Props) {
         }
       });
     }
-  }, []);
+  }, [deleteMode]);
 
   const onDeleteClick = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
@@ -67,14 +93,7 @@ function Gallery({ medias }: Props) {
 
   return (
     <>
-      <LightGallery
-        //onInit={onInit}
-        speed={500}
-        download={false}
-        elementClassNames="fitnxt-masonry-gallery mx-auto"
-        addClass="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5 block"
-        //plugins={[lgThumbnail, lgZoom]}
-      >
+      <LGWrapper deleteMode={deleteMode}>
         <div className="grid-sizer w-1/4"></div>
         {medias.map((media) => {
           return (
@@ -85,12 +104,14 @@ function Gallery({ medias }: Props) {
               data-sub-html={`<p>${media.caption}</p>`}
             >
               <div className="relative">
-                <span
-                  onClick={(e) => onDeleteClick(e, media.id)}
-                  className="z-9s absolute right-1 top-1 cursor-pointer p-1 text-white"
-                >
-                  <FontAwesomeIcon icon={faTrashCan} />
-                </span>
+                {deleteMode && (
+                  <span
+                    onClick={(e) => onDeleteClick(e, media.id)}
+                    className="z-9s absolute right-1 top-1 cursor-pointer p-1 text-white"
+                  >
+                    <FontAwesomeIcon icon={faTrashCan} />
+                  </span>
+                )}
                 <img
                   alt={media.caption}
                   className="img-responsive"
@@ -113,7 +134,7 @@ function Gallery({ medias }: Props) {
           src="https://images.unsplash.com/photo-1616279967983-ec413476e824?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         />
       </a> */}
-      </LightGallery>
+      </LGWrapper>
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">
           <svg

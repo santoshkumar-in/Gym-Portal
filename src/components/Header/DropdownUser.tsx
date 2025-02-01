@@ -3,16 +3,23 @@ import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
 import { getUserDetails } from "@/actions/auth";
-import { CURRENT_USER } from "@/types/auth";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [user, setUser] = useState<CURRENT_USER>({});
+  const [user, setUser] = useState<{ name: string; role: string }>({
+    name: "NA",
+    role: "NA",
+  });
 
   useEffect(() => {
     async function getUser() {
       const currentUser = await getUserDetails();
-      setUser(currentUser);
+      if (currentUser) {
+        setUser({
+          name: currentUser.firstName,
+          role: currentUser.role,
+        });
+      }
     }
     getUser();
   }, []);
@@ -26,9 +33,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            {user?.firstName || "NA"}
+            {user.name}
           </span>
-          <span className="block text-xs">{user?.role || "NA"}</span>
+          <span className="block text-xs">{user.role}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
@@ -139,7 +146,7 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <a
+          <Link
             href="/logout"
             className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
           >
@@ -161,7 +168,7 @@ const DropdownUser = () => {
               />
             </svg>
             Log Out
-          </a>
+          </Link>
         </div>
       )}
       {/* <!-- Dropdown End --> */}
