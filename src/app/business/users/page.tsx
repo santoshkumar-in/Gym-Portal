@@ -4,7 +4,7 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 
 export const metadata: Metadata = {
-  title: "NFitNxt",
+  title: "FitNxt",
   description: "",
 };
 

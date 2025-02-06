@@ -351,7 +351,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </svg>
               ),
               label: "Business",
-              route: "#",
+              route: "/",
               children: [
                 { label: "Team Members", route: "/team" },
                 { label: "Roles", route: "/roles" },

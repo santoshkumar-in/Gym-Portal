@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { BusinessInfoFormSchema } from "@/schemas/business";
 import { BUSINESS, BUSINESS_PACKAGES, MEDIAS } from "@/types/business";
 
 export const getBusinessDetails = cache(
@@ -17,6 +18,7 @@ export const getBusinessDetails = cache(
           coverImage: "/images/cover/cover-01.jpg",
           logo: "/images/business/b1.webp",
           name: "Programatic Soft",
+          establishedOn: "2020-12-15",
           reviews: 259,
           rating: "4.2/5",
           followers: "122k",
@@ -28,7 +30,7 @@ export const getBusinessDetails = cache(
             youtube: "https://youtube.com",
             facebook: "https://fb.com",
             instagram: "https://instagram.com",
-            snap: "https://snap.com",
+            twitter: "https://twitter.com",
           },
         },
       });
@@ -241,3 +243,26 @@ export const getMedias = cache(
     });
   },
 );
+
+export const updateBusinessDetails = async (formData: FormData) => {
+  const validatedFields = BusinessInfoFormSchema.safeParse({
+    establishedOn: formData.get("establishedOn"),
+    reviews: formData.get("reviews"),
+    rating: formData.get("rating"),
+    reviewRatingUrl: formData.get("reviewRatingUrl"),
+    geolocation: formData.get("reviewRatingUrl"),
+    phone: formData.get("phone"),
+    bio: formData.get("bio"),
+    socialProfiles: {
+      facebook: formData.get("socialProfiles['facebook']"),
+      instagram: formData.get("socialProfiles['instagram']"),
+      youtube: formData.get("socialProfiles['youtube']"),
+      twitter: formData.get("socialProfiles['twitter']"),
+    },
+  });
+
+  // If any form fields are invalid, return early
+  if (!validatedFields.success) {
+  }
+  console.log("validated", validatedFields.data);
+};

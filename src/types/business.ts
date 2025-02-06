@@ -1,6 +1,7 @@
 export type BUSINESS = {
   id: string;
   name: string;
+  establishedOn: string;
   coverImage: string;
   logo: string;
   reviews: number;

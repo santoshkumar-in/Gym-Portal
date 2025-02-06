@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import BasicInfoForm from "@/components/Business/Forms/BasicInfo";
+import BasicInfoForm from "@/components/Business/Forms/BusinessInfo/BusinessInfoInner";
 
 const EditBasicInfo = ({
   params,
@@ -24,7 +24,7 @@ const EditBasicInfo = ({
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-4xl">
         <div className="flex">
           <a
             className="mb-2 cursor-pointer font-medium"
