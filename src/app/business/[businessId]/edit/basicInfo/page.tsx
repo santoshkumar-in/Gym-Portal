@@ -19,7 +19,6 @@ const EditBasicInfo = ({
       setBusinessId(bId);
     }
     getParams();
-    console.log(businessId);
   }, []);
 
   return (
@@ -34,7 +33,7 @@ const EditBasicInfo = ({
           </a>
         </div>
 
-        <BasicInfoForm />
+        <BasicInfoForm businessId={businessId} />
       </div>
     </DefaultLayout>
   );

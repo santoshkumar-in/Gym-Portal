@@ -2,8 +2,8 @@ import flatpickr from "flatpickr";
 import { useEffect } from "react";
 
 interface Props {
-  name: string;
-  label: string;
+  name?: string;
+  label?: string;
   onChange?: (arg: unknown) => void;
   value?: string | number | readonly string[] | undefined;
 }
