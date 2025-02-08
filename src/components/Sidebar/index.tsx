@@ -13,7 +13,6 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { getUserDetails } from "@/actions/auth";
 import { CURRENT_MENU } from "@/types/auth";
 import { MenuGroups as MENU_GROUPS } from "@/types/menu";
-
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
@@ -291,7 +290,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   useEffect(() => {
     async function getUser() {
-      const currentUser = await getUserDetails();
+      const { data: currentUser } = await getUserDetails();
+
       //setUserMenu(currentUser.menu);
 
       const mGroups = [

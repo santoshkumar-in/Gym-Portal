@@ -15,3 +15,15 @@ export const BusinessInfoFormSchema = z.object({
     twitter: z.string().url().trim().nullable(),
   }),
 });
+
+export const BusinessPackageSchema = z.object({
+  businessId: z.string().trim(),
+  packageId: z.string().trim(),
+  packageName: z.string().trim(),
+  priceMonthly: z.number().min(1),
+  priceQuarterly: z.number().min(1),
+  priceHalfYearly: z.number().min(1),
+  priceYearly: z.number().min(1),
+  isPopular: z.boolean(),
+  services: z.array(z.string()),
+});

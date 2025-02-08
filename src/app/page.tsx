@@ -9,7 +9,8 @@ export default function Home() {
     useState<React.ReactNode>(null);
   useEffect(() => {
     async function getUser() {
-      const { role } = await getUserDetails();
+      const { data } = await getUserDetails();
+      const { role = "" } = data;
       if (role === "ROLE_SUPER") {
         setCurrentComponent(<SuperAdminDashboard />);
       } else if (role === "ROLE_BUSINESS") {

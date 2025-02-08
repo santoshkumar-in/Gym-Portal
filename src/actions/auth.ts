@@ -51,26 +51,29 @@ export const verifySession = cache(async () => {
 export const getUserDetails = cache(async () => {
   const cookie = (await cookies()).get("session")?.value;
   return {
-    id: 1,
-    userId: cookie,
-    username: "superadmin",
-    email: "business@gmail.com",
-    mobile: "9910062638",
-    isd: "+91",
-    firstName: "Super Admin",
-    businessId: "4567",
-    businessName: "Progmmatic Soft",
-    logoUrl: null,
-    role: "ROLE_BUSINESS", //ROLE_SUPER
-    menu: [
-      // {
-      //   menuItem: "Business Management",
-      //   viewOnly: "N",
-      // },
-      {
-        menuItem: "User Management",
-        viewOnly: "N",
-      },
-    ],
+    success: true,
+    data: {
+      id: 1,
+      userId: cookie,
+      username: "superadmin",
+      email: "business@gmail.com",
+      mobile: "9910062638",
+      isd: "+91",
+      firstName: "Super Admin",
+      businessId: "4567",
+      businessName: "Progmmatic Soft",
+      logoUrl: null,
+      role: "ROLE_BUSINESS", //ROLE_SUPER
+      menu: [
+        // {
+        //   menuItem: "Business Management",
+        //   viewOnly: "N",
+        // },
+        {
+          menuItem: "User Management",
+          viewOnly: "N",
+        },
+      ],
+    },
   };
 });

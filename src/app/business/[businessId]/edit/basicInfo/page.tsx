@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import BasicInfoForm from "@/components/Business/Forms/BusinessInfo/BusinessInfoInner";
+import BasicInfoForm from "@/components/Business/Forms/BusinessInfo";
 
 const EditBasicInfo = ({
   params,

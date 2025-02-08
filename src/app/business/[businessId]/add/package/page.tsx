@@ -9,15 +9,13 @@ import PackageForm from "@/components/Business/Forms/Package";
 interface Props {
   params: Promise<{ businessId: string; packageId: string }>;
 }
-const EditPackage = ({ params }: Props) => {
+const AddPackage = ({ params }: Props) => {
   const [businessId, setBusinessId] = useState<string>("");
-  const [packageId, setPackageId] = useState<string>("");
   const router = useRouter();
   useEffect(() => {
     async function getParams() {
-      const { businessId: bId, packageId: pId } = await params;
+      const { businessId: bId } = await params;
       setBusinessId(bId);
-      setPackageId(pId);
     }
     getParams();
   }, []);
@@ -33,10 +31,10 @@ const EditPackage = ({ params }: Props) => {
             <FontAwesomeIcon icon={faArrowRotateLeft} /> Back
           </a>
         </div>
-        <PackageForm businessId={businessId} packageId={packageId} />
+        <PackageForm businessId={businessId} />
       </div>
     </DefaultLayout>
   );
 };
 
-export default EditPackage;
+export default AddPackage;

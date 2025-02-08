@@ -16,8 +16,8 @@ const Medias = ({ businessId }: Props) => {
 
   useEffect(() => {
     async function getData() {
-      const response = await getMedias(businessId);
-      setMedias(response.data);
+      const { data = [] } = await getMedias(businessId);
+      setMedias(data);
     }
     getData();
   }, [businessId]);

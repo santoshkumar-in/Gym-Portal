@@ -1,7 +1,16 @@
 "use client";
 import { useState } from "react";
 
-const SwitcherThree = () => {
+interface Props {
+  name?: string;
+  defaultChecked?: boolean;
+  onChange?: (arg: React.ChangeEvent<HTMLInputElement>) => void;
+}
+const SwitcherThree = ({
+  name = "fn-switch",
+  onChange: onCheckboxChange = () => null,
+  defaultChecked,
+}: Props) => {
   const [enabled, setEnabled] = useState(false);
 
   return (
@@ -12,12 +21,15 @@ const SwitcherThree = () => {
       >
         <div className="relative">
           <input
+            name={name}
             type="checkbox"
             id="toggle3"
             className="sr-only"
-            onChange={() => {
+            onChange={(e) => {
               setEnabled(!enabled);
+              onCheckboxChange(e);
             }}
+            defaultChecked={defaultChecked}
           />
           <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]"></div>
           <div

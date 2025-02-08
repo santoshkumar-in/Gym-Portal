@@ -35,20 +35,24 @@ interface Props {
 }
 
 const ServicePackages = ({ businessId }: Props) => {
-  const [packages, setPackages] = useState<BUSINESS_PACKAGES>();
+  const [packages, setPackages] = useState<BUSINESS_PACKAGES>([]);
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>();
 
   useEffect(() => {
     async function getData() {
-      const response = await getPackages(businessId);
-      setPackages(response.data);
+      const { data = [] } = await getPackages(businessId);
+      setPackages(data);
     }
     getData();
   }, [businessId]);
 
   const onEdit = (packageId: string) => {
     redirect(`/business/${businessId}/edit/package/${packageId}`);
+  };
+
+  const handleAddPackage = () => {
+    redirect(`/business/${businessId}/add/package`);
   };
 
   const onDelete = (pack: BUSINESS_PACKAGE) => {
@@ -79,7 +83,10 @@ const ServicePackages = ({ businessId }: Props) => {
           Service Packages
         </h3>
         <div className="ml-auto">
-          <button className="inline-flex items-center justify-center rounded bg-primary px-5 py-1 text-center font-medium text-white hover:bg-opacity-90">
+          <button
+            onClick={handleAddPackage}
+            className="inline-flex items-center justify-center rounded bg-primary px-5 py-1 text-center font-medium text-white hover:bg-opacity-90"
+          >
             <span className="mr-1">
               <FontAwesomeIcon icon={faPlus} />
             </span>

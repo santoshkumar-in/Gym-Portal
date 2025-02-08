@@ -1,5 +1,9 @@
 import { cache } from "react";
-import { BusinessInfoFormSchema } from "@/schemas/business";
+import { toastSuccess } from "@/helpers/toast";
+import {
+  BusinessInfoFormSchema,
+  BusinessPackageSchema,
+} from "@/schemas/business";
 import { BUSINESS, BUSINESS_PACKAGES, MEDIAS } from "@/types/business";
 
 export const getBusinessDetails = cache(
@@ -43,15 +47,16 @@ export const getPackages = cache(
     businessId: string,
   ): Promise<{
     success: boolean;
-    data?: BUSINESS_PACKAGES;
+    data: BUSINESS_PACKAGES | [];
     message?: string;
   }> => {
     return new Promise(function (resolve) {
+      console.info(businessId);
       resolve({
         success: true,
         data: [
           {
-            id: businessId,
+            id: "120",
             packageName: "Package 1",
             priceMonthly: 1000,
             priceQuarterly: 3000,
@@ -263,6 +268,57 @@ export const updateBusinessDetails = async (formData: FormData) => {
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
+    console.error("errors", validatedFields.error);
   }
   console.log("validated", validatedFields.data);
+  toastSuccess("Details updated successfully");
+};
+
+export const updatePackage = async (formData: FormData) => {
+  const rawInput = {
+    businessId: formData.get("businessId"),
+    packageId: formData.get("packageId"),
+    packageName: formData.get("packageName"),
+    priceMonthly: parseFloat(formData.get("priceMonthly") as string) || 0,
+    priceQuarterly: parseFloat(formData.get("priceQuarterly") as string) || 0,
+    priceHalfYearly: parseFloat(formData.get("priceHalfYearly") as string) || 0,
+    priceYearly: parseFloat(formData.get("priceYearly") as string) || 0,
+    isPopular: formData.get("isPopular") === "on",
+    services: formData.getAll("services[]"),
+  };
+
+  const validatedFields = BusinessPackageSchema.safeParse(rawInput);
+
+  // If any form fields are invalid, return early
+  if (!validatedFields.success) {
+    console.error("errors", validatedFields.error);
+  } else {
+    console.log("validated", validatedFields.data);
+  }
+
+  toastSuccess("Package updated successfully");
+};
+
+export const addPackage = async (formData: FormData) => {
+  const rawInput = {
+    businessId: formData.get("businessId"),
+    packageName: formData.get("packageName"),
+    priceMonthly: parseFloat(formData.get("priceMonthly") as string) || 0,
+    priceQuarterly: parseFloat(formData.get("priceQuarterly") as string) || 0,
+    priceHalfYearly: parseFloat(formData.get("priceHalfYearly") as string) || 0,
+    priceYearly: parseFloat(formData.get("priceYearly") as string) || 0,
+    isPopular: formData.get("isPopular") === "on",
+    services: formData.getAll("services[]"),
+  };
+
+  const validatedFields = BusinessPackageSchema.safeParse(rawInput);
+
+  // If any form fields are invalid, return early
+  if (!validatedFields.success) {
+    console.error("errors", validatedFields.error);
+  } else {
+    console.log("validated", validatedFields.data);
+  }
+
+  toastSuccess("Package added successfully");
 };

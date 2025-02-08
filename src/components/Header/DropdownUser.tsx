@@ -3,23 +3,16 @@ import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
 import { getUserDetails } from "@/actions/auth";
+import { CURRENT_USER } from "@/types/auth";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; role: string }>({
-    name: "NA",
-    role: "NA",
-  });
+  const [user, setUser] = useState<CURRENT_USER>({} as CURRENT_USER);
 
   useEffect(() => {
     async function getUser() {
-      const currentUser = await getUserDetails();
-      if (currentUser) {
-        setUser({
-          name: currentUser.firstName,
-          role: currentUser.role,
-        });
-      }
+      const { data = {} } = await getUserDetails();
+      setUser(data);
     }
     getUser();
   }, []);
@@ -33,7 +26,7 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            {user.name}
+            {user.firstName}
           </span>
           <span className="block text-xs">{user.role}</span>
         </span>

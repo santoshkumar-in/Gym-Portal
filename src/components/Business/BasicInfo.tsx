@@ -24,7 +24,7 @@ interface Props {
 }
 
 const BasicInfo = ({ businessId }: Props) => {
-  const [businessData, setBusinessData] = useState<BUSINESS | null>();
+  const [businessData, setBusinessData] = useState<BUSINESS>({} as BUSINESS);
 
   useEffect(() => {
     async function getData() {
@@ -210,7 +210,7 @@ const BasicInfo = ({ businessId }: Props) => {
             <div className="flex items-center justify-center gap-3.5">
               <a
                 target="_blank"
-                href={businessData.socialProfiles.facebook}
+                href={businessData?.socialProfiles?.facebook}
                 className="hover:text-primary"
                 aria-label="social-icon"
               >
@@ -218,7 +218,7 @@ const BasicInfo = ({ businessId }: Props) => {
               </a>
               <a
                 target="_blank"
-                href={businessData.socialProfiles.instagram}
+                href={businessData?.socialProfiles?.instagram}
                 className="hover:text-primary"
                 aria-label="social-icon"
               >
@@ -226,7 +226,7 @@ const BasicInfo = ({ businessId }: Props) => {
               </a>
               <a
                 target="_blank"
-                href={businessData.socialProfiles.youtube}
+                href={businessData?.socialProfiles?.youtube}
                 className="hover:text-primary"
                 aria-label="social-icon"
               >
@@ -234,7 +234,7 @@ const BasicInfo = ({ businessId }: Props) => {
               </a>
               <a
                 target="_blank"
-                href={businessData.socialProfiles.snap}
+                href={businessData?.socialProfiles?.twitter}
                 className="hover:text-primary"
                 aria-label="social-icon"
               >
