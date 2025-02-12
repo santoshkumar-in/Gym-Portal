@@ -1,7 +1,10 @@
 import Business from "@/components/Business";
 
-const BusinessDashboard = () => {
-  return <Business />;
+interface Props {
+  businessId: string;
+}
+const BusinessDashboard = ({ businessId }: Props) => {
+  return <Business businessId={businessId} />;
 };
 
 export default BusinessDashboard;

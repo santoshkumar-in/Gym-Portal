@@ -65,12 +65,16 @@ export const getUserDetails = cache(async () => {
       logoUrl: null,
       role: "ROLE_BUSINESS", //ROLE_SUPER
       menu: [
-        // {
-        //   menuItem: "Business Management",
-        //   viewOnly: "N",
-        // },
         {
-          menuItem: "User Management",
+          menuItem: "Business Details",
+          viewOnly: "N",
+        },
+        {
+          menuItem: "Subscribers",
+          viewOnly: "N",
+        },
+        {
+          menuItem: "Account users",
           viewOnly: "N",
         },
       ],

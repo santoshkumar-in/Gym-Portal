@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getUserDetails } from "@/actions/auth";
 // 1. Specify protected and public routes
 const protectedRoutes = ["/"];
 const publicRoutes = ["/signin", "/signup"];
@@ -17,13 +18,29 @@ export default async function middleware(req: NextRequest) {
   if (isProtectedRoute && !jwtToken) {
     return NextResponse.redirect(new URL("/signin", req.nextUrl));
   }
-  // 5. Redirect to /dashboard if the user is authenticated
+
+  // 5. Prevent user from accessing other business page
+  const { data: currentUser } = await getUserDetails();
+  if (
+    jwtToken &&
+    path.startsWith("/business") &&
+    currentUser.role === "ROLE_BUSINESS"
+  ) {
+    const parts = path.split("/");
+    if (parts[2] !== currentUser.businessId) {
+      console.log("Invalid Path");
+      return NextResponse.redirect(
+        new URL(`/business/${currentUser.businessId}`, req.nextUrl),
+      );
+    }
+  }
+  // 6. Redirect to /dashboard if the user is authenticated
   if (
     isPublicRoute &&
     jwtToken &&
     publicRoutes.includes(req.nextUrl.pathname)
   ) {
-    console.log("Already authenticated");
+    console.error("Already authenticated");
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 

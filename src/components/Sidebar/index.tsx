@@ -351,12 +351,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </svg>
               ),
               label: "Business",
-              route: "/",
-              children: [
-                { label: "Team Members", route: "/team" },
-                { label: "Roles", route: "/roles" },
-                { label: "Permissions", route: "/permissions" },
-              ],
+              route: "#",
+              children: [{ label: "Access Denied", route: "/access-denied" }],
             },
           ],
         },
@@ -365,8 +361,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       mGroups[0]["menuItems"][0]["children"] = currentUser.menu.map(
         ({ menuItem }: CURRENT_MENU) => {
           const routes = {
-            "Business Management": "/business",
-            "User Management": "/business/users",
+            "Business Details": `/business/${currentUser.businessId}`,
+            Subscribers: `/business/${currentUser.businessId}/subscriber`,
+            "Account users": `/business/${currentUser.businessId}/user`,
           };
           return {
             label: menuItem,

@@ -44,3 +44,13 @@ export type MEDIA = {
   width?: string;
   height?: string;
 };
+
+export type SUBSCRIBER = {
+  id: string;
+  name: string;
+  gender: string;
+  mobile: string;
+  subscription: string;
+  startDate: string;
+  endDate: string;
+};

@@ -10,11 +10,11 @@ export default function Home() {
   useEffect(() => {
     async function getUser() {
       const { data } = await getUserDetails();
-      const { role = "" } = data;
+      const { role = "", businessId = "" } = data;
       if (role === "ROLE_SUPER") {
         setCurrentComponent(<SuperAdminDashboard />);
       } else if (role === "ROLE_BUSINESS") {
-        setCurrentComponent(<BusinessDashboard />);
+        setCurrentComponent(<BusinessDashboard businessId={businessId} />);
       }
     }
     getUser();

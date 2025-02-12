@@ -8,6 +8,8 @@ interface Props {
 }
 
 const SidebarDropdown = ({ item }: Props) => {
+  console.log("item", item);
+
   const pathname = usePathname();
 
   return (

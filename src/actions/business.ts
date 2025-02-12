@@ -4,7 +4,12 @@ import {
   BusinessInfoFormSchema,
   BusinessPackageSchema,
 } from "@/schemas/business";
-import { BUSINESS, BUSINESS_PACKAGES, MEDIAS } from "@/types/business";
+import {
+  BUSINESS,
+  BUSINESS_PACKAGES,
+  MEDIAS,
+  SUBSCRIBER,
+} from "@/types/business";
 
 export const getBusinessDetails = cache(
   (
@@ -242,6 +247,61 @@ export const getMedias = cache(
             type: "image",
             url: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             category: "aerobics",
+          },
+        ],
+      });
+    });
+  },
+);
+
+export const getSubscribers = cache(
+  (
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data: SUBSCRIBER[] | [];
+    message?: string;
+  }> => {
+    return new Promise(function (resolve) {
+      console.info(businessId);
+      resolve({
+        success: true,
+        data: [
+          {
+            id: "2301",
+            name: "Sandeep",
+            gender: "F",
+            mobile: "+9112345343",
+            subscription: "Package 1, Package 2",
+            startDate: "1st Jan 2025",
+            endDate: "31st March 2025",
+          },
+          {
+            id: "2301",
+            name: "Amit",
+            gender: "F",
+            mobile: "+911283633",
+            subscription: "Package 3, Package 7",
+            startDate: "18th March 2025",
+            endDate: "31st March 2025",
+          },
+          {
+            id: "2301",
+            name: "Krish",
+            gender: "F",
+            mobile: "+911284843",
+            subscription: "Package 4, Package 5",
+            startDate: "20th Feb 2025",
+            endDate: "25th Feb 2025",
+          },
+          {
+            id: "2301",
+            name: "Keshav",
+            gender: "F",
+            mobile: "+919494843",
+            subscription: "Package 2",
+            startDate: "10th Feb 2025",
+            endDate: "25th May 2025",
           },
         ],
       });

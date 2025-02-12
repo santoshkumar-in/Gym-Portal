@@ -3,8 +3,10 @@ import BasicInfo from "@/components/Business/BasicInfo";
 import ServicePackages from "@/components/Business/ServicePackages";
 import Medias from "@/components/Business/Medias";
 
-const BusinessDetails = () => {
-  const businessId = "34884";
+interface Props {
+  businessId: string;
+}
+const BusinessDetails = ({ businessId }: Props) => {
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-242.5">
