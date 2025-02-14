@@ -9,6 +9,9 @@ import {
   BUSINESS_PACKAGES,
   MEDIAS,
   SUBSCRIBER,
+  SUBSCRIPTION,
+  SUBSCRIBER_ATTENDANCE,
+  ATTENDANCE,
 } from "@/types/business";
 
 export const getBusinessDetails = cache(
@@ -302,6 +305,169 @@ export const getSubscribers = cache(
             subscription: "Package 2",
             startDate: "10th Feb 2025",
             endDate: "25th May 2025",
+          },
+        ],
+      });
+    });
+  },
+);
+
+export const getUserSubscriptions = cache(
+  (
+    subscriberId: string,
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data: SUBSCRIPTION[] | [];
+    message?: string;
+  }> => {
+    return new Promise(function (resolve) {
+      console.info(businessId);
+      resolve({
+        success: true,
+        data: [
+          {
+            id: "4501",
+            status: "ACTIVE",
+            name: "Package 1, Package 2",
+            total: 7,
+            consumed: 5,
+            price: "INR 2300",
+            validity: 90,
+            startDate: "1st Jan 2025",
+            endDate: "31st March 2025",
+            purchasedDate: "31st March 2025",
+          },
+          {
+            id: "4502",
+            name: "Package 3, Package 4",
+            total: 3,
+            consumed: 1,
+            price: "INR 1300",
+            validity: 90,
+            status: "EXPIRED",
+            startDate: "21st Nov 2024",
+            endDate: "21st March 2025",
+            purchasedDate: "31st March 2025",
+          },
+        ],
+      });
+    });
+  },
+);
+
+export const getUserAttendance = cache(
+  (
+    subscriberId: string,
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data: SUBSCRIBER_ATTENDANCE[] | [];
+    message?: string;
+  }> => {
+    return new Promise(function (resolve) {
+      console.info(businessId);
+      resolve({
+        success: true,
+        data: [
+          {
+            id: "7501",
+            subscription: "Package 1, Package 2",
+            date: "1st Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7502",
+            subscription: "Package 1, Package 2",
+            date: "2nd Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7503",
+            subscription: "Package 1, Package 2",
+            date: "3rd Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7504",
+            subscription: "Package 3, Package 4",
+            date: "4th Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7504",
+            subscription: "Package 3, Package 4",
+            date: "5th Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+        ],
+      });
+    });
+  },
+);
+
+export const getAttendance = cache(
+  (
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data: ATTENDANCE[] | [];
+    message?: string;
+  }> => {
+    return new Promise(function (resolve) {
+      console.info(businessId);
+      resolve({
+        success: true,
+        data: [
+          {
+            id: "7501",
+            name: "User 1",
+            mobile: "+91457777",
+            subscription: "Package 1, Package 2",
+            date: "1st Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7502",
+            name: "User 2",
+            mobile: "+91457777",
+            subscription: "Package 1, Package 2",
+            date: "2nd Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7503",
+            name: "User 3",
+            mobile: "+9145457",
+            subscription: "Package 1, Package 2",
+            date: "3rd Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7504",
+            name: "User 4",
+            mobile: "+91457777",
+            subscription: "Package 3, Package 4",
+            date: "4th Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
+          },
+          {
+            id: "7504",
+            name: "User 5",
+            mobile: "+91457777",
+            subscription: "Package 3, Package 4",
+            date: "5th Jan 2025",
+            inTime: "8:30PM",
+            outTime: "9:30PM",
           },
         ],
       });

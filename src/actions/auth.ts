@@ -74,6 +74,10 @@ export const getUserDetails = cache(async () => {
           viewOnly: "N",
         },
         {
+          menuItem: "Attendance",
+          viewOnly: "N",
+        },
+        {
           menuItem: "Account users",
           viewOnly: "N",
         },

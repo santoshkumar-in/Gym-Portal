@@ -1,14 +1,17 @@
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { faRepeat, faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
-
+import {
+  faRepeat,
+  faCalendarPlus,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { SUBSCRIBER } from "@/types/business";
-
 interface Props {
   subscribers: SUBSCRIBER[];
+  businessId: string;
 }
 
-const Subscribers = ({ subscribers }: Props) => {
+const Subscribers = ({ subscribers, businessId }: Props) => {
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
@@ -43,7 +46,12 @@ const Subscribers = ({ subscribers }: Props) => {
               <tr key={key}>
                 <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                   <h5 className="font-medium text-black dark:text-white">
-                    {subscriber.name}
+                    <Link
+                      className="text-primary"
+                      href={`/business/${businessId}/subscriber/${subscriber.id}`}
+                    >
+                      {subscriber.name}
+                    </Link>
                   </h5>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
@@ -78,6 +86,9 @@ const Subscribers = ({ subscribers }: Props) => {
                     </button>
                     <button className="w-4 hover:text-primary">
                       <FontAwesomeIcon icon={faCalendarPlus} />
+                    </button>
+                    <button className="w-4 hover:text-primary">
+                      <FontAwesomeIcon icon={faTrashCan} />
                     </button>
                   </div>
                 </td>

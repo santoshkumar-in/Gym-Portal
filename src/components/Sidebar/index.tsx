@@ -363,6 +363,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           const routes = {
             "Business Details": `/business/${currentUser.businessId}`,
             Subscribers: `/business/${currentUser.businessId}/subscriber`,
+            Attendance: `/business/${currentUser.businessId}/attendance`,
             "Account users": `/business/${currentUser.businessId}/user`,
           };
           return {

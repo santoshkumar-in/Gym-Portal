@@ -53,4 +53,38 @@ export type SUBSCRIBER = {
   subscription: string;
   startDate: string;
   endDate: string;
+  business?: BUSINESS;
+};
+
+export type SUBSCRIBER_ATTENDANCE = {
+  id: string;
+  date: string;
+  subscription: string;
+  inTime: string;
+  outTime: string;
+};
+
+export type SUBSCRIPTION = {
+  id: string;
+  name: string;
+  consumed: number;
+  status: "ACTIVE" | "EXPIRED";
+  total: number;
+  price: string;
+  validity: number;
+  startDate: string;
+  endDate: string;
+  purchasedDate: string;
+  business?: BUSINESS;
+};
+
+export type ATTENDANCE = {
+  id: string;
+  name: string;
+  mobile: string;
+  date: string;
+  subscription: string;
+  inTime: string;
+  outTime: string;
+  business?: BUSINESS;
 };
