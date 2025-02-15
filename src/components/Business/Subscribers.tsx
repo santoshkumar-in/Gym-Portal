@@ -1,17 +1,14 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faRepeat,
-  faCalendarPlus,
-  faTrashCan,
-} from "@fortawesome/free-solid-svg-icons";
+import { faRepeat, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { SUBSCRIBER } from "@/types/business";
 interface Props {
   subscribers: SUBSCRIBER[];
   businessId: string;
+  onDelete: (id: string) => void;
 }
 
-const Subscribers = ({ subscribers, businessId }: Props) => {
+const Subscribers = ({ subscribers, businessId, onDelete }: Props) => {
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
@@ -84,10 +81,10 @@ const Subscribers = ({ subscribers, businessId }: Props) => {
                     <button className="w-4 hover:text-primary">
                       <FontAwesomeIcon icon={faRepeat} />
                     </button>
-                    <button className="w-4 hover:text-primary">
-                      <FontAwesomeIcon icon={faCalendarPlus} />
-                    </button>
-                    <button className="w-4 hover:text-primary">
+                    <button
+                      onClick={() => onDelete(subscriber.id)}
+                      className="w-4 hover:text-primary"
+                    >
                       <FontAwesomeIcon icon={faTrashCan} />
                     </button>
                   </div>

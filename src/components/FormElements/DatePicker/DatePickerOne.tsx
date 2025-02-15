@@ -1,4 +1,5 @@
 import flatpickr from "flatpickr";
+import classnames from "classnames";
 import { useEffect } from "react";
 
 interface Props {
@@ -6,12 +7,16 @@ interface Props {
   label?: string;
   onChange?: (arg: unknown) => void;
   value?: string | number | readonly string[] | undefined;
+  className?: string;
+  containerClass?: string;
 }
 const DatePickerOne = ({
-  label = "Date Picker",
+  label = "",
   onChange,
   name = "date",
   value = "",
+  className = "",
+  containerClass = "",
 }: Props) => {
   useEffect(() => {
     // Init flatpickr
@@ -28,15 +33,21 @@ const DatePickerOne = ({
   }, []);
 
   return (
-    <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-        {label}
-      </label>
+    <div className={containerClass}>
+      {label && (
+        <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+          {label}
+        </label>
+      )}
       <div className="relative">
         <input
           name={name}
           value={value}
-          className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+          className={classnames(
+            "form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary",
+            className,
+            { "py-3": !className },
+          )}
           placeholder="mm/dd/yyyy"
           data-class="flatpickr-right"
           onChange={onChange}

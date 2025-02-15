@@ -27,3 +27,24 @@ export const BusinessPackageSchema = z.object({
   isPopular: z.boolean(),
   services: z.array(z.string()),
 });
+
+export const BusinessUserSchema = z.object({
+  id: z.string().trim(),
+  firstName: z.string().trim(),
+  lastName: z.string().trim(),
+  email: z.string().email().trim(),
+  gender: z.string().trim(),
+  mobile: z.string().trim(),
+  password: z.string().trim(),
+  role: z.string().trim(),
+  status: z.string().trim(),
+});
+
+export const BusinessAttendanceSchema = z.object({
+  id: z.string().trim(),
+  firstName: z.string().trim(),
+  lastName: z.string().trim(),
+  mobile: z.string().trim(),
+  inTime: z.string().trim(),
+  outTime: z.string().trim(),
+});

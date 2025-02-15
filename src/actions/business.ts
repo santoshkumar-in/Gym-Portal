@@ -1,8 +1,11 @@
+import { CURRENT_USER } from "@/types/auth";
 import { cache } from "react";
 import { toastSuccess } from "@/helpers/toast";
 import {
+  BusinessAttendanceSchema,
   BusinessInfoFormSchema,
   BusinessPackageSchema,
+  BusinessUserSchema,
 } from "@/schemas/business";
 import {
   BUSINESS,
@@ -312,6 +315,55 @@ export const getSubscribers = cache(
   },
 );
 
+export const getUsers = cache(
+  (
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data: CURRENT_USER[] | [];
+    message?: string;
+  }> => {
+    return new Promise(function (resolve) {
+      console.info(businessId);
+      resolve({
+        success: true,
+        data: [
+          {
+            id: "2401",
+            firstName: "Sandeep",
+            lastName: "Verma",
+            gender: "M",
+            email: "abs@gm.com",
+            mobile: "+9112345343",
+            role: "Admin",
+            status: "ACTIVE",
+          },
+          {
+            id: "2402",
+            firstName: "Sultan",
+            lastName: "Mirza",
+            gender: "M",
+            email: "rt@gm.com",
+            mobile: "+9112ff343",
+            role: "Operator",
+            status: "ACTIVE",
+          },
+          {
+            id: "2403",
+            firstName: "Tripti",
+            lastName: "K",
+            gender: "F",
+            email: "fg@gm.com",
+            mobile: "+911244443",
+            role: "Operator",
+            status: "ACTIVE",
+          },
+        ],
+      });
+    });
+  },
+);
+
 export const getUserSubscriptions = cache(
   (
     subscriberId: string,
@@ -547,4 +599,52 @@ export const addPackage = async (formData: FormData) => {
   }
 
   toastSuccess("Package added successfully");
+};
+
+export const addOrUpdateUser = async (formData: FormData) => {
+  const rawInput = {
+    id: formData.get("userId"),
+    businessId: formData.get("businessId"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
+    email: formData.get("email"),
+    mobile: formData.get("mobile"),
+    password: formData.get("password"),
+    role: formData.get("role"),
+    status: formData.get("status") ? "ACTIVE" : "INACTIVE",
+  };
+
+  const validatedFields = BusinessUserSchema.safeParse(rawInput);
+
+  // If any form fields are invalid, return early
+  if (!validatedFields.success) {
+    console.error("errors", validatedFields.error);
+  } else {
+    console.log("validated", validatedFields.data);
+  }
+
+  toastSuccess("User added successfully");
+};
+
+export const addAttendance = async (formData: FormData) => {
+  const rawInput = {
+    businessId: formData.get("businessId"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
+    mobile: formData.get("mobile"),
+    inTime: formData.get("inTime"),
+    outTime: formData.get("outTime"),
+    subscriptionId: formData.get("subscriptionId"),
+  };
+
+  const validatedFields = BusinessAttendanceSchema.safeParse(rawInput);
+
+  // If any form fields are invalid, return early
+  if (!validatedFields.success) {
+    console.error("errors", validatedFields.error);
+  } else {
+    console.log("validated", validatedFields.data);
+  }
+
+  toastSuccess("User added successfully");
 };
