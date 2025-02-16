@@ -9,8 +9,11 @@ import {
 import Link from "next/link";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Pagination from "@/components/Pagination";
+import Attendance from "@/components/Business/Attendance";
 import { getAttendance } from "@/actions/business";
 import { ATTENDANCE } from "@/types/business";
+import Modal from "@/components/Modal";
+import { toastSuccess } from "@/helpers/toast";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import MultiSelect from "@/components/FormElements/ReactSelectMultiSelect";
 
@@ -19,6 +22,8 @@ const SubscriberAttendance = ({
 }: {
   params: Promise<{ businessId: string; subscriberId: string }>;
 }) => {
+  const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string>("");
   const [businessId, setBusinessId] = useState<string>("");
   const [attendance, setAttendance] = useState<ATTENDANCE[]>([]);
 
@@ -31,6 +36,23 @@ const SubscriberAttendance = ({
     }
     getData();
   }, []);
+
+  const handleDelete = (attendanceId: string) => {
+    setShowDeletePrompt(true);
+    setSelected(attendanceId);
+  };
+
+  const onConfirmDelete = () => {
+    if (selected) {
+      onDeleteCancel();
+      toastSuccess(`Attendance deleted successfully`);
+    }
+  };
+
+  const onDeleteCancel = () => {
+    setShowDeletePrompt(false);
+    setSelected("");
+  };
 
   return (
     <DefaultLayout>
@@ -63,67 +85,7 @@ const SubscriberAttendance = ({
           </div>
         </div>
       </div>
-      <div className="mt-3 rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
-        <div className="max-w-full overflow-x-auto">
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                  Date
-                </th>
-                <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                  Name
-                </th>
-                <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                  Mobile
-                </th>
-                <th className="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                  Subscription
-                </th>
-                <th className="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                  In time
-                </th>
-                <th className="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                  Out time
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {attendance.map((attend, key) => (
-                <tr key={key}>
-                  <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                    <p className="text-black dark:text-white">{attend.date}</p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                    <p className="text-black dark:text-white">{attend.name}</p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                    <p className="text-black dark:text-white">
-                      {attend.mobile}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {attend.subscription}
-                    </p>
-                  </td>
-
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {attend.inTime}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                      {attend.outTime}
-                    </p>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Attendance attendance={attendance} onDelete={handleDelete} />
       <div className="mt-4 flex items-center justify-center rounded-sm border border-gray-100 bg-white px-5 py-3 shadow-default dark:border-gray-800 dark:bg-boxdark sm:px-7.5 sm:py-3">
         <Pagination />
         <div className="ml-auto flex items-center font-medium">
@@ -136,6 +98,57 @@ const SubscriberAttendance = ({
           <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
         </div>
       </div>
+      <Modal modalIsOpen={showDeletePrompt}>
+        <span className="mx-auto inline-block">
+          <svg
+            width="60"
+            height="60"
+            viewBox="0 0 60 60"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              opacity="0.1"
+              width="60"
+              height="60"
+              rx="30"
+              fill="#DC2626"
+            ></rect>
+            <path
+              d="M30 27.2498V29.9998V27.2498ZM30 35.4999H30.0134H30ZM20.6914 41H39.3086C41.3778 41 42.6704 38.7078 41.6358 36.8749L32.3272 20.3747C31.2926 18.5418 28.7074 18.5418 27.6728 20.3747L18.3642 36.8749C17.3296 38.7078 18.6222 41 20.6914 41Z"
+              stroke="#DC2626"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></path>
+          </svg>
+        </span>
+        <h3 className="mt-5.5 pb-2 text-xl font-bold text-black dark:text-white sm:text-2xl">
+          Are you sure?
+        </h3>
+        <p className="mb-10">
+          Would you like to delete the subscriber? Once deleted the data cannot
+          be recovered.
+        </p>
+        <div className="-mx-3 flex flex-wrap gap-y-4">
+          <div className="w-full px-3 2xsm:w-1/2">
+            <button
+              onClick={onDeleteCancel}
+              className="block w-full rounded border border-stroke bg-gray p-3 text-center font-medium text-black transition hover:border-meta-1 hover:bg-meta-1 hover:text-white dark:border-strokedark dark:bg-meta-4 dark:text-white dark:hover:border-meta-1 dark:hover:bg-meta-1"
+            >
+              Cancel
+            </button>
+          </div>
+          <div className="w-full px-3 2xsm:w-1/2">
+            <button
+              onClick={onConfirmDelete}
+              className="block w-full rounded border border-meta-1 bg-meta-1 p-3 text-center font-medium text-white transition hover:bg-opacity-90"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
     </DefaultLayout>
   );
 };

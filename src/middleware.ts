@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getUserDetails } from "@/actions/auth";
+import { ROLE_BUSINESS } from "@/enums";
 // 1. Specify protected and public routes
 const protectedRoutes = ["/"];
 const publicRoutes = ["/signin", "/signup"];
@@ -24,7 +25,7 @@ export default async function middleware(req: NextRequest) {
   if (
     jwtToken &&
     path.startsWith("/business") &&
-    currentUser.role === "ROLE_BUSINESS"
+    currentUser.role === ROLE_BUSINESS
   ) {
     const parts = path.split("/");
     if (parts[2] !== currentUser.businessId) {

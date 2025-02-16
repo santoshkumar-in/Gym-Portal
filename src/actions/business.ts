@@ -9,6 +9,7 @@ import {
 } from "@/schemas/business";
 import {
   BUSINESS,
+  BUSINESS_USER,
   BUSINESS_PACKAGES,
   MEDIAS,
   SUBSCRIBER,
@@ -320,7 +321,7 @@ export const getUsers = cache(
     businessId: string,
   ): Promise<{
     success: boolean;
-    data: CURRENT_USER[] | [];
+    data: BUSINESS_USER[] | [];
     message?: string;
   }> => {
     return new Promise(function (resolve) {

@@ -11,9 +11,11 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import { toastSuccess } from "@/helpers/toast";
+import { getUsers } from "@/actions/business";
+import { BUSINESS_USER } from "@/types/business";
 import MultiSelect from "@/components/FormElements/ReactSelectMultiSelect";
 import Select from "@/components/FormElements/ReactSelect";
-import Users from "@/components/Tables/BusinessUsers";
+import Users from "@/components/Business/Users";
 
 const BusinessUsers = ({
   params,
@@ -22,32 +24,44 @@ const BusinessUsers = ({
 }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("");
+  const [users, setUsers] = useState<BUSINESS_USER[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
     async function getData() {
       const bId = (await params).businessId;
       setBusinessId(bId);
-      //const { data } = await getSubscribers(bId);
+      const { data } = await getUsers(bId);
+      setUsers(data);
     }
     getData();
   }, []);
 
-  const handleDelete = (subscriberId: string) => {
+  const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
-    setSelected(subscriberId);
+    if (userId) {
+      setSelected(userId);
+    }
   };
 
   const onConfirmDelete = () => {
     if (selected) {
       onDeleteCancel();
-      toastSuccess(`subscriber is deleted successfully`);
+      toastSuccess(`User is deleted successfully`);
     }
   };
 
   const onDeleteCancel = () => {
     setShowDeletePrompt(false);
     setSelected("");
+  };
+
+  const handleStatusChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    userId: string,
+  ) => {
+    toastSuccess(`User status update successfully`);
+    console.log(e.target.value ? e.target.value.toUpperCase() : "OFF", userId);
   };
 
   return (
@@ -76,7 +90,7 @@ const BusinessUsers = ({
               <FontAwesomeIcon icon={faFilter} />
             </button>
             <Link
-              href={`/business/${businessId}/user/update`}
+              href={`/business/${businessId}/user/add`}
               className="ml-2 rounded bg-secondary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90"
             >
               <FontAwesomeIcon icon={faCirclePlus} />
@@ -84,7 +98,12 @@ const BusinessUsers = ({
           </div>
         </div>
       </div>
-      <Users />
+      <Users
+        onStatusChange={handleStatusChange}
+        onDelete={handleDelete}
+        users={users}
+        businessId={businessId}
+      />
       <div className="mt-4 rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
         <div className="flex justify-between pb-4">
           <Pagination />

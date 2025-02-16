@@ -63,7 +63,7 @@ export const getUserDetails = cache(async () => {
       businessId: "4567",
       businessName: "Progmmatic Soft",
       logoUrl: null,
-      role: "ROLE_BUSINESS", //ROLE_SUPER
+      role: "ROLE_ADMIN", //ROLE_SUPER
       menu: [
         {
           menuItem: "Business Details",

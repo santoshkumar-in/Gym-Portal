@@ -88,3 +88,19 @@ export type ATTENDANCE = {
   outTime: string;
   business?: BUSINESS;
 };
+
+export type BUSINESS_USER = {
+  id: string;
+  username?: string;
+  email?: string;
+  mobile?: string;
+  isd?: string;
+  password?: string;
+  gender?: string;
+  confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  logoUrl?: string | null;
+  role?: string;
+  status?: string;
+};

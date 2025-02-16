@@ -3,6 +3,7 @@ import { useState } from "react";
 
 interface Props {
   name?: string;
+  id?: string;
   defaultChecked?: boolean;
   onChange?: (arg: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -10,20 +11,21 @@ const SwitcherThree = ({
   name = "fn-switch",
   onChange: onCheckboxChange = () => null,
   defaultChecked,
+  id = (Math.random() * 100).toString(),
 }: Props) => {
   const [enabled, setEnabled] = useState(false);
 
   return (
     <div>
       <label
-        htmlFor="toggle3"
+        htmlFor={id}
         className="flex cursor-pointer select-none items-center"
       >
         <div className="relative">
           <input
             name={name}
             type="checkbox"
-            id="toggle3"
+            id={id}
             className="sr-only"
             onChange={(e) => {
               setEnabled(!enabled);
