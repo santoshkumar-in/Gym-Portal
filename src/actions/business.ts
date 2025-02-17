@@ -1,4 +1,3 @@
-import { CURRENT_USER } from "@/types/auth";
 import { cache } from "react";
 import { toastSuccess } from "@/helpers/toast";
 import {

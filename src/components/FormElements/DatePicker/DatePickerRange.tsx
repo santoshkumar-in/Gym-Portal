@@ -5,13 +5,13 @@ import { useEffect } from "react";
 interface Props {
   name?: string;
   label?: string;
-  onChange?: (arg: unknown) => void;
+  onChange?: (arg: Date[]) => void;
   value?: string | number | readonly string[] | undefined;
   className?: string;
   containerClass?: string;
   placeholder?: string;
 }
-const DatePickerOne = ({
+const DatePickerRange = ({
   label = "",
   onChange,
   name = "date",
@@ -23,7 +23,7 @@ const DatePickerOne = ({
   useEffect(() => {
     // Init flatpickr
     flatpickr(".form-datepicker", {
-      mode: "single",
+      mode: "range",
       static: true,
       monthSelectorType: "static",
       dateFormat: "M j, Y",
@@ -74,4 +74,4 @@ const DatePickerOne = ({
   );
 };
 
-export default DatePickerOne;
+export default DatePickerRange;

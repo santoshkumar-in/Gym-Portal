@@ -104,3 +104,9 @@ export type BUSINESS_USER = {
   role?: string;
   status?: string;
 };
+
+export type FILTER_DD_TYPE = {
+  value: string;
+  label: string;
+  [key: string]: unknown;
+};
