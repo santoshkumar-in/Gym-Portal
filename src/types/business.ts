@@ -93,7 +93,7 @@ export type BUSINESS_USER = {
   id: string;
   username?: string;
   email?: string;
-  mobile?: string;
+  mobile?: number;
   isd?: string;
   password?: string;
   gender?: string;

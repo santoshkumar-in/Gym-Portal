@@ -25,7 +25,7 @@ export default async function middleware(req: NextRequest) {
   if (
     jwtToken &&
     path.startsWith("/business") &&
-    currentUser.role === ROLE_BUSINESS
+    currentUser?.role === ROLE_BUSINESS
   ) {
     const parts = path.split("/");
     if (parts[2] !== currentUser.businessId) {
