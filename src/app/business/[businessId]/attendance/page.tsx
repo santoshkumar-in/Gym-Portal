@@ -46,6 +46,9 @@ const SubscriberAttendance = ({
   const [selected, setSelected] = useState<string>("");
   const [businessId, setBusinessId] = useState<string>("");
   const [attendance, setAttendance] = useState<ATTENDANCE[]>([]);
+  const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
+    { currentPage: 1, perPage: 10 },
+  );
 
   useEffect(() => {
     async function getData() {
@@ -78,6 +81,11 @@ const SubscriberAttendance = ({
     console.log(arg);
   };
 
+  const handlePageChange = (page: number) => {
+    console.log("New Page", page);
+    setPaginationData({ ...paginationData, currentPage: page });
+  };
+
   return (
     <DefaultLayout>
       <SearchAndFilterBar
@@ -87,18 +95,10 @@ const SubscriberAttendance = ({
         createNewUrl={`/business/${businessId}/attendance/add`}
       />
       <Attendance attendance={attendance} onDelete={handleDelete} />
-      <div className="mt-4 flex items-center justify-center rounded-sm border border-gray-100 bg-white px-5 py-3 shadow-default dark:border-gray-800 dark:bg-boxdark sm:px-7.5 sm:py-3">
-        <Pagination />
-        <div className="ml-auto flex items-center font-medium">
-          <select className="w-20 bg-transparent pl-2">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
-          <p className="pl-2 text-black dark:text-white">Entries Per Page</p>
-        </div>
-      </div>
+      <Pagination
+        onPageChange={handlePageChange}
+        currentPage={paginationData.currentPage}
+      />
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">
           <svg
