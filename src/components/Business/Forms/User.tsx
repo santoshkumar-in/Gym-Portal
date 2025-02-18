@@ -2,14 +2,14 @@
 import { useState, useEffect } from "react";
 import { getUsers, addOrUpdateUser } from "@/actions/business";
 import SwitcherThree from "@/components/Switchers/SwitcherThree";
-import { CURRENT_USER } from "@/types/auth";
+import { BUSINESS_USER } from "@/types/business";
 interface Props {
   businessId: string;
   userId?: string;
 }
 const UserForm = ({ businessId, userId = "" }: Props) => {
-  const [selectedUser, setSelectedUser] = useState<CURRENT_USER>(
-    {} as CURRENT_USER,
+  const [selectedUser, setSelectedUser] = useState<BUSINESS_USER>(
+    {} as BUSINESS_USER,
   );
   useEffect(() => {
     async function getData() {
@@ -23,10 +23,11 @@ const UserForm = ({ businessId, userId = "" }: Props) => {
       getData();
     } else {
       setSelectedUser({
+        id: "",
         firstName: "",
         lastName: "",
+        mobile: 0,
         email: "",
-        mobile: "",
         password: "",
         confirmPassword: "",
         status: "ACTIVE",

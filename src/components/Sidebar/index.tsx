@@ -358,20 +358,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         },
       ];
 
-      mGroups[0]["menuItems"][0]["children"] = currentUser.menu.map(
-        ({ menuItem }: CURRENT_MENU) => {
-          const routes = {
-            "Business Details": `/business/${currentUser.businessId}`,
-            Subscribers: `/business/${currentUser.businessId}/subscriber`,
-            Attendance: `/business/${currentUser.businessId}/attendance`,
-            "Account users": `/business/${currentUser.businessId}/user`,
-          };
-          return {
-            label: menuItem,
-            route: routes[menuItem as keyof typeof routes],
-          };
-        },
-      );
+      if (currentUser) {
+        mGroups[0]["menuItems"][0]["children"] = currentUser?.menu.map(
+          ({ menuItem }: CURRENT_MENU) => {
+            const routes = {
+              "Business Details": `/business/${currentUser.businessId}`,
+              Subscribers: `/business/${currentUser.businessId}/subscriber`,
+              Attendance: `/business/${currentUser.businessId}/attendance`,
+              "Account users": `/business/${currentUser.businessId}/user`,
+            };
+            return {
+              label: menuItem,
+              route: routes[menuItem as keyof typeof routes],
+            };
+          },
+        );
+      }
 
       setUserMenu(mGroups);
     }

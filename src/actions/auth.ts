@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { API_URL, ROLE_ADMIN } from "@/enums";
+import { API_URL } from "@/enums";
 import { SigninFormSchema } from "@/schemas/auth";
 
 export async function doSignIn(formData: FormData) {

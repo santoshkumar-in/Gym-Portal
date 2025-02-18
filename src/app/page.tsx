@@ -11,11 +11,13 @@ export default function Home() {
   useEffect(() => {
     async function getUser() {
       const { data } = await getUserDetails();
-      const { role = "", businessId = "" } = data;
-      if (role === ROLE_ADMIN) {
+
+      if (data?.role === ROLE_ADMIN) {
         setCurrentComponent(<SuperAdminDashboard />);
-      } else if (role === ROLE_BUSINESS) {
-        setCurrentComponent(<BusinessDashboard businessId={businessId} />);
+      } else if (data?.role === ROLE_BUSINESS) {
+        setCurrentComponent(
+          <BusinessDashboard businessId={data?.businessId} />,
+        );
       }
     }
     getUser();
