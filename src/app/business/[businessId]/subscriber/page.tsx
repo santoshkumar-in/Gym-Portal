@@ -1,11 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFilter,
-  faMagnifyingGlass,
-  faCirclePlus,
-} from "@fortawesome/free-solid-svg-icons";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { getSubscribers } from "@/actions/business";
 import { SUBSCRIBER } from "@/types/business";
@@ -13,8 +7,35 @@ import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import { toastSuccess } from "@/helpers/toast";
 import Subscribers from "@/components/Business/Subscribers";
-import MultiSelect from "@/components/FormElements/ReactSelectMultiSelect";
-import Select from "@/components/FormElements/ReactSelect";
+import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
+
+const tableFilters = [
+  {
+    value: "gender",
+    label: "Gender",
+    fieldType: "select",
+    selectOptions: [
+      { value: "M", label: "Male" },
+      { value: "F", label: "Female" },
+      { value: "Other", label: "Other" },
+    ],
+  },
+  {
+    value: "range",
+    label: "Date Range",
+    fieldType: "dateRange",
+  },
+  {
+    value: "package",
+    label: "Package",
+    fieldType: "multiselect",
+    selectOptions: [
+      { value: "123", label: "Package 1" },
+      { value: "124", label: "Package 2" },
+      { value: "125", label: "Package 3ß" },
+    ],
+  },
+];
 
 const BusinessSubscribers = ({
   params,
@@ -53,34 +74,18 @@ const BusinessSubscribers = ({
     setSelected("");
   };
 
+  const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
+    console.log(arg);
+  };
+
   return (
     <DefaultLayout>
-      <div className="mb-4 rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
-        <div className="flex justify-between pb-5">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
-              <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </span>
-            <input
-              type="text"
-              className="min-w-75 rounded-md border border-stroke px-5 py-2 pl-12 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
-              placeholder="Search..."
-              value=""
-            />
-          </div>
-          <div className="flex items-center font-medium">
-            <Select />
-
-            <MultiSelect />
-            <button className="ml-2 rounded bg-primary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90">
-              <FontAwesomeIcon icon={faFilter} />
-            </button>
-            <button className="ml-2 rounded bg-secondary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90">
-              <FontAwesomeIcon icon={faCirclePlus} />
-            </button>
-          </div>
-        </div>
-      </div>
+      <SearchAndFilterBar
+        tableFilterOptions={tableFilters}
+        onChange={handleFilterValueChange}
+        enableSearch={true}
+        //createNewUrl={`/business/${businessId}/attendance/add`}
+      />
       <Subscribers
         onDelete={handleDelete}
         subscribers={subscribers}

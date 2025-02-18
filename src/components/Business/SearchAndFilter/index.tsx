@@ -14,39 +14,7 @@ import FilterDropdown from "@/components/Business/SearchAndFilter/FilterDropdown
 import Select from "./ReactSelect";
 import MultiSelect from "./ReactSelectMultiSelect";
 import { FILTER_DD_TYPE } from "@/types/business";
-
-interface Props {
-  enableSearch?: boolean;
-  createNewUrl?: string;
-}
-
-const optionValues = [
-  {
-    value: "gender",
-    label: "Gender",
-    fieldType: "select",
-    selectOptions: [
-      { value: "M", label: "Male" },
-      { value: "F", label: "Female" },
-      { value: "Other", label: "Other" },
-    ],
-  },
-  {
-    value: "range",
-    label: "Date Range",
-    fieldType: "dateRange",
-  },
-  {
-    value: "package",
-    label: "Package",
-    fieldType: "multiselect",
-    selectOptions: [
-      { value: "123", label: "Package 1" },
-      { value: "124", label: "Package 2" },
-      { value: "125", label: "Package 3ß" },
-    ],
-  },
-];
+import useThrottle from "@/hooks/useThrottle";
 
 const NullField = () => null;
 
@@ -105,22 +73,43 @@ const FilterFieldComponent = ({
   }
 };
 
+interface Props {
+  enableSearch?: boolean;
+  createNewUrl?: string;
+  onChange?: (arg: { [key: string]: unknown }) => void;
+  tableFilterOptions?: FILTER_DD_TYPE[];
+}
+
 const SearchAndFilterBar = ({
   enableSearch = true,
   createNewUrl = "",
+  onChange = () => null,
+  tableFilterOptions = [],
 }: Props) => {
   const [enabledFilters, setEnabledFilters] = useState<
     MultiValue<FILTER_DD_TYPE>
   >([]);
-  const [dataFilters, setDataFilters] = useState({});
+  const [dataFilters, setDataFilters] = useState({ searchTerm: "" });
   const handleFilterChange = (val: MultiValue<FILTER_DD_TYPE>) => {
     console.log("activeFilters", val);
     setEnabledFilters(val);
   };
 
   const handleFieldChange = (v: unknown, field: unknown) => {
-    console.log(field, v);
-    setDataFilters({ ...dataFilters, field: v });
+    //console.log(field, v);
+    setDataFilters({ ...dataFilters, [field as string]: v });
+  };
+
+  const throttledChangeHandler = useThrottle(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      //console.log("Throttled Value:", event.target.value);
+      setDataFilters({ ...dataFilters, searchTerm: event.target.value });
+    },
+    300,
+  );
+
+  const applyFilter = () => {
+    onChange(dataFilters);
   };
 
   return (
@@ -134,9 +123,10 @@ const SearchAndFilterBar = ({
               </span>
               <input
                 type="text"
+                onChange={throttledChangeHandler}
                 className="min-w-75 rounded-md border border-stroke px-5 py-2 pl-12 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
                 placeholder="Search..."
-                value=""
+                value={dataFilters?.searchTerm || ""}
               />
             </div>
           )}
@@ -144,7 +134,7 @@ const SearchAndFilterBar = ({
             <FilterDropdown
               placeholder="Select filters"
               onChange={handleFilterChange}
-              options={optionValues}
+              options={tableFilterOptions}
             />
 
             {createNewUrl && (
@@ -182,7 +172,10 @@ const SearchAndFilterBar = ({
                 );
               },
             )}
-            <button className="ml-2 rounded bg-primary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90">
+            <button
+              onClick={applyFilter}
+              className="ml-2 rounded bg-primary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90"
+            >
               <FontAwesomeIcon icon={faFilter} />
             </button>
           </div>

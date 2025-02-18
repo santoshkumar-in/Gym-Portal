@@ -1,21 +1,25 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFilter,
-  faMagnifyingGlass,
-  faCirclePlus,
-} from "@fortawesome/free-solid-svg-icons";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import { toastSuccess } from "@/helpers/toast";
 import { getUsers } from "@/actions/business";
 import { BUSINESS_USER } from "@/types/business";
-import MultiSelect from "@/components/FormElements/ReactSelectMultiSelect";
-import Select from "@/components/FormElements/ReactSelect";
 import Users from "@/components/Business/Users";
+import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
+
+const tableFilters = [
+  {
+    value: "status",
+    label: "Status",
+    fieldType: "select",
+    selectOptions: [
+      { value: "ACTIVE", label: "Active" },
+      { value: "INACTIVE", label: "Inactive" },
+    ],
+  },
+];
 
 const BusinessUsers = ({
   params,
@@ -64,40 +68,18 @@ const BusinessUsers = ({
     console.log(e.target.value ? e.target.value.toUpperCase() : "OFF", userId);
   };
 
+  const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
+    console.log(arg);
+  };
+
   return (
     <DefaultLayout>
-      <div className="mb-4 rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
-        <div className="flex justify-between pb-5">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
-              <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </span>
-            <input
-              type="text"
-              className="min-w-75 rounded-md border border-stroke px-5 py-2 pl-12 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
-              placeholder="Search..."
-              value=""
-            />
-          </div>
-          <div className="flex items-center font-medium">
-            <Select />
-
-            <MultiSelect />
-            <button
-              onClick={() => handleDelete("33")}
-              className="ml-2 rounded bg-primary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90"
-            >
-              <FontAwesomeIcon icon={faFilter} />
-            </button>
-            <Link
-              href={`/business/${businessId}/user/add`}
-              className="ml-2 rounded bg-secondary px-5 py-2 text-center font-medium text-white hover:bg-opacity-90"
-            >
-              <FontAwesomeIcon icon={faCirclePlus} />
-            </Link>
-          </div>
-        </div>
-      </div>
+      <SearchAndFilterBar
+        tableFilterOptions={tableFilters}
+        onChange={handleFilterValueChange}
+        enableSearch={true}
+        createNewUrl={`/business/${businessId}/user/add`}
+      />
       <Users
         onStatusChange={handleStatusChange}
         onDelete={handleDelete}

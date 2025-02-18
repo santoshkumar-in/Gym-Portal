@@ -9,6 +9,34 @@ import Modal from "@/components/Modal";
 import { toastSuccess } from "@/helpers/toast";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
 
+const tableFilters = [
+  {
+    value: "gender",
+    label: "Gender",
+    fieldType: "select",
+    selectOptions: [
+      { value: "M", label: "Male" },
+      { value: "F", label: "Female" },
+      { value: "Other", label: "Other" },
+    ],
+  },
+  {
+    value: "range",
+    label: "Date Range",
+    fieldType: "dateRange",
+  },
+  {
+    value: "package",
+    label: "Package",
+    fieldType: "multiselect",
+    selectOptions: [
+      { value: "123", label: "Package 1" },
+      { value: "124", label: "Package 2" },
+      { value: "125", label: "Package 3ß" },
+    ],
+  },
+];
+
 const SubscriberAttendance = ({
   params,
 }: {
@@ -46,9 +74,15 @@ const SubscriberAttendance = ({
     setSelected("");
   };
 
+  const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
+    console.log(arg);
+  };
+
   return (
     <DefaultLayout>
       <SearchAndFilterBar
+        tableFilterOptions={tableFilters}
+        onChange={handleFilterValueChange}
         enableSearch={true}
         createNewUrl={`/business/${businessId}/attendance/add`}
       />
