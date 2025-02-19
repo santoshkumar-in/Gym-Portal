@@ -1,10 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { getMedias } from "@/actions/business";
 import { MEDIAS } from "@/types/business";
 import Gallery from "./Gallery";
+import { uploadFile } from "@/actions/media";
+import { useUploadContext } from "@/context/UploadProvider";
+import { BUSINESS_GALLERY } from "@/enums";
 
 interface Props {
   businessId: string;
@@ -13,7 +17,7 @@ interface Props {
 const Medias = ({ businessId }: Props) => {
   const [medias, setMedias] = useState<MEDIAS>();
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
-
+  const { dispatch } = useUploadContext();
   useEffect(() => {
     async function getData() {
       const { data = [] } = await getMedias(businessId);
@@ -24,6 +28,32 @@ const Medias = ({ businessId }: Props) => {
 
   const toggle = () => {
     setDeleteMode(!deleteMode);
+  };
+
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: string,
+  ) => {
+    if (!event.target.files) return;
+    const filesArray = Array.from(event.target.files);
+    filesArray.forEach((file) => {
+      const id = uuidv4();
+      const metaData = {
+        businessId,
+        type,
+      };
+
+      dispatch({
+        type: "ADD_FILE",
+        payload: {
+          id,
+          file,
+          progress: 0,
+          status: "pending",
+        },
+      });
+      uploadFile(file, id, metaData, dispatch);
+    });
   };
 
   if (!medias) {
@@ -48,8 +78,11 @@ const Medias = ({ businessId }: Props) => {
           >
             <input
               type="file"
+              multiple
+              onChange={(e) => handleFileChange(e, BUSINESS_GALLERY)}
               name="gallery-image"
               id="upload-image-in-gallery"
+              accept="image/png, image/jpeg"
               className="sr-only"
             />
             <span>

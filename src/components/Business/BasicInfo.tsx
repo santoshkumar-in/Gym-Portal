@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 //import { redirect } from "next/navigation";
 import Link from "next/link";
+import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquareFacebook,
@@ -15,15 +16,17 @@ import {
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import FitNxtDropDowns from "@/components/Dropdowns/FitNxtDropDowns";
-
 import { getBusinessDetails } from "@/actions/business";
 import { BUSINESS } from "@/types/business";
-
+import { uploadFile } from "@/actions/media";
+import { BUSINESS_COVER_PHOTO, BUSINESS_LOGO } from "@/enums";
+import { useUploadContext } from "@/context/UploadProvider";
 interface Props {
   businessId: string;
 }
 
 const BasicInfo = ({ businessId }: Props) => {
+  const { dispatch } = useUploadContext();
   const [businessData, setBusinessData] = useState<BUSINESS | undefined>(
     {} as BUSINESS,
   );
@@ -38,13 +41,35 @@ const BasicInfo = ({ businessId }: Props) => {
     getData();
   }, [businessId]);
 
-  // const onEdit = () => {
-  //   redirect(`/business/${businessId}/edit/basicInfo`);
-  // };
-
   if (!businessData) {
     return "Loading...";
   }
+
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: string,
+  ) => {
+    if (!event.target.files) return;
+    const filesArray = Array.from(event.target.files);
+    filesArray.forEach((file) => {
+      const id = uuidv4();
+      const metaData = {
+        businessId,
+        type,
+      };
+
+      dispatch({
+        type: "ADD_FILE",
+        payload: {
+          id,
+          file,
+          progress: 0,
+          status: "pending",
+        },
+      });
+      uploadFile(file, id, metaData, dispatch);
+    });
+  };
 
   return (
     <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -60,7 +85,14 @@ const BasicInfo = ({ businessId }: Props) => {
             htmlFor="cover"
             className="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary px-2 py-1 text-sm font-medium text-white hover:bg-opacity-80 xsm:px-4"
           >
-            <input type="file" name="cover" id="cover" className="sr-only" />
+            <input
+              onChange={(e) => handleFileChange(e, BUSINESS_COVER_PHOTO)}
+              type="file"
+              name="cover"
+              id="cover"
+              className="sr-only"
+              accept="image/png, image/jpeg"
+            />
             <span>
               <svg
                 className="fill-current"
@@ -129,7 +161,9 @@ const BasicInfo = ({ businessId }: Props) => {
               <input
                 type="file"
                 name="profile"
+                onChange={(e) => handleFileChange(e, BUSINESS_LOGO)}
                 id="profile"
+                accept="image/png, image/jpeg"
                 className="sr-only"
               />
             </label>
@@ -170,7 +204,7 @@ const BasicInfo = ({ businessId }: Props) => {
             </div>
             <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
               <span className="font-semibold text-black dark:text-white">
-                {businessData.rating}/5
+                {businessData.rating}
               </span>
               <span className="text-sm">Ratings</span>
             </div>

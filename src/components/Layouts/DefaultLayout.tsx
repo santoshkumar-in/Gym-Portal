@@ -2,7 +2,6 @@
 import { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import UploadProgress from "@/components/common/UploadProgress";
 
 export default function DefaultLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,7 +29,6 @@ export default function DefaultLayout({ children }: { children: ReactNode }) {
         </div>
         {/* <!-- ===== Content Area End ===== --> */}
       </div>
-      <UploadProgress />
       {/* <!-- ===== Page Wrapper End ===== --> */}
     </>
   );

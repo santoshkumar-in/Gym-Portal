@@ -4,6 +4,7 @@ import { getUserDetails } from "@/actions/auth";
 import { ROLE_BUSINESS, ROLE_ADMIN } from "@/enums";
 import BusinessDashboard from "@/components/Dashboards/Business";
 import SuperAdminDashboard from "@/components/Dashboards/SuperAdmin";
+import UploadProgress from "@/components/common/UploadProgress";
 
 export default function Home() {
   const [currentComponent, setCurrentComponent] =
@@ -22,5 +23,10 @@ export default function Home() {
     }
     getUser();
   }, []);
-  return currentComponent;
+  return (
+    <>
+      {currentComponent}
+      <UploadProgress />
+    </>
+  );
 }
