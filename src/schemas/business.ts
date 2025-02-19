@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const BusinessInfoFormSchema = z.object({
+  businessId: z.string().trim(),
   establishedOn: z.string().trim(),
   reviews: z.string().trim(),
   rating: z.string().trim(),

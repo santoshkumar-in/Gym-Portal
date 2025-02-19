@@ -7,6 +7,7 @@ export type BUSINESS = {
   reviews: number;
   rating: string;
   followers?: string | null;
+  isVerified?: boolean;
   reviewRatingUrl: string;
   geolocation: string;
   phone: string;

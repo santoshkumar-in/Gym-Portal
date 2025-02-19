@@ -21,11 +21,12 @@ export default async function middleware(req: NextRequest) {
   }
 
   // 5. Prevent user from accessing other business page
-  const { data: currentUser } = await getUserDetails();
+  const { data: currentUser, success } = await getUserDetails();
   if (
     jwtToken &&
     path.startsWith("/business") &&
-    currentUser?.role === ROLE_BUSINESS
+    currentUser?.role === ROLE_BUSINESS &&
+    success
   ) {
     const parts = path.split("/");
     if (parts[2] !== currentUser.businessId) {

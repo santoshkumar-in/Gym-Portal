@@ -2,7 +2,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { API_URL } from "@/enums";
+import { apiClient } from "@/helpers/api";
+import { API_BASE_URL } from "@/enums";
 import { SigninFormSchema } from "@/schemas/auth";
 
 export async function doSignIn(formData: FormData) {
@@ -25,7 +26,7 @@ export async function doSignIn(formData: FormData) {
   //   redirect("/");
   // }
 
-  const res = await fetch(`${API_URL}/leadapi/api/auth/public/signin`, {
+  const res = await fetch(`${API_BASE_URL}/api/auth/public/signin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -62,57 +63,47 @@ export const verifySession = cache(async () => {
 });
 
 export const getUserDetails = cache(async () => {
-  const jwtToken = (await cookies()).get("jwtToken")?.value;
-
-  const res = await fetch(`${API_URL}/leadapi/api/auth/user`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwtToken}`,
-    },
-  });
-
-  if (!res.ok) {
+  try {
+    const data = await apiClient("/api/auth/user", { method: "GET" });
+    return {
+      success: true,
+      data: {
+        id: 1,
+        username: data?.username,
+        email: data?.email,
+        mobile: data?.mobile,
+        isd: data?.isd,
+        firstName: data?.firstName,
+        lastName: data?.lastName,
+        businessId: data?.businessid,
+        businessName: "Progmmatic Soft",
+        logoUrl: null,
+        role: data?.role, //ROLE_SUPER
+        menu: [
+          {
+            menuItem: "Business Details",
+            viewOnly: "N",
+          },
+          {
+            menuItem: "Subscribers",
+            viewOnly: "N",
+          },
+          {
+            menuItem: "Attendance",
+            viewOnly: "N",
+          },
+          {
+            menuItem: "Account users",
+            viewOnly: "N",
+          },
+        ],
+      },
+    };
+  } catch (error) {
+    console.error("Fetch error:", error);
     return {
       success: false,
-      message: "Invalid credentials",
+      message: "Error while signing in",
     };
   }
-
-  const data = await res.json();
-
-  return {
-    success: true,
-    data: {
-      id: 1,
-      username: data?.username,
-      email: data?.email,
-      mobile: data?.mobile,
-      isd: data?.isd,
-      firstName: data?.firstName,
-      lastName: data?.lastName,
-      businessId: data?.businessid,
-      businessName: "Progmmatic Soft",
-      logoUrl: null,
-      role: data?.role, //ROLE_SUPER
-      menu: [
-        {
-          menuItem: "Business Details",
-          viewOnly: "N",
-        },
-        {
-          menuItem: "Subscribers",
-          viewOnly: "N",
-        },
-        {
-          menuItem: "Attendance",
-          viewOnly: "N",
-        },
-        {
-          menuItem: "Account users",
-          viewOnly: "N",
-        },
-      ],
-    },
-  };
 });

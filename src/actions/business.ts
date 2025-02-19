@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { toastSuccess } from "@/helpers/toast";
+import { toastSuccess, toastError } from "@/helpers/toast";
 import {
   BusinessAttendanceSchema,
   BusinessInfoFormSchema,
@@ -16,40 +16,29 @@ import {
   SUBSCRIBER_ATTENDANCE,
   ATTENDANCE,
 } from "@/types/business";
+import { apiClient } from "@/helpers/api";
 
 export const getBusinessDetails = cache(
-  (
+  async (
     businessId: string,
   ): Promise<{
     success: boolean;
-    data: BUSINESS;
+    data?: BUSINESS;
     message?: string;
   }> => {
-    return new Promise(function (resolve) {
-      resolve({
-        success: true,
-        data: {
-          id: businessId,
-          coverImage: "/images/cover/cover-01.jpg",
-          logo: "/images/business/b1.webp",
-          name: "Programatic Soft",
-          establishedOn: "2020-12-15",
-          reviews: 259,
-          rating: "4.2/5",
-          followers: "122k",
-          reviewRatingUrl: "https://google.com",
-          geolocation: "123.78989, 57.90900",
-          phone: "+91 234567888",
-          bio: "Elevate your fitness journey with our all-in-one gym offering a wide range of services, including strength training, cardio, yoga, personal training, group classes, and more. Whether you&apos;re a beginner or a pro, our expert trainers and state-of-the-art equipment are here to help you achieve your goals in a supportive environment. 💪✨",
-          socialProfiles: {
-            youtube: "https://youtube.com",
-            facebook: "https://fb.com",
-            instagram: "https://instagram.com",
-            twitter: "https://twitter.com",
-          },
-        },
-      });
-    });
+    try {
+      const data = await apiClient(
+        `/api/info/business/details-part1/${businessId}`,
+        { method: "GET" },
+      );
+      return data;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
   },
 );
 
@@ -529,6 +518,7 @@ export const getAttendance = cache(
 
 export const updateBusinessDetails = async (formData: FormData) => {
   const validatedFields = BusinessInfoFormSchema.safeParse({
+    businessId: formData.get("businessId"),
     establishedOn: formData.get("establishedOn"),
     reviews: formData.get("reviews"),
     rating: formData.get("rating"),
@@ -548,8 +538,23 @@ export const updateBusinessDetails = async (formData: FormData) => {
   if (!validatedFields.success) {
     console.error("errors", validatedFields.error);
   }
-  console.log("validated", validatedFields.data);
-  toastSuccess("Details updated successfully");
+  //console.log("validated", validatedFields.data);
+  try {
+    const response = await apiClient("/submit", {
+      method: "POST",
+      body: JSON.stringify(validatedFields.data),
+    });
+    toastSuccess("Details updated successfully");
+    console.log("Response:", response);
+  } catch (e: unknown) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while updating the detail");
+  }
 };
 
 export const updatePackage = async (formData: FormData) => {
@@ -574,7 +579,22 @@ export const updatePackage = async (formData: FormData) => {
     console.log("validated", validatedFields.data);
   }
 
-  toastSuccess("Package updated successfully");
+  try {
+    const response = await apiClient("/submit", {
+      method: "POST",
+      body: JSON.stringify(validatedFields.data),
+    });
+    toastSuccess("Details updated successfully");
+    console.log("Response:", response);
+  } catch (e: unknown) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while updating the detail");
+  }
 };
 
 export const addPackage = async (formData: FormData) => {
@@ -598,7 +618,22 @@ export const addPackage = async (formData: FormData) => {
     console.log("validated", validatedFields.data);
   }
 
-  toastSuccess("Package added successfully");
+  try {
+    const response = await apiClient("/submit", {
+      method: "POST",
+      body: JSON.stringify(validatedFields.data),
+    });
+    toastSuccess("Details updated successfully");
+    console.log("Response:", response);
+  } catch (e: unknown) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while updating the detail");
+  }
 };
 
 export const addOrUpdateUser = async (formData: FormData) => {
@@ -623,7 +658,22 @@ export const addOrUpdateUser = async (formData: FormData) => {
     console.log("validated", validatedFields.data);
   }
 
-  toastSuccess("User added successfully");
+  try {
+    const response = await apiClient("/submit", {
+      method: "POST",
+      body: JSON.stringify(validatedFields.data),
+    });
+    toastSuccess("Details updated successfully");
+    console.log("Response:", response);
+  } catch (e: unknown) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while updating the detail");
+  }
 };
 
 export const addAttendance = async (formData: FormData) => {
@@ -646,5 +696,20 @@ export const addAttendance = async (formData: FormData) => {
     console.log("validated", validatedFields.data);
   }
 
-  toastSuccess("User added successfully");
+  try {
+    const response = await apiClient("/submit", {
+      method: "POST",
+      body: JSON.stringify(validatedFields.data),
+    });
+    toastSuccess("Details updated successfully");
+    console.log("Response:", response);
+  } catch (e: unknown) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while updating the detail");
+  }
 };

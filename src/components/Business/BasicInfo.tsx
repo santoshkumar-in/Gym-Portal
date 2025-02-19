@@ -24,12 +24,16 @@ interface Props {
 }
 
 const BasicInfo = ({ businessId }: Props) => {
-  const [businessData, setBusinessData] = useState<BUSINESS>({} as BUSINESS);
+  const [businessData, setBusinessData] = useState<BUSINESS | undefined>(
+    {} as BUSINESS,
+  );
 
   useEffect(() => {
     async function getData() {
-      const { data } = await getBusinessDetails(businessId);
-      setBusinessData(data);
+      const { data, success } = await getBusinessDetails(businessId);
+      if (success) {
+        setBusinessData(data);
+      }
     }
     getData();
   }, [businessId]);

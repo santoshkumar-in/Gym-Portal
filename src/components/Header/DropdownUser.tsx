@@ -11,8 +11,10 @@ const DropdownUser = () => {
 
   useEffect(() => {
     async function getUser() {
-      const { data = {} } = await getUserDetails();
-      setUser(data);
+      const { data = {}, success } = await getUserDetails();
+      if (success) {
+        setUser(data);
+      }
     }
     getUser();
   }, []);
