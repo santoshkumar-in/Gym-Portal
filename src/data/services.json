@@ -1,0 +1,174 @@
+{
+  "categories": [
+    {
+      "id": "camOj33FkjHvLMxQ60LBfQ",
+      "value": "Free Once in Lifetime",
+      "services": [
+        {
+          "id": "CZO7bVJjshQ31E1W_dGmkA",
+          "value": "Free access to Gym once"
+        }
+      ]
+    },
+    {
+      "id": "cp1jKWh2YZXchvlvZo_H9A",
+      "value": "Group Exercise Classes",
+      "services": [
+        {
+          "id": "9WbzpZvdLZQSqxQDf_W2Uw",
+          "value": "Aerobics"
+        },
+        {
+          "id": "wS1Y17g_9YH9z2rUReagnQ",
+          "value": "HIIT (High-Intensity Interval Training)"
+        },
+        {
+          "id": "xjq_55QdiqBR3f5RPOjHmg",
+          "value": "Martial arts and self-defense classes"
+        },
+        {
+          "id": "QnQSmebsTWPFosgk6Kb8VQ",
+          "value": "Pilates"
+        },
+        {
+          "id": "qQ9Mm2HFSKl0h-TH7P5_lQ",
+          "value": "Spinning/Cycling"
+        },
+        {
+          "id": "kSS1qtwu1Ou8qHEYNIWEsA",
+          "value": "Yoga"
+        },
+        {
+          "id": "3rXciMvdpIo00P9z3EhxQw",
+          "value": "Zumba"
+        }
+      ]
+    },
+    {
+      "id": "-KjaG3TIdcBC4Q0BpJcKug",
+      "value": "Membership Benefit",
+      "services": [
+        {
+          "id": "Ty2gSrBdfdXAqaCxVvmF5A",
+          "value": "Access to exclusive gym events or challenges"
+        },
+        {
+          "id": "Lg2gRsBrtwauJ2fwOkvolw",
+          "value": "Discounts on products or services (like supplements or apparel)"
+        },
+        {
+          "id": "4DRPQe9CT6-_8V3RCHa67Q",
+          "value": "Locker rooms, towel service, and other amenities"
+        }
+      ]
+    },
+    {
+      "id": "tc1Pvx80TYeVE27PeCoNKw",
+      "value": "Nutrition Counseling",
+      "services": [
+        {
+          "id": "WvZeQCUL0LhCys73XYTx_w",
+          "value": "Guidance on meal planning and dietary supplements"
+        },
+        {
+          "id": "MGFRKqUK9dpYkdP4ov-H7A",
+          "value": "Nutritional assessments"
+        }
+      ]
+    },
+    {
+      "id": "zktrH_D0tVr55HnFMQxmFw",
+      "value": "Online or Virtual Training",
+      "services": [
+        {
+          "id": "LLgADXnOFZUEDd-mdlzeQA",
+          "value": "Access to online training platforms or apps"
+        },
+        {
+          "id": "Tgv0K6rGDvEEpCw0xar-Og",
+          "value": "Virtual classes or workouts"
+        }
+      ]
+    },
+    {
+      "id": "cskNpCUe4cuEcBghdOHmXw",
+      "value": "Personal Training",
+      "services": [
+        {
+          "id": "E_Dt8xZKe-kB8K7AhHPpCw",
+          "value": "Custom fitness plans and goal setting"
+        },
+        {
+          "id": "eQe3X1Bh4XnfsufCgAWCfQ",
+          "value": "Nutrition advice and coaching"
+        },
+        {
+          "id": "N9W3TK92eD55NVmi94swww",
+          "value": "One-on-one sessions with certified personal trainers"
+        },
+        {
+          "id": "maT9vVGtyhikJCwhG8eNzw",
+          "value": "Specialized training (weight loss, strength, mobility)"
+        }
+      ]
+    },
+    {
+      "id": "UzV-QkxWatkDaApu3GDQig",
+      "value": "Sports Facilities",
+      "services": [
+        {
+          "id": "Dfs5AsANkDdT_8eloPcEmw",
+          "value": "Basketball courts"
+        },
+        {
+          "id": "BB0nbTpwS6sryBzM4LzMlg",
+          "value": "Racquetball courts"
+        },
+        {
+          "id": "vtd2GDT6APNGrXv-I6aCow",
+          "value": "Tennis courts"
+        }
+      ]
+    },
+    {
+      "id": "MaHDsoxqptLyvSjPA0XFGw",
+      "value": "Stretching and Recovery",
+      "services": [
+        {
+          "id": "l-ySezeTlVSLdZbu_FBwAA",
+          "value": "Foam rolling and mobility classes"
+        },
+        {
+          "id": "BXNXTmsq8AB0nwdiLDrqoA",
+          "value": "Massage therapy"
+        },
+        {
+          "id": "Lm4kJ-MF-qA0zS0gy3lAuw",
+          "value": "Sauna, steam room, or hot tub use"
+        },
+        {
+          "id": "JtVK4DvsWw8vkZ0FYH85Mw",
+          "value": "tretching areas or sessions"
+        }
+      ]
+    },
+    {
+      "id": "2Ljkl_4jKvryCJrxfp1oQA",
+      "value": "Swimming Pools",
+      "services": [
+        {
+          "id": "EbH-1MgFBIVDdg0MAT_0LQ",
+          "value": "Aquatic fitness classes (water aerobics)"
+        },
+        {
+          "id": "mxj8z7w1OW4Lo12Q9jULiw",
+          "value": "Lap swimming"
+        },
+        {
+          "id": "wieDmlEPuOuQFqfDum4icA",
+          "value": "Swim lessons"
+        }
+      ]
+    }
+  ]
+}

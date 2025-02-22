@@ -540,10 +540,13 @@ export const updateBusinessDetails = async (formData: FormData) => {
   }
   //console.log("validated", validatedFields.data);
   try {
-    const response = await apiClient("/submit", {
-      method: "POST",
-      body: JSON.stringify(validatedFields.data),
-    });
+    const response = await apiClient(
+      `/api/info/business/details-part1/${validatedFields?.data?.businessId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(validatedFields.data),
+      },
+    );
     toastSuccess("Details updated successfully");
     console.log("Response:", response);
   } catch (e: unknown) {

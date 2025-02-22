@@ -1,7 +1,21 @@
 "use client";
 import React, { useState } from "react";
+import cn from "classnames";
 
-const SelectGroupOne: React.FC = () => {
+type Option = { value: string | number; label: string };
+interface Props {
+  options?: Option[];
+  selectLabel?: string;
+  placeholder?: string;
+  containerClassName?: string;
+}
+
+const SelectGroupOne: React.FC = ({
+  options = [],
+  selectLabel = "",
+  placeholder = "",
+  containerClassName = "",
+}: Props) => {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -10,11 +24,10 @@ const SelectGroupOne: React.FC = () => {
   };
 
   return (
-    <div className="mb-4.5">
-      <label className="mb-2.5 block text-black dark:text-white">
-        {" "}
-        Subject{" "}
-      </label>
+    <div className={cn("mb-4.5", { "mb-4.5": !containerClassName })}>
+      {selectLabel && (
+        <label className="mb-2.5 block text-black dark:text-white"></label>
+      )}
 
       <div className="relative z-20 bg-transparent dark:bg-form-input">
         <select
@@ -28,17 +41,19 @@ const SelectGroupOne: React.FC = () => {
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
-            Select your subject
+            {placeholder || "Select option..."}
           </option>
-          <option value="USA" className="text-body dark:text-bodydark">
-            USA
-          </option>
-          <option value="UK" className="text-body dark:text-bodydark">
-            UK
-          </option>
-          <option value="Canada" className="text-body dark:text-bodydark">
-            Canada
-          </option>
+          {options.map(({ value, label }: Option) => {
+            return (
+              <option
+                key={value}
+                value={value}
+                className="text-body dark:text-bodydark"
+              >
+                {label}
+              </option>
+            );
+          })}
         </select>
 
         <span className="absolute right-4 top-1/2 z-30 -translate-y-1/2">

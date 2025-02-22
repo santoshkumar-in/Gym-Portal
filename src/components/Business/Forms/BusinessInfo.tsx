@@ -32,6 +32,7 @@ const BasicInfoForm = ({ businessId }: BasicInfoFormProps) => {
         <h3 className="font-medium text-black dark:text-white">Edit Details</h3>
       </div>
       <form action={updateBusinessDetails}>
+        <input type="hidden" name="businessId" value={businessId} />
         <div className="p-6.5">
           <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
             <div className="w-full xl:w-1/2">

@@ -363,6 +363,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           ({ menuItem }: CURRENT_MENU) => {
             const routes = {
               "Business Details": `/business/${currentUser.businessId}`,
+              Calender: `/business/${currentUser.businessId}/calender`,
               Subscribers: `/business/${currentUser.businessId}/subscriber`,
               Attendance: `/business/${currentUser.businessId}/attendance`,
               "Account users": `/business/${currentUser.businessId}/user`,
