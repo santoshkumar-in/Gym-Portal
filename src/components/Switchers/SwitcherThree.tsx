@@ -5,15 +5,16 @@ interface Props {
   name?: string;
   id?: string;
   defaultChecked?: boolean;
+  checked?: boolean;
   onChange?: (arg: React.ChangeEvent<HTMLInputElement>) => void;
 }
 const SwitcherThree = ({
   name = "fn-switch",
   onChange: onCheckboxChange = () => null,
-  defaultChecked,
+  defaultChecked = false,
   id = (Math.random() * 100).toString(),
 }: Props) => {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(defaultChecked);
 
   return (
     <div>

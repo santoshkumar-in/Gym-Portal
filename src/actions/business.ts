@@ -335,7 +335,7 @@ export const getUsers = cache(
             email: "rt@gm.com",
             mobile: 9112343,
             role: "Operator",
-            status: "ACTIVE",
+            status: "INACTIVE",
           },
           {
             id: "2403",

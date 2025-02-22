@@ -4,8 +4,9 @@ import { isPastDay } from "@/helpers";
 interface EventType {
   id: string;
   title: string;
-  startTime: string;
-  endTime: string;
+  isHoliday: boolean;
+  startTime?: string;
+  endTime?: string;
   date: Date;
 }
 
@@ -29,7 +30,8 @@ const Event: React.FC<EventProps> = ({ event, onClick }) => {
         { "cursor-pointer": !isPast, "cursor-not-allowed": isPast },
       )}
     >
-      {event.startTime} - {event.title}
+      {!event.isHoliday && `${event.startTime} - ${event.title}`}
+      {event.isHoliday && `${event.title}`}
     </div>
   );
 };

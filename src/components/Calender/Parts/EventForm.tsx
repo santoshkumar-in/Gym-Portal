@@ -7,8 +7,9 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 interface EventType {
   id: string;
   title: string;
-  startTime: string;
-  endTime: string;
+  isHoliday: boolean;
+  startTime?: string;
+  endTime?: string;
   date: Date;
 }
 
@@ -31,11 +32,13 @@ const EventForm: React.FC<EventFormProps> = ({
   );
   const [endTime, setEndTime] = useState<string>(event?.endTime || "10:00");
 
-  const [isHoliday, setIsHoliday] = useState<boolean>();
+  const [isHoliday, setIsHoliday] = useState<boolean>(
+    event?.isHoliday || false,
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ title, startTime, endTime });
+    onSubmit({ title, startTime, isHoliday, endTime });
   };
 
   return (
@@ -45,6 +48,7 @@ const EventForm: React.FC<EventFormProps> = ({
           Event title
         </label>
         <input
+          required
           name="eventTitle"
           type="text"
           placeholder="Enter Title"
@@ -59,7 +63,8 @@ const EventForm: React.FC<EventFormProps> = ({
           Gym Holiday?
         </label>
         <SwitcherThree
-          name="status"
+          name="isHoliday"
+          defaultChecked={isHoliday}
           onChange={(e) => setIsHoliday(e.target.checked)}
         />
       </div>

@@ -65,6 +65,7 @@ const BusinessUsers = ({
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                   <SwitcherThree
                     name="status"
+                    defaultChecked={user.status === "ACTIVE"}
                     onChange={(e) => onStatusChange(e, user.id)}
                   />
                 </td>

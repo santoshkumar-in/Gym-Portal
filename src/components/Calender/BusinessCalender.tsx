@@ -8,14 +8,10 @@ import { getDaysInMonth, getFirstDayOfMonth, isPastDay } from "@/helpers";
 // Define Types
 interface Event {
   id: string;
+  isHoliday: boolean;
   title: string;
-  startTime: string;
-  endTime: string;
-  date: Date;
-}
-
-interface Holiday {
-  name: string;
+  startTime?: string;
+  endTime?: string;
   date: Date;
 }
 
@@ -25,25 +21,12 @@ const BusinessCalendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
 
   useEffect(() => {
-    const mockHolidays: Holiday[] = [
-      {
-        name: "New Year's Day",
-        date: new Date(currentDate.getFullYear(), 0, 1),
-      },
-      { name: "Christmas", date: new Date(currentDate.getFullYear(), 11, 25) },
-      {
-        name: "Gym is Closed",
-        date: new Date(currentDate.getFullYear(), 1, 25),
-      },
-    ];
-    setHolidays(mockHolidays);
-
     const mockEvents: Event[] = [
       {
         id: "1",
+        isHoliday: false,
         title: "Team Meeting",
         startTime: "10:00",
         endTime: "11:00",
@@ -51,10 +34,23 @@ const BusinessCalendar: React.FC = () => {
       },
       {
         id: "2",
+        isHoliday: false,
         title: "Project Review",
         startTime: "14:00",
         endTime: "15:00",
         date: new Date(currentDate.getFullYear(), currentDate.getMonth(), 20),
+      },
+      {
+        id: "3",
+        title: "Random Day",
+        isHoliday: true,
+        date: new Date(currentDate.getFullYear(), 1, 24),
+      },
+      {
+        id: "4",
+        title: "Monthly Maintenance",
+        isHoliday: true,
+        date: new Date(currentDate.getFullYear(), 1, 28),
       },
     ];
     setEvents(mockEvents);
@@ -80,9 +76,12 @@ const BusinessCalendar: React.FC = () => {
     setCurrentDate(new Date(year, currentDate.getMonth()));
   };
 
-  const handleDayClick = (date: Date) => {
+  const handleDayClick = (date: Date, holidayEvent: Event | null) => {
     if (!isPastDay(date)) {
       setSelectedDate(date);
+      if (holidayEvent) {
+        setSelectedEvent(holidayEvent);
+      }
       setIsEventDialogOpen(true);
     }
   };
@@ -100,6 +99,10 @@ const BusinessCalendar: React.FC = () => {
         ...eventData,
         date: selectedDate,
       };
+      if (newEvent.isHoliday) {
+        delete newEvent.startTime;
+        delete newEvent.endTime;
+      }
       setEvents([...events, newEvent]);
     }
     setIsEventDialogOpen(false);
@@ -122,14 +125,14 @@ const BusinessCalendar: React.FC = () => {
     currentDate.getMonth(),
   );
 
-  const lastMonthDays = Array.from({ length: firstDayOfMonth }, () => null);
+  const blanks = Array.from({ length: firstDayOfMonth }, () => null);
 
   const currentMonthDays = Array.from(
     { length: daysInMonth },
     (_, day) =>
       new Date(currentDate.getFullYear(), currentDate.getMonth(), day + 1),
   );
-  const days: (Date | null)[] = [...lastMonthDays, ...currentMonthDays];
+  const days: (Date | null)[] = [...blanks, ...currentMonthDays];
 
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -154,25 +157,29 @@ const BusinessCalendar: React.FC = () => {
             </div>
           ))}
 
-          {days.map((date, index) => (
-            <div key={index} className="bg-white">
-              {date && (
-                <Day
-                  date={date}
-                  events={events.filter(
-                    (event) =>
-                      event.date.toDateString() === date.toDateString(),
-                  )}
-                  onEventClick={(event) => {
-                    setSelectedEvent(event);
-                    setIsEventDialogOpen(true);
-                  }}
-                  onDayClick={handleDayClick}
-                  holidays={holidays}
-                />
-              )}
-            </div>
-          ))}
+          {days.map((date, index) => {
+            const currentDayEvents = events.filter(
+              (event) => event.date.toDateString() === date?.toDateString(),
+            );
+            const holidays = currentDayEvents.filter((h) => h.isHoliday);
+
+            return (
+              <div key={index} className="bg-white">
+                {date && (
+                  <Day
+                    date={date}
+                    events={holidays.length > 0 ? holidays : currentDayEvents}
+                    onEventClick={(event) => {
+                      setSelectedEvent(event);
+                      setIsEventDialogOpen(true);
+                    }}
+                    onDayClick={handleDayClick}
+                    isHoliday={holidays.length > 0}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
