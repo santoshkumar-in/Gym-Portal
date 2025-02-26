@@ -516,9 +516,15 @@ export const getAttendance = cache(
   },
 );
 
-export const updateBusinessDetails = async (formData: FormData) => {
+export const updateBusinessDetails = async (
+  formData: FormData,
+): Promise<{
+  success: boolean;
+  data?: BUSINESS;
+  message?: string;
+}> => {
+  const businessId = formData.get("businessId");
   const validatedFields = BusinessInfoFormSchema.safeParse({
-    businessId: formData.get("businessId"),
     establishedOn: formData.get("establishedOn"),
     reviews: formData.get("reviews"),
     rating: formData.get("rating"),
@@ -537,18 +543,24 @@ export const updateBusinessDetails = async (formData: FormData) => {
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     console.error("errors", validatedFields.error);
+    return {
+      success: false,
+      message: "Validation Error",
+    };
   }
+
   //console.log("validated", validatedFields.data);
+
   try {
     const response = await apiClient(
-      `/api/info/business/details-part1/${validatedFields?.data?.businessId}`,
+      `/api/admin/business/details-part1/${businessId}`,
       {
-        method: "POST",
+        method: "PUT",
         body: JSON.stringify(validatedFields.data),
       },
     );
     toastSuccess("Details updated successfully");
-    console.log("Response:", response);
+    return response;
   } catch (e: unknown) {
     let message = "";
     if (typeof e === "string") {
@@ -557,6 +569,10 @@ export const updateBusinessDetails = async (formData: FormData) => {
       message = e.message;
     }
     toastError(message || "Error while updating the detail");
+    return {
+      success: false,
+      message,
+    };
   }
 };
 
@@ -578,10 +594,9 @@ export const updatePackage = async (formData: FormData) => {
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     console.error("errors", validatedFields.error);
-  } else {
-    console.log("validated", validatedFields.data);
+    return;
   }
-
+  console.log("validated", validatedFields.data);
   try {
     const response = await apiClient("/submit", {
       method: "POST",
@@ -617,10 +632,9 @@ export const addPackage = async (formData: FormData) => {
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     console.error("errors", validatedFields.error);
-  } else {
-    console.log("validated", validatedFields.data);
+    return;
   }
-
+  console.log("validated", validatedFields.data);
   try {
     const response = await apiClient("/submit", {
       method: "POST",
@@ -657,10 +671,9 @@ export const addOrUpdateUser = async (formData: FormData) => {
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     console.error("errors", validatedFields.error);
-  } else {
-    console.log("validated", validatedFields.data);
+    return;
   }
-
+  console.log("validated", validatedFields.data);
   try {
     const response = await apiClient("/submit", {
       method: "POST",
@@ -695,9 +708,10 @@ export const addAttendance = async (formData: FormData) => {
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     console.error("errors", validatedFields.error);
-  } else {
-    console.log("validated", validatedFields.data);
+    return;
   }
+
+  console.log("validated", validatedFields.data);
 
   try {
     const response = await apiClient("/submit", {

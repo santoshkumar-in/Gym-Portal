@@ -26,6 +26,7 @@ export const isPastDay = (date: Date): boolean => {
 };
 
 export const getRecurringEvents = (date: Date) => {
+  return date;
   // const recurringCalenderSettings = {
   //   weekly: {
   //     0: { willOpen: false },

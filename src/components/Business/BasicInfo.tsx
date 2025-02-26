@@ -75,7 +75,7 @@ const BasicInfo = ({ businessId }: Props) => {
     <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="relative z-20 min-h-55">
         <Image
-          src={businessData.coverImage}
+          src={businessData.coverImage || "/images/cover/cover-01.jpg"}
           alt="profile cover"
           className="rounded-tl-sm rounded-tr-sm object-cover object-center"
           fill={true}
@@ -124,7 +124,7 @@ const BasicInfo = ({ businessId }: Props) => {
           <div className="relative drop-shadow-2">
             <Image
               className="rounded-full"
-              src={businessData.logo}
+              src={businessData.logo || "/images/business/b1.webp"}
               width={160}
               height={160}
               style={{

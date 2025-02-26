@@ -26,12 +26,19 @@ const BasicInfoForm = ({ businessId }: BasicInfoFormProps) => {
   const { location: loc } = useGeoLocation();
   const locationRef = useRef(null);
 
+  const handleFormSubmit = async (formData: FormData) => {
+    const { success, data } = await updateBusinessDetails(formData);
+    if (success) {
+      setBusinessData(data);
+    }
+  };
+
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
         <h3 className="font-medium text-black dark:text-white">Edit Details</h3>
       </div>
-      <form action={updateBusinessDetails}>
+      <form action={handleFormSubmit}>
         <input type="hidden" name="businessId" value={businessId} />
         <div className="p-6.5">
           <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">

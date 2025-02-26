@@ -17,11 +17,13 @@ export const apiClient = async (url: string, options: RequestInit = {}) => {
       headers,
     });
 
+    const jsonRes = await response.json(); // Convert response to JSON
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      console.error("Error Message:", jsonRes["message"]);
+      throw new Error(`HTTP ${response.status}: ${jsonRes["message"]}`);
     }
 
-    return await response.json(); // Convert response to JSON
+    return jsonRes; // Convert response to JSON
   } catch (error) {
     console.error("API Error:", error);
     throw error; // Re-throw for further handling
