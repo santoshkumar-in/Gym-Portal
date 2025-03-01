@@ -18,6 +18,84 @@ import {
 } from "@/types/business";
 import { apiClient } from "@/helpers/api";
 
+export const getAllUsers = cache(
+  async (
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER[] ;
+    message?: string;
+  }> => {
+    try {
+      const data = await apiClient(
+        `/api/admin/business/${businessId}/get-all-users`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        }
+      );
+      // console.log(data)
+      return data;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+// export const getUsers = cache(
+//   (
+//     businessId: string,
+//   ): Promise<{
+//     success: boolean;
+//     data: BUSINESS_USER[] | [];
+//     message?: string;
+//   }> => {
+//     return new Promise(function (resolve) {
+//       console.info(businessId);
+//       resolve({
+//         success: true,
+//         data: [
+//           {
+//             id: "2401",
+//             firstName: "Sandeep",
+//             lastName: "Verma",
+//             gender: "M",
+//             email: "abs@gm.com",
+//             mobile: 112345343,
+//             role: "Admin",
+//             status: "ACTIVE",
+//           },
+//           {
+//             id: "2402",
+//             firstName: "Sultan",
+//             lastName: "Mirza",
+//             gender: "M",
+//             email: "rt@gm.com",
+//             mobile: 9112343,
+//             role: "Operator",
+//             status: "INACTIVE",
+//           },
+//           {
+//             id: "2403",
+//             firstName: "Tripti",
+//             lastName: "K",
+//             gender: "F",
+//             email: "fg@gm.com",
+//             mobile: 911244443,
+//             role: "Operator",
+//             status: "ACTIVE",
+//           },
+//         ],
+//       });
+//     });
+//   },
+// );
+
 export const getBusinessDetails = cache(
   async (
     businessId: string,
@@ -31,6 +109,7 @@ export const getBusinessDetails = cache(
         `/api/info/business/details-part1/${businessId}`,
         { method: "GET" },
       );
+      console.log(data);
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
@@ -304,54 +383,7 @@ export const getSubscribers = cache(
   },
 );
 
-export const getUsers = cache(
-  (
-    businessId: string,
-  ): Promise<{
-    success: boolean;
-    data: BUSINESS_USER[] | [];
-    message?: string;
-  }> => {
-    return new Promise(function (resolve) {
-      console.info(businessId);
-      resolve({
-        success: true,
-        data: [
-          {
-            id: "2401",
-            firstName: "Sandeep",
-            lastName: "Verma",
-            gender: "M",
-            email: "abs@gm.com",
-            mobile: 112345343,
-            role: "Admin",
-            status: "ACTIVE",
-          },
-          {
-            id: "2402",
-            firstName: "Sultan",
-            lastName: "Mirza",
-            gender: "M",
-            email: "rt@gm.com",
-            mobile: 9112343,
-            role: "Operator",
-            status: "INACTIVE",
-          },
-          {
-            id: "2403",
-            firstName: "Tripti",
-            lastName: "K",
-            gender: "F",
-            email: "fg@gm.com",
-            mobile: 911244443,
-            role: "Operator",
-            status: "ACTIVE",
-          },
-        ],
-      });
-    });
-  },
-);
+
 
 export const getUserSubscriptions = cache(
   (

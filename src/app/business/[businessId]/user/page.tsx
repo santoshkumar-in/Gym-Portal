@@ -4,7 +4,7 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import { toastSuccess } from "@/helpers/toast";
-import { getUsers } from "@/actions/business";
+import { getAllUsers } from "@/actions/business";
 import { BUSINESS_USER } from "@/types/business";
 import Users from "@/components/Business/Users";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
@@ -34,12 +34,21 @@ const BusinessUsers = ({
     { currentPage: 1, perPage: 10 },
   );
 
+
   useEffect(() => {
     async function getData() {
       const bId = (await params).businessId;
       setBusinessId(bId);
-      const { data } = await getUsers(bId);
-      setUsers(data);
+      try {
+        const { data } = await getAllUsers(bId);
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else {
+          console.error("Wrong data format", data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+      }
     }
     getData();
   }, []);
@@ -93,6 +102,7 @@ const BusinessUsers = ({
         users={users}
         businessId={businessId}
       />
+      {/* //TODO:- NEED TO CREate pagination LOGIC RENDER ITEMS ACCODING PER PAGE FILTER  */}
       <Pagination
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}

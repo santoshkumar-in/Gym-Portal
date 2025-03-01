@@ -18,7 +18,9 @@ const BusinessUsers = ({
   businessId,
   onDelete,
   onStatusChange,
+
 }: Props) => {
+  // console.log(users)
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
@@ -50,17 +52,17 @@ const BusinessUsers = ({
               <tr key={key}>
                 <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                   <h5 className="font-medium text-black dark:text-white">
-                    {user.firstName}
+                    {user.firstName || "N/A"}
                   </h5>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.lastName}</p>
+                  <p className="text-black dark:text-white">{user.lastName || "N/A"}</p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.email}</p>
+                  <p className="text-black dark:text-white">{user.email || "N/A"}</p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.mobile}</p>
+                  <p className="text-black dark:text-white">{user.mobile || "N/A"}</p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                   <SwitcherThree
