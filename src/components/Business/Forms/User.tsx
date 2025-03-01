@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getUsers, addOrUpdateUser } from "@/actions/business";
+import { addOrUpdateUser, getAllUsers } from "@/actions/business";
 import SwitcherThree from "@/components/Switchers/SwitcherThree";
 import { BUSINESS_USER } from "@/types/business";
 interface Props {
@@ -13,7 +13,7 @@ const UserForm = ({ businessId, userId = "" }: Props) => {
   );
   useEffect(() => {
     async function getData() {
-      const { data: packages = [] } = await getUsers(businessId);
+      const { data: packages = [] } = await getAllUsers(businessId);
       const found = packages.find((p) => p.id === userId);
       if (found) {
         setSelectedUser(found);
