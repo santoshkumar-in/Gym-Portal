@@ -33,25 +33,36 @@ const BusinessUsers = ({
   const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
     { currentPage: 1, perPage: 10 },
   );
-
+  console.log(paginationData)
 
   useEffect(() => {
-    async function getData() {
-      const bId = (await params).businessId;
-      setBusinessId(bId);
+    const getData = async () => {
       try {
-        const { data } = await getAllUsers(bId);
-        if (Array.isArray(data)) {
-          setUsers(data);
+        const { businessId: bId } = await params;
+        setBusinessId(bId);
+  
+        const res = await getAllUsers(bId, paginationData.currentPage, paginationData.perPage);
+  
+        setPaginationData((prev) => ({
+          ...prev,
+          currentPage: res.currentPage, // Ensure you're not resetting state to the same value
+          perPage: res.perPage,
+        }));
+  
+        if (Array.isArray(res.data)) {
+          setUsers(res.data);
         } else {
-          console.error("Wrong data format", data);
+          console.error("Wrong data format", res.data);
         }
       } catch (error) {
         console.error("Failed to fetch users", error);
       }
-    }
+    };
+  
     getData();
-  }, []);
+  }, [params, paginationData.currentPage, paginationData.perPage]);  //todo--- per page working but cureent page chnge not workimng 
+  // }, []);
+  
 
   const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
@@ -84,9 +95,14 @@ const BusinessUsers = ({
     console.log(arg);
   };
 
-  const handlePageChange = (page: number) => {
-    setPaginationData({ ...paginationData, currentPage: page });
-  };
+const handlePageChange = (page: number) => {
+  setPaginationData((prev) => ({ ...prev, currentPage: page }));
+};
+
+const handlePerPageChange = (perPage: number) => {
+  setPaginationData((prev) => ({ ...prev, perPage }));
+};
+
 
   return (
     <DefaultLayout>
@@ -104,8 +120,10 @@ const BusinessUsers = ({
       />
       {/* //TODO:- NEED TO CREate pagination LOGIC RENDER ITEMS ACCODING PER PAGE FILTER  */}
       <Pagination
+      onPerPageChange = {handlePerPageChange}
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}
+        perPage={paginationData.perPage}
       />
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">

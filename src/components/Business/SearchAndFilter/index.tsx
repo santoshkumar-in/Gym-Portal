@@ -126,7 +126,7 @@ const SearchAndFilterBar = ({
                 onChange={throttledChangeHandler}
                 className="min-w-75 rounded-md border border-stroke px-5 py-2 pl-12 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
                 placeholder="Search..."
-                value={dataFilters?.searchTerm || ""}
+                value={dataFilters?.searchTerm || ""}  
               />
             </div>
           )}

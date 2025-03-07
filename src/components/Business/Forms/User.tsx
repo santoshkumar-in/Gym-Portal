@@ -7,13 +7,18 @@ interface Props {
   businessId: string;
   userId?: string;
 }
-const UserForm = ({ businessId, userId = "" }: Props) => {
+const UserForm = ({ businessId, userId  = "" }: Props) => {
   const [selectedUser, setSelectedUser] = useState<BUSINESS_USER>(
     {} as BUSINESS_USER,
   );
+  // console.log(selectedUser)
+  // console.log(businessId)
+  // console.log(userId)
   useEffect(() => {
     async function getData() {
       const { data: packages = [] } = await getAllUsers(businessId);
+
+
       const found = packages.find((p) => p.id === userId);
       if (found) {
         setSelectedUser(found);

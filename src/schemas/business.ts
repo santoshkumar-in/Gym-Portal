@@ -29,11 +29,11 @@ export const BusinessPackageSchema = z.object({
 });
 
 export const BusinessUserSchema = z.object({
-  id: z.string().trim(),
+  // id: z.string().trim(),
   firstName: z.string().trim(),
   lastName: z.string().trim(),
   email: z.string().email().trim(),
-  gender: z.string().trim(),
+  // gender: z.string().trim(),
   mobile: z.string().trim(),
   password: z.string().trim(),
   role: z.string().trim(),
