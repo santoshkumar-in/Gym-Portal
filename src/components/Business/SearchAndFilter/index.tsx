@@ -104,6 +104,7 @@ const SearchAndFilterBar = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       //console.log("Throttled Value:", event.target.value);
       setDataFilters({ ...dataFilters, searchTerm: event.target.value });
+      onChange({ ...dataFilters, searchTerm: event.target.value });
     },
     300,
   );

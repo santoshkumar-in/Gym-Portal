@@ -21,9 +21,12 @@ import { apiClient } from "@/helpers/api";
 export const getAllUsers = cache(
   async (
     businessId: string,
+    bodyParams: { [k: string]: unknown },
   ): Promise<{
+    currentPage: number;
+    perPage: number;
     success: boolean;
-    data?: BUSINESS_USER[] ;
+    data?: BUSINESS_USER[];
     message?: string;
   }> => {
     try {
@@ -31,15 +34,15 @@ export const getAllUsers = cache(
         `/api/admin/business/${businessId}/get-all-users`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        }
+          body: JSON.stringify(bodyParams),
+        },
       );
-      // console.log(data)
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
       return {
+        currentPage: 0,
+        perPage: 0,
         success: false,
         message: "Error",
       };
@@ -47,54 +50,76 @@ export const getAllUsers = cache(
   },
 );
 
-// export const getUsers = cache(
-//   (
-//     businessId: string,
-//   ): Promise<{
-//     success: boolean;
-//     data: BUSINESS_USER[] | [];
-//     message?: string;
-//   }> => {
-//     return new Promise(function (resolve) {
-//       console.info(businessId);
-//       resolve({
-//         success: true,
-//         data: [
-//           {
-//             id: "2401",
-//             firstName: "Sandeep",
-//             lastName: "Verma",
-//             gender: "M",
-//             email: "abs@gm.com",
-//             mobile: 112345343,
-//             role: "Admin",
-//             status: "ACTIVE",
-//           },
-//           {
-//             id: "2402",
-//             firstName: "Sultan",
-//             lastName: "Mirza",
-//             gender: "M",
-//             email: "rt@gm.com",
-//             mobile: 9112343,
-//             role: "Operator",
-//             status: "INACTIVE",
-//           },
-//           {
-//             id: "2403",
-//             firstName: "Tripti",
-//             lastName: "K",
-//             gender: "F",
-//             email: "fg@gm.com",
-//             mobile: 911244443,
-//             role: "Operator",
-//             status: "ACTIVE",
-//           },
-//         ],
-//       });
-//     });
-//   },
-// );
+export const addOrUpdateUser = cache(
+  async (
+    formData: FormData,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER;
+    message?: string;
+  }> => {
+    const validatedFields = BusinessUserSchema.safeParse({
+      businessId: formData.get("businessId"),
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      status: formData.get("status") || "INACTIVE",
+      email: formData.get("email"),
+      mobile: Number(formData.get("mobile")),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+      phone: formData.get("phone"),
+      role: formData.get("role"),
+    });
+
+    // If any form fields are invalid, return early
+    if (!validatedFields.success) {
+      console.error("errors", validatedFields.error);
+      return {
+        success: false,
+        message: "Validation Error",
+      };
+    }
+
+    const body = {
+      businessId: formData.get("businessId"),
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      //status: formData.get("status") || "INACTIVE",
+      emailId: formData.get("email"),
+      mobile: Number(formData.get("mobile")),
+      password: formData.get("password"),
+      role: formData.get("role"),
+      isd: "UH1jADHmrx9lddZkWFAWnQ", //Remove later
+    };
+
+    console.log("validated", body);
+
+    try {
+      const data = await apiClient(`/api/admin/create-operator`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (e: unknown) {
+      let message = "";
+      if (typeof e === "string") {
+        message = e.toUpperCase();
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      toastError(message || "Error while updating the detail");
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+);
 
 export const getBusinessDetails = cache(
   async (
@@ -383,8 +408,6 @@ export const getSubscribers = cache(
   },
 );
 
-
-
 export const getUserSubscriptions = cache(
   (
     subscriberId: string,
@@ -660,45 +683,6 @@ export const addPackage = async (formData: FormData) => {
   };
 
   const validatedFields = BusinessPackageSchema.safeParse(rawInput);
-
-  // If any form fields are invalid, return early
-  if (!validatedFields.success) {
-    console.error("errors", validatedFields.error);
-    return;
-  }
-  console.log("validated", validatedFields.data);
-  try {
-    const response = await apiClient("/submit", {
-      method: "POST",
-      body: JSON.stringify(validatedFields.data),
-    });
-    toastSuccess("Details updated successfully");
-    console.log("Response:", response);
-  } catch (e: unknown) {
-    let message = "";
-    if (typeof e === "string") {
-      message = e.toUpperCase();
-    } else if (e instanceof Error) {
-      message = e.message;
-    }
-    toastError(message || "Error while updating the detail");
-  }
-};
-
-export const addOrUpdateUser = async (formData: FormData) => {
-  const rawInput = {
-    id: formData.get("userId"),
-    businessId: formData.get("businessId"),
-    firstName: formData.get("firstName"),
-    lastName: formData.get("lastName"),
-    email: formData.get("email"),
-    mobile: formData.get("mobile"),
-    password: formData.get("password"),
-    role: formData.get("role"),
-    status: formData.get("status") ? "ACTIVE" : "INACTIVE",
-  };
-
-  const validatedFields = BusinessUserSchema.safeParse(rawInput);
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {

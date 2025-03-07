@@ -1,17 +1,20 @@
 "use client";
-import { useState } from "react";
+
 interface Props {
   total?: number;
   currentPage?: number;
+  perPage?: number;
+  onPerPageChange?: (page: number) => void;
   onPageChange?: (page: number) => void;
 }
 
 const Pagination = ({
-  total = 1244,
+  total = 10,
   currentPage = 1,
+  perPage = 10,
   onPageChange = () => null,
+  onPerPageChange = () => null,
 }: Props) => {
-  const [perPage, setPerPage] = useState<number>(10);
   const totalPages = Math.ceil(total / perPage);
   const maxPageNumbersToShow = 9;
 
@@ -57,11 +60,6 @@ const Pagination = ({
     }
 
     return pages;
-  };
-
-  const handlePerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
-    setPerPage(Number(e.target.value));
   };
 
   return (
@@ -148,7 +146,7 @@ const Pagination = ({
       <div className="ml-auto flex items-center font-medium">
         <select
           className="w-20 bg-transparent pl-2"
-          onChange={handlePerPageChange}
+          onChange={(e) => onPerPageChange(Number(e.target.value))}
           value={perPage}
         >
           <option value={5}>5</option>

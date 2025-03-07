@@ -92,7 +92,7 @@ export type ATTENDANCE = {
 
 export type BUSINESS_USER = {
   id: string;
-  username?: string;
+  userName?: string;
   email?: string;
   mobile?: number;
   isd?: string;
@@ -101,6 +101,7 @@ export type BUSINESS_USER = {
   confirmPassword?: string;
   firstName?: string;
   lastName?: string;
+  fullName?: string;
   logoUrl?: string | null;
   role?: string;
   status?: string;

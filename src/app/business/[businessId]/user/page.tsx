@@ -15,6 +15,7 @@ const tableFilters = [
     label: "Status",
     fieldType: "select",
     selectOptions: [
+      { value: "ALL", label: "All" },
       { value: "ACTIVE", label: "Active" },
       { value: "INACTIVE", label: "Inactive" },
     ],
@@ -34,24 +35,48 @@ const BusinessUsers = ({
     { currentPage: 1, perPage: 10 },
   );
 
+  const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
+    [k: string]: unknown;
+  }>({ searchTerm: "", status: "" });
 
   useEffect(() => {
-    async function getData() {
-      const bId = (await params).businessId;
+    const getBusinessId = async () => {
+      const { businessId: bId } = await params;
       setBusinessId(bId);
-      try {
-        const { data } = await getAllUsers(bId);
-        if (Array.isArray(data)) {
-          setUsers(data);
-        } else {
-          console.error("Wrong data format", data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch users", error);
+    };
+    getBusinessId();
+  }, [params]);
+
+  useEffect(() => {
+    const { currentPage, perPage } = paginationData;
+    //const { searchTerm, status } = currentSearchAndFilters;
+    const bodyParams = {
+      perPage,
+      currentPage,
+      //searchTerm,
+      //status,
+    };
+    getData(bodyParams);
+  }, [businessId]);
+
+  const getData = async (params: { [s: string]: unknown }) => {
+    try {
+      const res = await getAllUsers(businessId, params);
+      setPaginationData((prev) => ({
+        ...prev,
+        currentPage: res.currentPage, // Ensure you're not resetting state to the same value
+        perPage: res.perPage,
+      }));
+
+      if (Array.isArray(res.data)) {
+        setUsers(res.data);
+      } else {
+        console.error("Wrong data format", res.data);
       }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
     }
-    getData();
-  }, []);
+  };
 
   const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
@@ -81,11 +106,41 @@ const BusinessUsers = ({
   };
 
   const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
-    console.log(arg);
+    setCurrentSearchAndFilters(arg);
+    const { currentPage, perPage } = paginationData;
+    const bodyParams = {
+      perPage,
+      currentPage,
+      ...arg,
+    };
+    getData(bodyParams);
   };
 
   const handlePageChange = (page: number) => {
-    setPaginationData({ ...paginationData, currentPage: page });
+    setPaginationData((prev) => ({ ...prev, currentPage: page }));
+
+    const { perPage } = paginationData;
+    const { searchTerm, status } = currentSearchAndFilters;
+    const bodyParams = {
+      perPage,
+      currentPage: page,
+      searchTerm,
+      status,
+    };
+    getData(bodyParams);
+  };
+
+  const handlePerPageChange = (perPage: number) => {
+    setPaginationData((prev) => ({ ...prev, perPage }));
+    const { currentPage } = paginationData;
+    const { searchTerm, status } = currentSearchAndFilters;
+    const bodyParams = {
+      perPage,
+      currentPage,
+      searchTerm,
+      status,
+    };
+    getData(bodyParams);
   };
 
   return (
@@ -104,8 +159,10 @@ const BusinessUsers = ({
       />
       {/* //TODO:- NEED TO CREate pagination LOGIC RENDER ITEMS ACCODING PER PAGE FILTER  */}
       <Pagination
+        onPerPageChange={handlePerPageChange}
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}
+        perPage={paginationData.perPage}
       />
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">
