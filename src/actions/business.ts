@@ -4,7 +4,7 @@ import {
   BusinessAttendanceSchema,
   BusinessInfoFormSchema,
   BusinessPackageSchema,
-  //BusinessUserSchema,
+  BusinessUserSchema,
 } from "@/schemas/business";
 import {
   BUSINESS,
@@ -50,65 +50,72 @@ export const getAllUsers = cache(
   },
 );
 
-// export const addOrUpdateUser = cache(
-//   async (
-//     businessId: string,
-//     page: number, perPage: number
-//   ): Promise<{
-//     // currentPage: number;
-//     // perPage: number;
-//     // success: boolean;
-//     data?: BUSINESS_USER[] ;
-//     message?: string;
-//   }> => {
-//     try {
-//       const data = await apiClient(
-//         `/api/admin/create-operator`,
-//         {
-//           method: "POST",
-//           headers: { "Content-Type": "application/json" },
-//           body: JSON.stringify({}),
-//         }
-//       );
-//       //console.log(data)   //currentPage :0 ,  perPage : 10, total : 1
-//       return data;
-//     } catch (error) {
-//       console.error("Fetch error:", error);
-//       return {
-//         success: false,
-//         message: "Error",
-//       };
-//     }
-//   },
-// );
 export const addOrUpdateUser = cache(
-  async (businessId: string, user: Partial<BUSINESS_USER>) => {
+  async (
+    formData: FormData,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER;
+    message?: string;
+  }> => {
+    const validatedFields = BusinessUserSchema.safeParse({
+      businessId: formData.get("businessId"),
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      status: formData.get("status") || "INACTIVE",
+      email: formData.get("email"),
+      mobile: Number(formData.get("mobile")),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+      phone: formData.get("phone"),
+      role: formData.get("role"),
+    });
+
+    // If any form fields are invalid, return early
+    if (!validatedFields.success) {
+      console.error("errors", validatedFields.error);
+      return {
+        success: false,
+        message: "Validation Error",
+      };
+    }
+
+    const body = {
+      businessId: formData.get("businessId"),
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      //status: formData.get("status") || "INACTIVE",
+      emailId: formData.get("email"),
+      mobile: Number(formData.get("mobile")),
+      password: formData.get("password"),
+      role: formData.get("role"),
+      isd: "UH1jADHmrx9lddZkWFAWnQ", //Remove later
+    };
+
+    console.log("validated", body);
+
     try {
-      const response = await apiClient(`/api/admin/create-operator`, {
+      const data = await apiClient(`/api/admin/create-operator`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          businessId, // Ensure backend accepts this
-          ...user,
-        }),
+        body: JSON.stringify(body),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${data.message || "Error"}`);
-      }
 
       return {
         success: true,
         data,
-        message: "User added/updated successfully",
       };
-    } catch (error) {
-      console.error("Fetch error:", error);
+    } catch (e: unknown) {
+      let message = "";
+      if (typeof e === "string") {
+        message = e.toUpperCase();
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      toastError(message || "Error while updating the detail");
       return {
         success: false,
-        message: error.message || "Error adding/updating user",
+        message,
       };
     }
   },
@@ -700,45 +707,6 @@ export const addPackage = async (formData: FormData) => {
     toastError(message || "Error while updating the detail");
   }
 };
-
-// export const addOrUpdateUser = async (formData: FormData) => {
-//   const rawInput = {
-//     id: formData.get("userId"),
-//     businessId: formData.get("businessId"),
-//     firstName: formData.get("firstName"),
-//     lastName: formData.get("lastName"),
-//     email: formData.get("email"),
-//     mobile: formData.get("mobile"),
-//     password: formData.get("password"),
-//     role: formData.get("role"),
-//     status: formData.get("status") ? "ACTIVE" : "INACTIVE",
-//   };
-
-//   const validatedFields = BusinessUserSchema.safeParse(rawInput);
-
-//   // If any form fields are invalid, return early
-//   if (!validatedFields.success) {
-//     console.error("errors", validatedFields.error);
-//     return;
-//   }
-//   console.log("validated", validatedFields.data);
-//   try {
-//     const response = await apiClient("/submit", {
-//       method: "POST",
-//       body: JSON.stringify(validatedFields.data),
-//     });
-//     toastSuccess("Details updated successfully");
-//     console.log("Response:", response);
-//   } catch (e: unknown) {
-//     let message = "";
-//     if (typeof e === "string") {
-//       message = e.toUpperCase();
-//     } else if (e instanceof Error) {
-//       message = e.message;
-//     }
-//     toastError(message || "Error while updating the detail");
-//   }
-// };
 
 export const addAttendance = async (formData: FormData) => {
   const rawInput = {

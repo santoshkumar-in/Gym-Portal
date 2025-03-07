@@ -28,17 +28,22 @@ export const BusinessPackageSchema = z.object({
   services: z.array(z.string()),
 });
 
-export const BusinessUserSchema = z.object({
-  // id: z.string().trim(),
-  firstName: z.string().trim(),
-  lastName: z.string().trim(),
-  email: z.string().email().trim(),
-  // gender: z.string().trim(),
-  mobile: z.string().trim(),
-  password: z.string().trim(),
-  role: z.string().trim(),
-  status: z.string().trim(),
-});
+export const BusinessUserSchema = z
+  .object({
+    businessId: z.string().trim(),
+    fullName: z.string().trim(),
+    userName: z.string().trim(),
+    email: z.string().email().trim(),
+    mobile: z.number().min(10, "Mobile must be 10 digit"),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
+    confirmPassword: z.string().trim(),
+    role: z.string().trim(),
+    status: z.string().trim(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"], // This ensures the error appears under confirmPassword
+  });
 
 export const BusinessAttendanceSchema = z.object({
   id: z.string().trim(),
