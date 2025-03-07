@@ -15,6 +15,7 @@ const tableFilters = [
     label: "Status",
     fieldType: "select",
     selectOptions: [
+      { value: "ALL", label: "All" },
       { value: "ACTIVE", label: "Active" },
       { value: "INACTIVE", label: "Inactive" },
     ],
@@ -33,36 +34,49 @@ const BusinessUsers = ({
   const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
     { currentPage: 1, perPage: 10 },
   );
-  console.log(paginationData)
+
+  const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
+    [k: string]: unknown;
+  }>({ searchTerm: "", status: "" });
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const { businessId: bId } = await params;
-        setBusinessId(bId);
-  
-        const res = await getAllUsers(bId, paginationData.currentPage, paginationData.perPage);
-  
-        setPaginationData((prev) => ({
-          ...prev,
-          currentPage: res.currentPage, // Ensure you're not resetting state to the same value
-          perPage: res.perPage,
-        }));
-  
-        if (Array.isArray(res.data)) {
-          setUsers(res.data);
-        } else {
-          console.error("Wrong data format", res.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch users", error);
-      }
+    const getBusinessId = async () => {
+      const { businessId: bId } = await params;
+      setBusinessId(bId);
     };
-  
-    getData();
-  }, [params, paginationData.currentPage, paginationData.perPage]);  //todo--- per page working but cureent page chnge not workimng 
-  // }, []);
-  
+    getBusinessId();
+  }, [params]);
+
+  useEffect(() => {
+    const { currentPage, perPage } = paginationData;
+    //const { searchTerm, status } = currentSearchAndFilters;
+    const bodyParams = {
+      perPage,
+      currentPage,
+      //searchTerm,
+      //status,
+    };
+    getData(bodyParams);
+  }, [businessId]);
+
+  const getData = async (params: { [s: string]: unknown }) => {
+    try {
+      const res = await getAllUsers(businessId, params);
+      setPaginationData((prev) => ({
+        ...prev,
+        currentPage: res.currentPage, // Ensure you're not resetting state to the same value
+        perPage: res.perPage,
+      }));
+
+      if (Array.isArray(res.data)) {
+        setUsers(res.data);
+      } else {
+        console.error("Wrong data format", res.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    }
+  };
 
   const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
@@ -92,17 +106,42 @@ const BusinessUsers = ({
   };
 
   const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
-    console.log(arg);
+    setCurrentSearchAndFilters(arg);
+    const { currentPage, perPage } = paginationData;
+    const bodyParams = {
+      perPage,
+      currentPage,
+      ...arg,
+    };
+    getData(bodyParams);
   };
 
-const handlePageChange = (page: number) => {
-  setPaginationData((prev) => ({ ...prev, currentPage: page }));
-};
+  const handlePageChange = (page: number) => {
+    setPaginationData((prev) => ({ ...prev, currentPage: page }));
 
-const handlePerPageChange = (perPage: number) => {
-  setPaginationData((prev) => ({ ...prev, perPage }));
-};
+    const { perPage } = paginationData;
+    const { searchTerm, status } = currentSearchAndFilters;
+    const bodyParams = {
+      perPage,
+      currentPage: page,
+      searchTerm,
+      status,
+    };
+    getData(bodyParams);
+  };
 
+  const handlePerPageChange = (perPage: number) => {
+    setPaginationData((prev) => ({ ...prev, perPage }));
+    const { currentPage } = paginationData;
+    const { searchTerm, status } = currentSearchAndFilters;
+    const bodyParams = {
+      perPage,
+      currentPage,
+      searchTerm,
+      status,
+    };
+    getData(bodyParams);
+  };
 
   return (
     <DefaultLayout>
@@ -120,7 +159,7 @@ const handlePerPageChange = (perPage: number) => {
       />
       {/* //TODO:- NEED TO CREate pagination LOGIC RENDER ITEMS ACCODING PER PAGE FILTER  */}
       <Pagination
-      onPerPageChange = {handlePerPageChange}
+        onPerPageChange={handlePerPageChange}
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}
         perPage={paginationData.perPage}

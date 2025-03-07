@@ -9,7 +9,7 @@ interface Props {
 }
 
 const Pagination = ({
-  total = 1244,
+  total = 10,
   currentPage = 1,
   perPage = 10,
   onPageChange = () => null,
@@ -61,8 +61,6 @@ const Pagination = ({
 
     return pages;
   };
-
-
 
   return (
     <div className="mt-4 flex items-center justify-center rounded-sm border border-gray-100 bg-white px-5 py-3 shadow-default dark:border-gray-800 dark:bg-boxdark sm:px-7.5 sm:py-3">

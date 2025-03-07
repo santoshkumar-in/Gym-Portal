@@ -11,6 +11,8 @@ export const apiClient = async (url: string, options: RequestInit = {}) => {
     ...options.headers, // Merge with existing headers (if any)
   };
 
+  console.log("headers", { token, url });
+
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {
       ...options,

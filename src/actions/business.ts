@@ -4,7 +4,7 @@ import {
   BusinessAttendanceSchema,
   BusinessInfoFormSchema,
   BusinessPackageSchema,
-  BusinessUserSchema,
+  //BusinessUserSchema,
 } from "@/schemas/business";
 import {
   BUSINESS,
@@ -21,24 +21,22 @@ import { apiClient } from "@/helpers/api";
 export const getAllUsers = cache(
   async (
     businessId: string,
-    page: number, perPage: number
+    bodyParams: { [k: string]: unknown },
   ): Promise<{
     currentPage: number;
     perPage: number;
     success: boolean;
-    data?: BUSINESS_USER[] ;
+    data?: BUSINESS_USER[];
     message?: string;
   }> => {
     try {
       const data = await apiClient(
-        `/api/admin/business/${businessId}/get-all-users?page=${page}&perPage=${perPage}`,
+        `/api/admin/business/${businessId}/get-all-users`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        }
+          body: JSON.stringify(bodyParams),
+        },
       );
-      //console.log(data)   //currentPage :0 ,  perPage : 10, total : 1
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
@@ -113,11 +111,8 @@ export const addOrUpdateUser = cache(
         message: error.message || "Error adding/updating user",
       };
     }
-  }
+  },
 );
-
-
-
 
 export const getBusinessDetails = cache(
   async (
