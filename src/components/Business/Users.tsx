@@ -28,10 +28,10 @@ const BusinessUsers = ({
           <thead>
             <tr className="bg-gray-2 text-left dark:bg-meta-4">
               <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                First Name
+                Full Name
               </th>
               <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white">
-                Last Name
+                Username
               </th>
               <th className="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
                 Email
@@ -52,11 +52,11 @@ const BusinessUsers = ({
               <tr key={key}>
                 <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                   <h5 className="font-medium text-black dark:text-white">
-                    {user.firstName || "N/A"}
+                    {user.fullName || "N/A"}
                   </h5>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.lastName || "N/A"}</p>
+                  <p className="text-black dark:text-white">{user.userName || "N/A"}</p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                   <p className="text-black dark:text-white">{user.email || "N/A"}</p>
@@ -67,8 +67,9 @@ const BusinessUsers = ({
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                   <SwitcherThree
                     name="status"
-                    defaultChecked={user.status === "ACTIVE"}
-                    onChange={(e) => onStatusChange(e, user.id)}
+                    // defaultChecked={user.status === "ACTIVE"}
+                    defaultChecked={user.enabled} // True = active, False = inactive
+                    onChange={(e) => onStatusChange(e, user.businessid)}
                   />
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">

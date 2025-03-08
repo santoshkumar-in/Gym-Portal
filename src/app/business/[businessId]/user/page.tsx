@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
-import { toastSuccess } from "@/helpers/toast";
+import { toastSuccess, toastError } from "@/helpers/toast";
 import { getAllUsers } from "@/actions/business";
 import { BUSINESS_USER } from "@/types/business";
 import Users from "@/components/Business/Users";
@@ -38,6 +38,8 @@ const BusinessUsers = ({
   const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
     [k: string]: unknown;
   }>({ searchTerm: "", status: "" });
+
+  console.log(users);
 
   useEffect(() => {
     const getBusinessId = async () => {
@@ -78,6 +80,8 @@ const BusinessUsers = ({
     }
   };
 
+  
+
   const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
     if (userId) {
@@ -97,14 +101,64 @@ const BusinessUsers = ({
     setSelected("");
   };
 
-  const handleStatusChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    userId: string,
-  ) => {
-    toastSuccess(`User status update successfully`);
-    console.log(e.target.value ? e.target.value.toUpperCase() : "OFF", userId);
-  };
+  // const handleStatusChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   userId: string,
+  // ) => {
+  //   toastSuccess(`User status update successfully`);
+  //   console.log(e.target.value ? e.target.value.toUpperCase() : "OFF", userId);
+  // };
 
+  // const handleStatusChange = async (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   userId: string
+  // ) => {
+  //   const newStatus = e.target.checked; // True if toggled on, False if toggled off
+  // console.log(newStatus)
+  //   try {
+  //     const response = await getAllUsers(businessId,newStatus params);
+  
+  //     if (!response.ok) {
+  //       throw new Error("Failed to update status");
+  //     }
+  
+  //     toastSuccess(`User status updated successfully`);
+  
+  //     // Refresh user data to reflect changes
+  //     await getData({});
+  //   } catch (error) {
+  //     toastError("Failed to update user status");
+  //     console.error("Status update error:", error);
+  //   }
+  // };
+  
+//? i chenged this only ---
+  const handleStatusChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    userId: string
+  ) => {
+    const newStatus = e.target.checked; // True if toggled on, False if toggled off
+  
+    console.log("Updating status for user:", userId, "New Status:", newStatus);
+  
+    try {
+      // Fetch updated user list with new status
+      const response = await getData({ userId, enabled: newStatus });
+      console.log(response)
+  
+      // if (!response) {
+      //   throw new Error("Failed to update status");
+      // }
+  
+      toastSuccess(`User status updated successfully`);
+    } catch (error) {
+      toastError("Failed to update user status");
+      console.error("Status update error:", error);
+    }
+  };
+  
+
+  
   const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
     setCurrentSearchAndFilters(arg);
     const { currentPage, perPage } = paginationData;
