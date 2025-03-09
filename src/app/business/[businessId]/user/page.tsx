@@ -32,7 +32,7 @@ const BusinessUsers = ({
   const [users, setUsers] = useState<BUSINESS_USER[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
   const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
-    { currentPage: 1, perPage: 10 },
+    { currentPage: 1, perPage: 10,  total:0, },
   );
 
   const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
@@ -50,24 +50,31 @@ const BusinessUsers = ({
   }, [params]);
 
   useEffect(() => {
-    const { currentPage, perPage } = paginationData;
+    const { currentPage, perPage, total } = paginationData;
     //const { searchTerm, status } = currentSearchAndFilters;
     const bodyParams = {
       perPage,
       currentPage,
+      total
       //searchTerm,
       //status,
     };
     getData(bodyParams);
   }, [businessId]);
 
+// console.log(paginationData)
+
   const getData = async (params: { [s: string]: unknown }) => {
     try {
       const res = await getAllUsers(businessId, params);
+      console.log(res)
+      
       setPaginationData((prev) => ({
         ...prev,
         currentPage: res.currentPage, // Ensure you're not resetting state to the same value
         perPage: res.perPage,
+        total: res.total || prev.total, // Keep previous total if not returned
+        
       }));
 
       if (Array.isArray(res.data)) {
@@ -81,6 +88,7 @@ const BusinessUsers = ({
   };
 
   
+
 
   const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
@@ -173,27 +181,31 @@ const BusinessUsers = ({
   const handlePageChange = (page: number) => {
     setPaginationData((prev) => ({ ...prev, currentPage: page }));
 
-    const { perPage } = paginationData;
+    const { perPage, total  } = paginationData;
     const { searchTerm, status } = currentSearchAndFilters;
     const bodyParams = {
       perPage,
       currentPage: page,
+      total,
       searchTerm,
       status,
     };
+    console.log("Sending API request with:", bodyParams);
     getData(bodyParams);
   };
 
   const handlePerPageChange = (perPage: number) => {
     setPaginationData((prev) => ({ ...prev, perPage }));
-    const { currentPage } = paginationData;
+    const { currentPage,total  } = paginationData;
     const { searchTerm, status } = currentSearchAndFilters;
     const bodyParams = {
       perPage,
       currentPage,
+      total ,
       searchTerm,
       status,
     };
+    console.log("Sending API request with:", bodyParams);
     getData(bodyParams);
   };
 
@@ -217,6 +229,7 @@ const BusinessUsers = ({
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}
         perPage={paginationData.perPage}
+        total={paginationData.total}
       />
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">

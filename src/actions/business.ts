@@ -25,24 +25,34 @@ export const getAllUsers = cache(
   ): Promise<{
     currentPage: number;
     perPage: number;
+    total:number;
     success: boolean;
     data?: BUSINESS_USER[];
     message?: string;
   }> => {
     try {
+      // const data = await apiClient(
+      //   `/api/admin/business/${businessId}/get-all-users?perPage=perPage&currentPage=currentPage}`,
+      //   {
+      //     method: "POST",
+      //     body: JSON.stringify(bodyParams),
+      //   },
+      // );
       const data = await apiClient(
-        `/api/admin/business/${businessId}/get-all-users`,
+        `/api/admin/business/${businessId}/get-all-users?search=${bodyParams.searchTerm}&perPage=${bodyParams.perPage}&currentPage=${bodyParams.currentPage}`,
         {
           method: "POST",
           body: JSON.stringify(bodyParams),
-        },
+        }
       );
+      
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
       return {
         currentPage: 0,
         perPage: 0,
+        total:0,
         success: false,
         message: "Error",
       };

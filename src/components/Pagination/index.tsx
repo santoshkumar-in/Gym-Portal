@@ -7,9 +7,8 @@ interface Props {
   onPerPageChange?: (page: number) => void;
   onPageChange?: (page: number) => void;
 }
-
 const Pagination = ({
-  total = 10,
+  total = 20,
   currentPage = 1,
   perPage = 10,
   onPageChange = () => null,
@@ -17,6 +16,7 @@ const Pagination = ({
 }: Props) => {
   const totalPages = Math.ceil(total / perPage);
   const maxPageNumbersToShow = 9;
+console.log(total,currentPage,perPage)
 
   if (totalPages < 2) {
     return null;
