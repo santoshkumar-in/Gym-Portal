@@ -32,7 +32,7 @@ const BusinessUsers = ({
   const [users, setUsers] = useState<BUSINESS_USER[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
   const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
-    { currentPage: 1, perPage: 10,  total:0, },
+    { currentPage: 1, perPage: 10, total: 0, },
   );
 
   const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
@@ -51,30 +51,29 @@ const BusinessUsers = ({
 
   useEffect(() => {
     const { currentPage, perPage, total } = paginationData;
-    //const { searchTerm, status } = currentSearchAndFilters;
+    const { searchTerm, status } = currentSearchAndFilters;
     const bodyParams = {
       perPage,
       currentPage,
-      total
-      //searchTerm,
-      //status,
+      total,
+      searchTerm,
+      status,
     };
     getData(bodyParams);
   }, [businessId]);
 
-// console.log(paginationData)
+  // console.log(paginationData)
 
   const getData = async (params: { [s: string]: unknown }) => {
     try {
       const res = await getAllUsers(businessId, params);
-      console.log(res)
-      
+      // console.log(res)
+
       setPaginationData((prev) => ({
         ...prev,
-        currentPage: res.currentPage, // Ensure you're not resetting state to the same value
+        currentPage: res.currentPage,
         perPage: res.perPage,
-        total: res.total || prev.total, // Keep previous total if not returned
-        
+        total: res.total
       }));
 
       if (Array.isArray(res.data)) {
@@ -86,9 +85,6 @@ const BusinessUsers = ({
       console.error("Failed to fetch users", error);
     }
   };
-
-  
-
 
   const handleDelete = (userId: string | undefined) => {
     setShowDeletePrompt(true);
@@ -109,64 +105,24 @@ const BusinessUsers = ({
     setSelected("");
   };
 
-  // const handleStatusChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   userId: string,
-  // ) => {
-  //   toastSuccess(`User status update successfully`);
-  //   console.log(e.target.value ? e.target.value.toUpperCase() : "OFF", userId);
-  // };
-
-  // const handleStatusChange = async (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   userId: string
-  // ) => {
-  //   const newStatus = e.target.checked; // True if toggled on, False if toggled off
-  // console.log(newStatus)
-  //   try {
-  //     const response = await getAllUsers(businessId,newStatus params);
-  
-  //     if (!response.ok) {
-  //       throw new Error("Failed to update status");
-  //     }
-  
-  //     toastSuccess(`User status updated successfully`);
-  
-  //     // Refresh user data to reflect changes
-  //     await getData({});
-  //   } catch (error) {
-  //     toastError("Failed to update user status");
-  //     console.error("Status update error:", error);
-  //   }
-  // };
-  
-//? i chenged this only ---
   const handleStatusChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
     userId: string
   ) => {
-    const newStatus = e.target.checked; // True if toggled on, False if toggled off
-  
+    const newStatus = e.target.checked;
     console.log("Updating status for user:", userId, "New Status:", newStatus);
-  
+
     try {
-      // Fetch updated user list with new status
       const response = await getData({ userId, enabled: newStatus });
       console.log(response)
-  
-      // if (!response) {
-      //   throw new Error("Failed to update status");
-      // }
-  
+
       toastSuccess(`User status updated successfully`);
     } catch (error) {
       toastError("Failed to update user status");
       console.error("Status update error:", error);
     }
   };
-  
 
-  
   const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
     setCurrentSearchAndFilters(arg);
     const { currentPage, perPage } = paginationData;
@@ -181,7 +137,7 @@ const BusinessUsers = ({
   const handlePageChange = (page: number) => {
     setPaginationData((prev) => ({ ...prev, currentPage: page }));
 
-    const { perPage, total  } = paginationData;
+    const { perPage, total } = paginationData;
     const { searchTerm, status } = currentSearchAndFilters;
     const bodyParams = {
       perPage,
@@ -196,12 +152,12 @@ const BusinessUsers = ({
 
   const handlePerPageChange = (perPage: number) => {
     setPaginationData((prev) => ({ ...prev, perPage }));
-    const { currentPage,total  } = paginationData;
+    const { currentPage, total } = paginationData;
     const { searchTerm, status } = currentSearchAndFilters;
     const bodyParams = {
       perPage,
       currentPage,
-      total ,
+      total,
       searchTerm,
       status,
     };
@@ -223,7 +179,6 @@ const BusinessUsers = ({
         users={users}
         businessId={businessId}
       />
-      {/* //TODO:- NEED TO CREate pagination LOGIC RENDER ITEMS ACCODING PER PAGE FILTER  */}
       <Pagination
         onPerPageChange={handlePerPageChange}
         onPageChange={handlePageChange}
