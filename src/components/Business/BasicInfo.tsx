@@ -30,11 +30,15 @@ const BasicInfo = ({ businessId }: Props) => {
   const [businessData, setBusinessData] = useState<BUSINESS | undefined>(
     {} as BUSINESS,
   );
+  const [coverImage, setCoverImage] = useState<string>("");
+  const [logo, setLogo] = useState<string>("");
 
   useEffect(() => {
     async function getData() {
       const { data, success } = await getBusinessDetails(businessId);
       if (success) {
+        setCoverImage(data?.coverImage || "");
+        setLogo(data?.logo || "");
         setBusinessData(data);
       }
     }
@@ -51,6 +55,20 @@ const BasicInfo = ({ businessId }: Props) => {
   ) => {
     if (!event.target.files) return;
     const filesArray = Array.from(event.target.files);
+
+    if ([BUSINESS_COVER_PHOTO, BUSINESS_LOGO].includes(type)) {
+      const file = event.target.files?.[0];
+      if (file) {
+        // Generate preview URL
+        const reader = new FileReader();
+        reader.onloadend = () =>
+          type === BUSINESS_COVER_PHOTO
+            ? setCoverImage(reader.result as string)
+            : setLogo(reader.result as string);
+        reader.readAsDataURL(file);
+      }
+    }
+
     filesArray.forEach((file) => {
       const id = uuidv4();
       const metaData = {
@@ -75,7 +93,7 @@ const BasicInfo = ({ businessId }: Props) => {
     <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="relative z-20 min-h-55">
         <Image
-          src={businessData.coverImage || "/images/cover/cover-01.jpg"}
+          src={coverImage || "/images/cover/cover-01.jpg"}
           alt="profile cover"
           className="rounded-tl-sm rounded-tr-sm object-cover object-center"
           fill={true}
@@ -91,7 +109,7 @@ const BasicInfo = ({ businessId }: Props) => {
               name="cover"
               id="cover"
               className="sr-only"
-              accept="image/png, image/jpeg"
+              accept="image/png, image/jpeg, image/webp"
             />
             <span>
               <svg
@@ -124,7 +142,7 @@ const BasicInfo = ({ businessId }: Props) => {
           <div className="relative drop-shadow-2">
             <Image
               className="rounded-full"
-              src={businessData.logo || "/images/business/b1.webp"}
+              src={logo || "/images/business/b1.webp"}
               width={160}
               height={160}
               style={{
@@ -163,7 +181,7 @@ const BasicInfo = ({ businessId }: Props) => {
                 name="profile"
                 onChange={(e) => handleFileChange(e, BUSINESS_LOGO)}
                 id="profile"
-                accept="image/png, image/jpeg"
+                accept="image/png, image/jpeg, image/webp"
                 className="sr-only"
               />
             </label>

@@ -1,6 +1,7 @@
 "use client";
 import { Dispatch } from "react";
 import { Action } from "@/context/UploadProvider";
+import { toastSuccess, toastError } from "@/helpers/toast";
 
 export const uploadFile = async (
   file: File,
@@ -39,8 +40,10 @@ const doRealUpload = async (
 
   xhr.onload = () => {
     if (xhr.status === 200) {
+      toastSuccess("Media uploaded successfully");
       dispatch({ type: "UPDATE_STATUS", payload: { id, status: "completed" } });
     } else {
+      toastError("Error in media upload");
       dispatch({ type: "UPDATE_STATUS", payload: { id, status: "error" } });
     }
   };
