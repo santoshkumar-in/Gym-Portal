@@ -31,16 +31,7 @@ const UserForm = ({ businessId, userId = "" }: Props) => {
     if (userId) {
       getData();
     } else {
-      setSelectedUser({
-        id: "",
-        fullName: "",
-        userName: "",
-        mobile: 0,
-        email: "",
-        password: "",
-        confirmPassword: "",
-        status: "ACTIVE",
-      });
+      setSelectedUser({} as BUSINESS_USER);
     }
   }, [businessId, userId]);
 
