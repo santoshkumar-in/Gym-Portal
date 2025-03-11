@@ -7,9 +7,8 @@ interface Props {
   onPerPageChange?: (page: number) => void;
   onPageChange?: (page: number) => void;
 }
-
 const Pagination = ({
-  total = 10,
+  total = 20,
   currentPage = 1,
   perPage = 10,
   onPageChange = () => null,
@@ -17,6 +16,7 @@ const Pagination = ({
 }: Props) => {
   const totalPages = Math.ceil(total / perPage);
   const maxPageNumbersToShow = 9;
+  console.log(total, currentPage, perPage)
 
   if (totalPages < 2) {
     return null;
@@ -100,11 +100,10 @@ const Pagination = ({
                 <li key={index}>
                   <a
                     href="#"
-                    className={`rounded border px-3 py-1 ${
-                      currentPage === page
-                        ? "flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-sm font-medium text-white hover:bg-blue-800"
-                        : "hover:bg-brand-500 flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium text-gray-700 hover:text-white dark:text-gray-400 dark:hover:text-white"
-                    }`}
+                    className={`rounded border px-3 py-1 ${currentPage === page
+                      ? "flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-sm font-medium text-white hover:bg-blue-800"
+                      : "hover:bg-brand-500 flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium text-gray-700 hover:text-white dark:text-gray-400 dark:hover:text-white"
+                      }`}
                     onClick={(e) => handlePageChange(e, page)}
                   >
                     {page}

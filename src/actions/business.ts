@@ -25,6 +25,7 @@ export const getAllUsers = cache(
   ): Promise<{
     currentPage: number;
     perPage: number;
+    total: number;
     success: boolean;
     data?: BUSINESS_USER[];
     message?: string;
@@ -35,14 +36,19 @@ export const getAllUsers = cache(
         {
           method: "POST",
           body: JSON.stringify(bodyParams),
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
       );
+
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
       return {
         currentPage: 0,
         perPage: 0,
+        total: 0,
         success: false,
         message: "Error",
       };

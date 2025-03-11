@@ -92,6 +92,7 @@ export type ATTENDANCE = {
 
 export type BUSINESS_USER = {
   id: string;
+  businessid:string;
   userName?: string;
   email?: string;
   mobile?: number;
@@ -105,6 +106,7 @@ export type BUSINESS_USER = {
   logoUrl?: string | null;
   role?: string;
   status?: string;
+  enabled?: boolean;
 };
 
 export type FILTER_DD_TYPE = {
