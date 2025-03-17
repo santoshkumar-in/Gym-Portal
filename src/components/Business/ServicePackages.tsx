@@ -41,8 +41,12 @@ const ServicePackages = ({ businessId }: Props) => {
 
   useEffect(() => {
     async function getData() {
-      const { data = [] } = await getPackages(businessId);
-      setPackages(data);
+      const { success, data = [] } = await getPackages(businessId);
+      if (success) {
+        setPackages(data);
+      } else {
+        setPackages([]);
+      }
     }
     getData();
   }, [businessId]);
@@ -99,19 +103,21 @@ const ServicePackages = ({ businessId }: Props) => {
       <div className="mb-10">
         <Slider {...settings}>
           {packages.map((pack: BUSINESS_PACKAGE) => {
-            const serviceHTML = pack.services.map((service) => {
-              return (
-                <li key={service} className="font-medium">
-                  <span>
-                    <FontAwesomeIcon icon={faCircleCheck} />
-                  </span>{" "}
-                  {service}
-                </li>
-              );
-            });
+            const serviceHTML = pack.services.map(
+              ({ serviceMappingId, serviceName }) => {
+                return (
+                  <li key={serviceMappingId} className="font-medium">
+                    <span>
+                      <FontAwesomeIcon icon={faCircleCheck} />
+                    </span>{" "}
+                    {serviceName}
+                  </li>
+                );
+              },
+            );
             return (
               <div
-                key={pack.id}
+                key={pack.packageId}
                 className="relative rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark md:p-9 xl:p-11.5"
               >
                 <span className="absolute right-3 top-3.5">
@@ -138,7 +144,7 @@ const ServicePackages = ({ businessId }: Props) => {
                       </svg> */}
                   <FitNxtDropDowns>
                     <button
-                      onClick={() => onEdit(pack.id)}
+                      onClick={() => onEdit(pack.packageId)}
                       className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
                     >
                       <FontAwesomeIcon icon={faPenToSquare} />
@@ -161,11 +167,32 @@ const ServicePackages = ({ businessId }: Props) => {
                     ₹
                   </span>
                   <span className="text-title-xxl2 font-bold text-black dark:text-white">
-                    {pack.priceMonthly}
+                    {pack.price}
                   </span>
-                  <span className="font-medium"> Per Month</span>
+                  {/* <span className="font-medium"> Per Month</span> */}
                 </h3>
-                <h4 className="mb-5 mt-7.5 text-lg font-medium text-black dark:text-white">
+                <div className="mt-5">
+                  <p className="flex justify-between">
+                    <span> Discount </span>
+                    <span className="font-medium text-black dark:text-white">
+                      {pack.discount}
+                    </span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span> Selling Price </span>
+                    <span className="font-medium text-black dark:text-white">
+                      {pack.sellingPrice}
+                    </span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span> Validity (In Days) </span>
+                    <span className="font-medium text-black dark:text-white">
+                      {pack.validityDays}
+                    </span>
+                  </p>
+                </div>
+
+                <h4 className="my-5 text-lg font-medium text-black dark:text-white">
                   Services
                 </h4>
                 <ul className="flex flex-col gap-3.5">{serviceHTML}</ul>

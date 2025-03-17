@@ -7,6 +7,7 @@ interface Props {
   onChange: (arg: SingleValue<OptionType>) => void;
   placeholder?: string;
   name?: string;
+  defaultValue?: SingleValue<OptionType>;
 }
 
 function FitNxtReactSelect({
@@ -14,6 +15,7 @@ function FitNxtReactSelect({
   onChange,
   placeholder,
   name,
+  defaultValue,
 }: Props) {
   const [selectedOption, setSelectedOption] =
     useState<SingleValue<OptionType>>();
@@ -33,6 +35,7 @@ function FitNxtReactSelect({
       hideSelectedOptions={false}
       onChange={handleChange}
       value={selectedOption}
+      defaultValue={defaultValue}
     />
   );
 }

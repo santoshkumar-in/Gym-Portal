@@ -24,14 +24,21 @@ export type BUSINESS = {
 export type BUSINESS_PACKAGES = BUSINESS_PACKAGE[];
 
 export type BUSINESS_PACKAGE = {
-  id: string;
+  packageId: string;
   packageName: string;
-  priceMonthly: number;
-  priceQuarterly?: number;
-  priceHalfYearly?: number;
-  priceYearly?: number;
-  isPopular: boolean;
-  services: string[];
+  price: number;
+  discount: number;
+  sellingPrice?: number;
+  minPrice?: number;
+  validityDays?: string;
+  validityId?: string;
+  businessId: string;
+  subscriptionLimit?: number;
+  popular?: boolean;
+  services: {
+    serviceMappingId: string;
+    serviceName: string;
+  }[];
 };
 
 export type MEDIAS = MEDIA[];
@@ -92,7 +99,7 @@ export type ATTENDANCE = {
 
 export type BUSINESS_USER = {
   id: string;
-  businessid:string;
+  businessid: string;
   userName?: string;
   email?: string;
   mobile?: number;
@@ -113,4 +120,14 @@ export type FILTER_DD_TYPE = {
   value: string;
   label: string;
   [key: string]: unknown;
+};
+
+export type MASTER_VALIDITY = {
+  id: string;
+  value: string;
+};
+
+export type BUSINESS_SERVICE = {
+  serviceMappingId: string;
+  serviceName: string;
 };

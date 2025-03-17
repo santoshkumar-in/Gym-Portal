@@ -15,6 +15,9 @@ import {
   SUBSCRIPTION,
   SUBSCRIBER_ATTENDANCE,
   ATTENDANCE,
+  BUSINESS_PACKAGE,
+  MASTER_VALIDITY,
+  BUSINESS_SERVICE,
 } from "@/types/business";
 import { apiClient } from "@/helpers/api";
 
@@ -153,117 +156,133 @@ export const getBusinessDetails = cache(
 );
 
 export const getPackages = cache(
-  (
+  async (
     businessId: string,
   ): Promise<{
     success: boolean;
-    data: BUSINESS_PACKAGES | [];
+    data?: BUSINESS_PACKAGES | [];
     message?: string;
   }> => {
-    return new Promise(function (resolve) {
-      console.info(businessId);
-      resolve({
-        success: true,
-        data: [
-          {
-            id: "120",
-            packageName: "Package 1",
-            priceMonthly: 1000,
-            priceQuarterly: 3000,
-            priceHalfYearly: 6000,
-            priceYearly: 12000,
-            isPopular: false,
-            services: [
-              "Aerobics",
-              "Zumba",
-              "Personal Training",
-              "Dance",
-              "Money back guarantee",
-            ],
-          },
-          {
-            id: "121",
-            packageName: "Package 2",
-            priceMonthly: 1100,
-            priceQuarterly: 3200,
-            priceHalfYearly: 6300,
-            priceYearly: 11000,
-            isPopular: false,
-            services: [
-              "Zumba",
-              "Aerobics",
-              "Dance",
-              "Personal Training",
-              "Money back guarantee",
-            ],
-          },
-          {
-            id: "122",
-            packageName: "Package 3",
-            priceMonthly: 1200,
-            priceQuarterly: 3200,
-            priceHalfYearly: 6500,
-            priceYearly: 10000,
-            isPopular: false,
-            services: [
-              "Aerobics",
-              "Dance",
-              "Personal Training",
-              "Money back guarantee",
-              "Zumba",
-            ],
-          },
-          {
-            id: "123",
-            packageName: "Package 4",
-            priceMonthly: 800,
-            priceQuarterly: 2300,
-            priceHalfYearly: 4500,
-            priceYearly: 9000,
-            isPopular: false,
-            services: [
-              "Money back guarantee",
-              "Aerobics",
-              "Dance",
-              "Personal Training",
-              "Zumba",
-            ],
-          },
-          {
-            id: "124",
-            packageName: "Package 4",
-            priceMonthly: 800,
-            priceQuarterly: 2300,
-            priceHalfYearly: 4500,
-            priceYearly: 9000,
-            isPopular: false,
-            services: [
-              "Money back guarantee",
-              "Aerobics",
-              "Dance",
-              "Personal Training",
-              "Zumba",
-            ],
-          },
-          {
-            id: "125",
-            packageName: "Package 4",
-            priceMonthly: 500,
-            priceQuarterly: 1500,
-            priceHalfYearly: 3000,
-            priceYearly: 6000,
-            isPopular: false,
-            services: [
-              "Personal Training",
-              "Money back guarantee",
-              "Dance",
-              "Aerobics",
-              "Zumba",
-            ],
-          },
-        ],
+    try {
+      const data = await apiClient(`/api/admin/${businessId}/packages`, {
+        method: "GET",
       });
-    });
+      return { success: true, data };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+export const getValidities = cache(
+  async (): Promise<{
+    success: boolean;
+    data?: MASTER_VALIDITY[] | [];
+    message?: string;
+  }> => {
+    try {
+      const data = await apiClient(`/api/master/package-validity`, {
+        method: "GET",
+      });
+      return { success: true, data };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+export const getBusinessServices = cache(
+  async (
+    businessId: string,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_SERVICE[] | [];
+    message?: string;
+  }> => {
+    try {
+      const data = await apiClient(`/api/admin/get-business-services`, {
+        method: "POST",
+        body: JSON.stringify({ businessId }),
+      });
+      return { success: true, data: data.services || [] };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+export const addOrUpdatePackage = cache(
+  async (
+    formData: FormData,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_PACKAGE;
+    message?: string;
+  }> => {
+    const fieldList = {
+      packageId: formData.get("packageId"),
+      businessId: formData.get("businessId"),
+      packageName: formData.get("packageName"),
+      price: Number(formData.get("price")),
+      discount: Number(formData.get("discount")),
+      validityId: formData.get("validityId"),
+      minPrice: Number(formData.get("minPrice")),
+      subcriptionLimit: Number(formData.get("subscriptionLimit")),
+      popular: formData.get("popular") === "on",
+      availableServices: formData
+        .get("availableServices")
+        ?.toString()
+        .split(","),
+    };
+
+    const validatedFields = BusinessPackageSchema.safeParse(fieldList);
+
+    // If any form fields are invalid, return early
+    if (!validatedFields.success) {
+      console.error("errors", validatedFields.error);
+      return {
+        success: false,
+        message: "Validation Error",
+      };
+    }
+    console.log("validated", validatedFields.data);
+
+    try {
+      const data = await apiClient(`/api/admin/create-package`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validatedFields.data),
+      });
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (e: unknown) {
+      let message = "";
+      if (typeof e === "string") {
+        message = e.toUpperCase();
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      toastError(message || "Error while updating the detail");
+      return {
+        success: false,
+        message,
+      };
+    }
   },
 );
 
@@ -634,83 +653,6 @@ export const updateBusinessDetails = async (
       success: false,
       message,
     };
-  }
-};
-
-export const updatePackage = async (formData: FormData) => {
-  const rawInput = {
-    businessId: formData.get("businessId"),
-    packageId: formData.get("packageId"),
-    packageName: formData.get("packageName"),
-    priceMonthly: parseFloat(formData.get("priceMonthly") as string) || 0,
-    priceQuarterly: parseFloat(formData.get("priceQuarterly") as string) || 0,
-    priceHalfYearly: parseFloat(formData.get("priceHalfYearly") as string) || 0,
-    priceYearly: parseFloat(formData.get("priceYearly") as string) || 0,
-    isPopular: formData.get("isPopular") === "on",
-    services: formData.getAll("services[]"),
-  };
-
-  const validatedFields = BusinessPackageSchema.safeParse(rawInput);
-
-  // If any form fields are invalid, return early
-  if (!validatedFields.success) {
-    console.error("errors", validatedFields.error);
-    return;
-  }
-  console.log("validated", validatedFields.data);
-  try {
-    const response = await apiClient("/submit", {
-      method: "POST",
-      body: JSON.stringify(validatedFields.data),
-    });
-    toastSuccess("Details updated successfully");
-    console.log("Response:", response);
-  } catch (e: unknown) {
-    let message = "";
-    if (typeof e === "string") {
-      message = e.toUpperCase();
-    } else if (e instanceof Error) {
-      message = e.message;
-    }
-    toastError(message || "Error while updating the detail");
-  }
-};
-
-export const addPackage = async (formData: FormData) => {
-  const rawInput = {
-    businessId: formData.get("businessId"),
-    packageName: formData.get("packageName"),
-    priceMonthly: parseFloat(formData.get("priceMonthly") as string) || 0,
-    priceQuarterly: parseFloat(formData.get("priceQuarterly") as string) || 0,
-    priceHalfYearly: parseFloat(formData.get("priceHalfYearly") as string) || 0,
-    priceYearly: parseFloat(formData.get("priceYearly") as string) || 0,
-    isPopular: formData.get("isPopular") === "on",
-    services: formData.getAll("services[]"),
-  };
-
-  const validatedFields = BusinessPackageSchema.safeParse(rawInput);
-
-  // If any form fields are invalid, return early
-  if (!validatedFields.success) {
-    console.error("errors", validatedFields.error);
-    return;
-  }
-  console.log("validated", validatedFields.data);
-  try {
-    const response = await apiClient("/submit", {
-      method: "POST",
-      body: JSON.stringify(validatedFields.data),
-    });
-    toastSuccess("Details updated successfully");
-    console.log("Response:", response);
-  } catch (e: unknown) {
-    let message = "";
-    if (typeof e === "string") {
-      message = e.toUpperCase();
-    } else if (e instanceof Error) {
-      message = e.message;
-    }
-    toastError(message || "Error while updating the detail");
   }
 };
 
