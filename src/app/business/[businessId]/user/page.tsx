@@ -67,7 +67,7 @@ const BusinessUsers = ({
   const getData = async (params: { [s: string]: unknown }) => {
     try {
       const res = await getAllUsers(businessId, params);
-      // console.log(res)
+      console.log(res)
 
       setPaginationData((prev) => ({
         ...prev,

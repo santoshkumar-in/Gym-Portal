@@ -31,17 +31,22 @@ export const getAllUsers = cache(
     message?: string;
   }> => {
     try {
+      console.log(
+        "Sending request with bodyParams:",
+        JSON.stringify(bodyParams),
+      );
+
       const data = await apiClient(
-        `/api/admin/business/${businessId}/get-all-users`,
+        // `/api/admin/business/${businessId}/get-all-users`,
+        `/api/admin/business/${businessId}/get-all-users?perPage=10&currentPage=1`,
         {
           method: "POST",
-          body: JSON.stringify(bodyParams),
+          // body: JSON.stringify(bodyParams),
           headers: {
             "Content-Type": "application/json",
           },
         },
       );
-
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
@@ -49,6 +54,124 @@ export const getAllUsers = cache(
         currentPage: 0,
         perPage: 0,
         total: 0,
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+export const addBusinessServices = cache(
+  async (
+    businessId: string,
+    serviceId: string,
+  ): Promise<{
+    success: boolean;
+    message?: string;
+  }> => {
+    try {
+      const response = await apiClient(`/api/admin/add-services-to-business`, {
+        method: "POST",
+        body: JSON.stringify({
+          businessId,
+          services: serviceId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return await response;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error creating service",
+      };
+    }
+  },
+);
+
+export const deleteBusinessServices = cache(
+  async (
+    businessId: string,
+    serviceId: string,
+  ): Promise<{
+    success: boolean;
+    message?: string;
+  }> => {
+    try {
+      const response = await apiClient(`/api/admin/delete-business-services`, {
+        method: "POST",
+        body: JSON.stringify({
+          businessId,
+          services: [serviceId],
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return await response;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error deleting service",
+      };
+    }
+  },
+);
+
+export const getBusinessServices = cache(
+  async (
+    businessId: string,
+    bodyParams: { [k: string]: unknown },
+  ): Promise<{
+    currentPage: number;
+    perPage: number;
+    total: number;
+    success: boolean;
+    data?: BUSINESS_USER[];
+    message?: string;
+  }> => {
+    try {
+      const response = await apiClient(`/api/admin/get-business-services`, {
+        method: "POST",
+        body: JSON.stringify({ businessId, ...bodyParams }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        currentPage: 0,
+        perPage: 0,
+        total: 0,
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+export const getAllServices = cache(
+  async (): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER[];
+    message?: string;
+  }> => {
+    try {
+      const response = await apiClient(`/api/service/services`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
         success: false,
         message: "Error",
       };
