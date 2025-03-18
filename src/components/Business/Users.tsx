@@ -18,7 +18,6 @@ const BusinessUsers = ({
   businessId,
   onDelete,
   onStatusChange,
-
 }: Props) => {
   // console.log(users)
   return (
@@ -56,13 +55,19 @@ const BusinessUsers = ({
                   </h5>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.userName || "N/A"}</p>
+                  <p className="text-black dark:text-white">
+                    {user.userName || "N/A"}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.email || "N/A"}</p>
+                  <p className="text-black dark:text-white">
+                    {user.email || "N/A"}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                  <p className="text-black dark:text-white">{user.mobile || "N/A"}</p>
+                  <p className="text-black dark:text-white">
+                    {user.mobile || "N/A"}
+                  </p>
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                   <SwitcherThree

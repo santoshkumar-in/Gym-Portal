@@ -20,6 +20,7 @@ interface Props {
   onChange: (arg: MultiValue<OptionType>) => void;
   placeholder?: string;
   name?: string;
+  defaultValue?: MultiValue<OptionType>;
 }
 
 function ReactSelectMultiSelect({
@@ -27,6 +28,7 @@ function ReactSelectMultiSelect({
   onChange,
   placeholder,
   name,
+  defaultValue,
 }: Props) {
   const [selectedOption, setSelectedOption] = useState<MultiValue<OptionType>>(
     [],
@@ -49,6 +51,7 @@ function ReactSelectMultiSelect({
       components={{ Option: MyOption }}
       onChange={handleChange}
       value={selectedOption}
+      defaultValue={defaultValue}
     />
   );
 }

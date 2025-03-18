@@ -17,15 +17,16 @@ export const BusinessInfoFormSchema = z.object({
 });
 
 export const BusinessPackageSchema = z.object({
+  packageId: z.string().nullish(),
   businessId: z.string().trim(),
-  packageId: z.string().trim(),
   packageName: z.string().trim(),
-  priceMonthly: z.number().min(1),
-  priceQuarterly: z.number().min(1),
-  priceHalfYearly: z.number().min(1),
-  priceYearly: z.number().min(1),
-  isPopular: z.boolean(),
-  services: z.array(z.string()),
+  price: z.number(),
+  discount: z.number(),
+  validityId: z.string().trim(),
+  minPrice: z.number(),
+  subcriptionLimit: z.number(),
+  popular: z.boolean(),
+  availableServices: z.array(z.string()),
 });
 
 export const BusinessUserSchema = z

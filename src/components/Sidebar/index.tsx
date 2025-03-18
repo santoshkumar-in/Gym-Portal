@@ -301,7 +301,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             {
               icon: (
                 <svg
-                  className="fill-current"
+                  className="fill-current "
                   width="18"
                   height="19"
                   viewBox="0 0 18 19"
@@ -367,6 +367,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               Subscribers: `/business/${currentUser.businessId}/subscriber`,
               Attendance: `/business/${currentUser.businessId}/attendance`,
               "Account users": `/business/${currentUser.businessId}/user`,
+              "Services": `/business/${currentUser.businessId}/services`,
             };
             return {
               label: menuItem,
@@ -424,14 +425,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
         <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
           {/* <!-- Sidebar Menu --> */}
-          <nav className="px-4 py-4 lg:px-6">
+          <nav className="px-4 py-4 lg:px-6 ">
             {menuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
                   {group.name}
                 </h3>
 
-                <ul className="mb-6 flex flex-col gap-1.5">
+                <ul className="mb-6 flex flex-col gap-1.5 ">
                   {group.menuItems.map((menuItem, menuIndex) => (
                     <SidebarItem
                       key={menuIndex}

@@ -4,10 +4,13 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import { toastSuccess, toastError } from "@/helpers/toast";
-import { getAllUsers } from "@/actions/business";
-import { BUSINESS_USER } from "@/types/business";
-import Users from "@/components/Business/Users";
+import {
+  deleteBusinessServices,
+  getBusinessServices,
+} from "@/actions/business";
+import BusinessServices from "@/components/Business/Services";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
+import { BUSINESS_SERVICE } from "@/types/business";
 
 const tableFilters = [
   {
@@ -22,147 +25,112 @@ const tableFilters = [
   },
 ];
 
-const BusinessUsers = ({
-  params,
-}: {
-  params: Promise<{ businessId: string }>;
-}) => {
-  const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>("");
-  const [users, setUsers] = useState<BUSINESS_USER[]>([]);
+const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
+  const [showDeletePrompt, setShowDeletePrompt] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [services, setServices] = useState<BUSINESS_SERVICE[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
-  const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
-    { currentPage: 1, perPage: 10, total: 0, },
-  );
+  const [paginationData, setPaginationData] = useState({
+    currentPage: 1,
+    perPage: 10,
+    total: 0,
+  });
 
   const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
-    [k: string]: unknown;
-  }>({ searchTerm: "", status: "" });
-
-  console.log(users);
+    [key: string]: unknown;
+  }>({
+    searchTerm: "",
+    status: "",
+  });
 
   useEffect(() => {
-    const getBusinessId = async () => {
+    const fetchBusinessId = async () => {
       const { businessId: bId } = await params;
       setBusinessId(bId);
     };
-    getBusinessId();
+    fetchBusinessId();
   }, [params]);
 
   useEffect(() => {
-    const { currentPage, perPage, total } = paginationData;
-    const { searchTerm, status } = currentSearchAndFilters;
-    const bodyParams = {
-      perPage,
-      currentPage,
-      total,
-      searchTerm,
-      status,
-    };
-    getData(bodyParams);
-  }, [businessId]);
+    if (businessId) {
+      fetchServices();
+    }
+  }, [businessId, paginationData.currentPage, currentSearchAndFilters]);
 
-  // console.log(paginationData)
-
-  const getData = async (params: { [s: string]: unknown }) => {
+  const fetchServices = async () => {
     try {
-      const res = await getAllUsers(businessId, params);
-      console.log(res)
+      const { success, data, perPage, total, currentPage, message } =
+        await getBusinessServices(businessId, {
+          currentPage: paginationData.currentPage,
+          perPage: paginationData.perPage,
+          searchTerm: currentSearchAndFilters.searchTerm,
+          status: currentSearchAndFilters.status,
+        });
 
-      setPaginationData((prev) => ({
-        ...prev,
-        currentPage: res.currentPage,
-        perPage: res.perPage,
-        total: res.total
-      }));
-
-      if (Array.isArray(res.data)) {
-        setUsers(res.data);
+      if (success) {
+        setServices(data as BUSINESS_SERVICE[]);
+        setPaginationData((prev) => ({
+          ...prev,
+          total,
+          currentPage,
+          perPage,
+        }));
       } else {
-        console.error("Wrong data format", res.data);
+        console.error("Unexpected response format", message);
       }
     } catch (error) {
-      console.error("Failed to fetch users", error);
+      console.error("Failed to fetch services", error);
     }
   };
 
-  const handleDelete = (userId: string | undefined) => {
+  const handleDelete = (serviceId: string) => {
     setShowDeletePrompt(true);
-    if (userId) {
-      setSelected(userId);
-    }
+    setSelected(serviceId);
   };
 
-  const onConfirmDelete = () => {
-    if (selected) {
-      onDeleteCancel();
-      toastSuccess(`User is deleted successfully`);
+  const onConfirmDelete = async () => {
+    if (!selected || !businessId) {
+      toastError("No service ID or business ID found");
+      return;
+    }
+
+    try {
+      const { success, message } = await deleteBusinessServices(
+        businessId,
+        selected,
+      );
+      if (success) {
+        toastSuccess("Service deleted successfully");
+        setShowDeletePrompt(false);
+        setSelected(null);
+        setServices((prev) =>
+          prev.filter((service) => service.serviceMappingId !== selected),
+        );
+        fetchServices();
+      } else {
+        toastError(message || "Failed to delete service");
+      }
+    } catch (error) {
+      console.error("Failed to delete service", error);
+      toastError("An error occurred while deleting the service");
     }
   };
 
   const onDeleteCancel = () => {
     setShowDeletePrompt(false);
-    setSelected("");
+    setSelected(null);
   };
 
-  const handleStatusChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    userId: string
-  ) => {
-    const newStatus = e.target.checked;
-    console.log("Updating status for user:", userId, "New Status:", newStatus);
-
-    try {
-      const response = await getData({ userId, enabled: newStatus });
-      console.log(response)
-
-      toastSuccess(`User status updated successfully`);
-    } catch (error) {
-      toastError("Failed to update user status");
-      console.error("Status update error:", error);
-    }
-  };
-
-  const handleFilterValueChange = (arg: { [key: string]: unknown }) => {
-    setCurrentSearchAndFilters(arg);
-    const { currentPage, perPage } = paginationData;
-    const bodyParams = {
-      perPage,
-      currentPage,
-      ...arg,
-    };
-    getData(bodyParams);
+  const handleFilterValueChange = (filters: { [key: string]: unknown }) => {
+    setCurrentSearchAndFilters(filters);
   };
 
   const handlePageChange = (page: number) => {
     setPaginationData((prev) => ({ ...prev, currentPage: page }));
-
-    const { perPage, total } = paginationData;
-    const { searchTerm, status } = currentSearchAndFilters;
-    const bodyParams = {
-      perPage,
-      currentPage: page,
-      total,
-      searchTerm,
-      status,
-    };
-    console.log("Sending API request with:", bodyParams);
-    getData(bodyParams);
   };
 
   const handlePerPageChange = (perPage: number) => {
     setPaginationData((prev) => ({ ...prev, perPage }));
-    const { currentPage, total } = paginationData;
-    const { searchTerm, status } = currentSearchAndFilters;
-    const bodyParams = {
-      perPage,
-      currentPage,
-      total,
-      searchTerm,
-      status,
-    };
-    console.log("Sending API request with:", bodyParams);
-    getData(bodyParams);
   };
 
   return (
@@ -171,12 +139,11 @@ const BusinessUsers = ({
         tableFilterOptions={tableFilters}
         onChange={handleFilterValueChange}
         enableSearch={true}
-        createNewUrl={`/business/${businessId}/user/add`}
+        createNewUrl={`/business/${businessId}/services/add`}
       />
-      <Users
-        onStatusChange={handleStatusChange}
+      <BusinessServices
         onDelete={handleDelete}
-        users={users}
+        services={services}
         businessId={businessId}
       />
       <Pagination
@@ -215,7 +182,7 @@ const BusinessUsers = ({
           Are you sure?
         </h3>
         <p className="mb-10">
-          Would you like to delete the subscriber? Once deleted the data cannot
+          Would you like to delete this service? Once deleted, the data cannot
           be recovered.
         </p>
         <div className="-mx-3 flex flex-wrap gap-y-4">
@@ -241,4 +208,4 @@ const BusinessUsers = ({
   );
 };
 
-export default BusinessUsers;
+export default Services;
