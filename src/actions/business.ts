@@ -18,6 +18,7 @@ import {
   BUSINESS_PACKAGE,
   MASTER_VALIDITY,
   BUSINESS_SERVICE,
+  MASTER_SERVICE_CATEGORY,
 } from "@/types/business";
 import { apiClient } from "@/helpers/api";
 
@@ -67,7 +68,7 @@ export const getAllUsers = cache(
 export const addBusinessServices = cache(
   async (
     businessId: string,
-    serviceId: string,
+    serviceId: string[],
   ): Promise<{
     success: boolean;
     message?: string;
@@ -100,6 +101,7 @@ export const deleteBusinessServices = cache(
     serviceId: string,
   ): Promise<{
     success: boolean;
+    data?: BUSINESS_SERVICE[];
     message?: string;
   }> => {
     try {
@@ -113,7 +115,7 @@ export const deleteBusinessServices = cache(
           "Content-Type": "application/json",
         },
       });
-      return await response;
+      return { success: true, data: response.services };
     } catch (error) {
       console.error("Fetch error:", error);
       return {
@@ -133,18 +135,24 @@ export const getBusinessServices = cache(
     perPage: number;
     total: number;
     success: boolean;
-    data?: BUSINESS_USER[];
+    data?: BUSINESS_SERVICE[];
     message?: string;
   }> => {
     try {
-      const response = await apiClient(`/api/admin/get-business-services`, {
+      const data = await apiClient(`/api/admin/get-business-services`, {
         method: "POST",
         body: JSON.stringify({ businessId, ...bodyParams }),
         headers: {
           "Content-Type": "application/json",
         },
       });
-      return response;
+      return {
+        success: true,
+        data: data.services || [],
+        perPage: 0,
+        currentPage: 0,
+        total: 0,
+      };
     } catch (error) {
       console.error("Fetch error:", error);
       return {
@@ -161,17 +169,17 @@ export const getBusinessServices = cache(
 export const getAllServices = cache(
   async (): Promise<{
     success: boolean;
-    data?: BUSINESS_USER[];
+    data?: MASTER_SERVICE_CATEGORY[] | undefined;
     message?: string;
   }> => {
     try {
-      const response = await apiClient(`/api/service/services`, {
+      const data = await apiClient(`/api/service/services`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      return response;
+      return { success: true, data: data.categories };
     } catch (error) {
       console.error("Fetch error:", error);
       return {
@@ -322,7 +330,7 @@ export const getValidities = cache(
   },
 );
 
-export const getBusinessServices = cache(
+export const getBusinessAllServices = cache(
   async (
     businessId: string,
   ): Promise<{

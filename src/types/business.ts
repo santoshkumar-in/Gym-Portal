@@ -127,6 +127,16 @@ export type MASTER_VALIDITY = {
   value: string;
 };
 
+export type MASTER_SERVICE = {
+  id: string;
+  value: string;
+};
+export type MASTER_SERVICE_CATEGORY = {
+  id: string;
+  value: string;
+  services: MASTER_SERVICE[];
+};
+
 export type BUSINESS_SERVICE = {
   serviceMappingId: string;
   serviceName: string;

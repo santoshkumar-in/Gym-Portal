@@ -1,13 +1,16 @@
-
 "use client";
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import { toastSuccess, toastError } from "@/helpers/toast";
-import { deleteBusinessServices, getBusinessServices } from "@/actions/business";
-import Users from "@/components/Business/Users";
+import {
+  deleteBusinessServices,
+  getBusinessServices,
+} from "@/actions/business";
+import BusinessServices from "@/components/Business/Services";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
+import { BUSINESS_SERVICE } from "@/types/business";
 
 const tableFilters = [
   {
@@ -22,14 +25,10 @@ const tableFilters = [
   },
 ];
 
-const Services = ({
-  params,
-}: {
-  params: Promise<{ businessId: string }>;
-}) => {
+const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [services, setServices] = useState<BUSINESS_SERVICES[]>([]);
+  const [services, setServices] = useState<BUSINESS_SERVICE[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
@@ -37,7 +36,9 @@ const Services = ({
     total: 0,
   });
 
-  const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState({
+  const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
+    [key: string]: unknown;
+  }>({
     searchTerm: "",
     status: "",
   });
@@ -58,21 +59,24 @@ const Services = ({
 
   const fetchServices = async () => {
     try {
-      const res = await getBusinessServices(businessId, {
-        currentPage: paginationData.currentPage,
-        perPage: paginationData.perPage,
-        searchTerm: currentSearchAndFilters.searchTerm,
-        status: currentSearchAndFilters.status,
-      });
+      const { success, data, perPage, total, currentPage, message } =
+        await getBusinessServices(businessId, {
+          currentPage: paginationData.currentPage,
+          perPage: paginationData.perPage,
+          searchTerm: currentSearchAndFilters.searchTerm,
+          status: currentSearchAndFilters.status,
+        });
 
-      if (res?.services) {
-        setServices(res.services);
+      if (success) {
+        setServices(data as BUSINESS_SERVICE[]);
         setPaginationData((prev) => ({
           ...prev,
-          total: res.total,
+          total,
+          currentPage,
+          perPage,
         }));
       } else {
-        console.error("Unexpected response format", res);
+        console.error("Unexpected response format", message);
       }
     } catch (error) {
       console.error("Failed to fetch services", error);
@@ -91,15 +95,20 @@ const Services = ({
     }
 
     try {
-      const res = await deleteBusinessServices(businessId, selected);
-      if (res) {
+      const { success, message } = await deleteBusinessServices(
+        businessId,
+        selected,
+      );
+      if (success) {
         toastSuccess("Service deleted successfully");
         setShowDeletePrompt(false);
         setSelected(null);
-        setServices((prev) => prev.filter((service) => service.id !== selected));
+        setServices((prev) =>
+          prev.filter((service) => service.serviceMappingId !== selected),
+        );
         fetchServices();
       } else {
-        toastError(res.message || "Failed to delete service");
+        toastError(message || "Failed to delete service");
       }
     } catch (error) {
       console.error("Failed to delete service", error);
@@ -132,7 +141,7 @@ const Services = ({
         enableSearch={true}
         createNewUrl={`/business/${businessId}/services/add`}
       />
-      <Users
+      <BusinessServices
         onDelete={handleDelete}
         services={services}
         businessId={businessId}
@@ -146,8 +155,20 @@ const Services = ({
       />
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect opacity="0.1" width="60" height="60" rx="30" fill="#DC2626"></rect>
+          <svg
+            width="60"
+            height="60"
+            viewBox="0 0 60 60"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              opacity="0.1"
+              width="60"
+              height="60"
+              rx="30"
+              fill="#DC2626"
+            ></rect>
             <path
               d="M30 27.2498V29.9998V27.2498ZM30 35.4999H30.0134H30ZM20.6914 41H39.3086C41.3778 41 42.6704 38.7078 41.6358 36.8749L32.3272 20.3747C31.2926 18.5418 28.7074 18.5418 27.6728 20.3747L18.3642 36.8749C17.3296 38.7078 18.6222 41 20.6914 41Z"
               stroke="#DC2626"
@@ -161,7 +182,8 @@ const Services = ({
           Are you sure?
         </h3>
         <p className="mb-10">
-          Would you like to delete this service? Once deleted, the data cannot be recovered.
+          Would you like to delete this service? Once deleted, the data cannot
+          be recovered.
         </p>
         <div className="-mx-3 flex flex-wrap gap-y-4">
           <div className="w-full px-3 2xsm:w-1/2">

@@ -5,7 +5,7 @@ import {
   getPackages,
   addOrUpdatePackage,
   getValidities,
-  getBusinessServices,
+  getBusinessAllServices,
 } from "@/actions/business";
 import SwitcherThree from "@/components/Switchers/SwitcherThree";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
@@ -93,7 +93,7 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
 
   useEffect(() => {
     async function getData() {
-      const { data = [] } = await getBusinessServices(businessId);
+      const { data = [] } = await getBusinessAllServices(businessId);
       const options = data.map(
         ({ serviceMappingId: value, serviceName: label }) => {
           return {

@@ -1,4 +1,3 @@
-
 "use client";
 import { addBusinessServices } from "@/actions/business";
 import { toastSuccess, toastError } from "@/helpers/toast";
@@ -10,10 +9,9 @@ interface Props {
 }
 
 const ServiceForm = ({ businessId }: Props) => {
-
-  const handleSelectedServices = async (selectedServices) => {
+  const handleSelectedServices = async (selectedServices: string[]) => {
     try {
-      const res = await addBusinessServices(businessId, selectedServices);
+      await addBusinessServices(businessId, selectedServices);
       toastSuccess("Services added successfully");
     } catch (error) {
       console.error("Failed to add services", error);
