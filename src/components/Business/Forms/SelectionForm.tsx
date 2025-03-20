@@ -11,7 +11,7 @@ const ServiceSelection = ({
   const [selectedServices, setSelectedServices] = useState<MASTER_SERVICE[]>(
     [],
   );
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
 
   useEffect(() => {
     getServices();
@@ -32,9 +32,12 @@ const ServiceSelection = ({
   const toggleServiceSelection = (service: MASTER_SERVICE) => {
     setSelectedServices((prevSelected) => {
       const isSelected = prevSelected.some((s) => s.id === service.id);
-      return isSelected
+      const updatedSelection = isSelected
         ? prevSelected.filter((s) => s.id !== service.id)
         : [...prevSelected, service];
+      onSelectServices(updatedSelection.map((s) => s.id));
+
+      return updatedSelection;
     });
   };
 
@@ -44,24 +47,17 @@ const ServiceSelection = ({
     );
   };
 
-  const handleSubmit = () => {
-    const selectedServiceIds = selectedServices.map((service) => service.id);
-    onSelectServices(selectedServiceIds);
-    setSelectedServices([]);
-    setIsDropdownOpen(false);
-  };
-
   return (
-    <div className="relative w-full max-w-lg">
+    <div className="relative w-full">
       <div
-        className="flex cursor-pointer flex-wrap items-center gap-2 rounded-lg border border-gray-300 bg-white p-3 shadow-md dark:border-gray-700 dark:bg-gray-900"
+        className="flex cursor-pointer flex-wrap items-center gap-2 rounded-lg border border-gray-300 bg-white p-3 shadow-md dark:border-gray-700 dark:bg-gray-900 "
         onClick={() => setIsDropdownOpen((prev) => !prev)}
       >
         {selectedServices.length > 0 ? (
           selectedServices.map((service) => (
             <span
               key={service.id}
-              className="flex items-center rounded-full bg-blue-600 px-3 py-1 text-sm text-white"
+              className="flex items-center rounded-full bg-green-500 px-3 py-1 text-sm text-white "
             >
               {service.value}
               <button
@@ -106,7 +102,7 @@ const ServiceSelection = ({
       </div>
 
       {isDropdownOpen && (
-        <div className="absolute z-50 mt-2 max-h-60 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className=" mt-2 max-h-80 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 ">
           {categories.map((category) => (
             <div
               key={category.id}
@@ -120,11 +116,10 @@ const ServiceSelection = ({
                   <button
                     key={service.id}
                     onClick={() => toggleServiceSelection(service)}
-                    className={`rounded border px-3 py-2 text-sm transition-all ${
-                      selectedServices.some((s) => s.id === service.id)
+                    className={`rounded border px-3 py-2 text-sm transition-all ${selectedServices.some((s) => s.id === service.id)
                         ? "border-blue-600 bg-blue-600 text-white"
                         : "border-gray-300 bg-gray-100 text-gray-700"
-                    }`}
+                      }`}
                   >
                     {service.value}
                   </button>
@@ -132,15 +127,6 @@ const ServiceSelection = ({
               </div>
             </div>
           ))}
-
-          <div className="flex justify-end p-3">
-            <button
-              onClick={handleSubmit}
-              className="rounded-md bg-blue-600 px-4 py-2 text-white shadow-md transition-all hover:bg-blue-700"
-            >
-              Submit
-            </button>
-          </div>
         </div>
       )}
     </div>

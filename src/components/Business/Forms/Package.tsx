@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   getPackages,
   addOrUpdatePackage,
@@ -31,6 +31,7 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
   );
 
   const [popular, setPopular] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     async function getData() {
@@ -127,7 +128,7 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
     const { success } = await addOrUpdatePackage(newFormData);
     if (success) {
       toastSuccess("Package Added/updated Successfully");
-      redirect(`/business/${businessId}`);
+      router.push(`/business/${businessId}`);
     } else {
       toastError("Error while adding/updating package");
     }
