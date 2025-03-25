@@ -166,7 +166,7 @@ const BusinessUsers = ({
   };
 
   return (
-    <DefaultLayout>
+    <DefaultLayout >
       <SearchAndFilterBar
         tableFilterOptions={tableFilters}
         onChange={handleFilterValueChange}
@@ -179,13 +179,13 @@ const BusinessUsers = ({
         users={users}
         businessId={businessId}
       />
-      <Pagination
+      {/* <Pagination
         onPerPageChange={handlePerPageChange}
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}
         perPage={paginationData.perPage}
         total={paginationData.total}
-      />
+      /> */}
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">
           <svg
