@@ -120,7 +120,8 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
         onChange={handleFilterValueChange}
         enableSearch={true}
         createNewUrl={`/business/${businessId}/services/add`}
-        services={true}
+        // services={true}
+        {...({ services: true } as { services: boolean })} 
       // added for conditonally not show filter or search in service page instand of creating new search component for service , need to figure out how we can do this by creating a new component or by showing condetonaly.
       />
       <BusinessServices

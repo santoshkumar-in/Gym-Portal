@@ -78,6 +78,7 @@ interface Props {
   createNewUrl?: string;
   onChange?: (arg: { [key: string]: unknown }) => void;
   tableFilterOptions?: FILTER_DD_TYPE[];
+  services?: boolean; //added
 }
 
 const SearchAndFilterBar = ({
