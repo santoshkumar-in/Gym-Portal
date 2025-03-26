@@ -14,10 +14,15 @@ interface Props {
   businessId: string;
 }
 
+const categories = ["Workout", "Equipment", "Facility", "Events"];
+
 const Medias = ({ businessId }: Props) => {
   const [medias, setMedias] = useState<MEDIAS>();
-  const [deleteMode, setDeleteMode] = useState<boolean>(false);
+  const [deleteMode, setDeleteMode] = useState(false);
   const { dispatch } = useUploadContext();
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   useEffect(() => {
     async function getData() {
       const { data = [] } = await getMedias(businessId);
@@ -34,13 +39,16 @@ const Medias = ({ businessId }: Props) => {
     event: React.ChangeEvent<HTMLInputElement>,
     type: string,
   ) => {
-    if (!event.target.files) return;
+    if (!event.target.files || !selectedCategory) return;
+
     const filesArray = Array.from(event.target.files);
     filesArray.forEach((file) => {
       const id = uuidv4();
       const metaData = {
         businessId,
         type,
+        category: selectedCategory,
+        gallery: "gallery",
       };
 
       dispatch({
@@ -54,6 +62,8 @@ const Medias = ({ businessId }: Props) => {
       });
       uploadFile(file, id, metaData, dispatch);
     });
+
+    setSelectedCategory(null);
   };
 
   if (!medias) {
@@ -63,28 +73,20 @@ const Medias = ({ businessId }: Props) => {
   return (
     <div className="mt-4">
       <div className="mb-4 flex items-center rounded-sm bg-white px-4 py-4 shadow-default sm:px-6 xl:px-7.5">
-        <h3 className="font-bold text-black dark:text-white">Image gallery</h3>
+
+        <h3 className="font-bold text-black dark:text-white">Image Gallery</h3>
         <button
           onClick={toggle}
           className="ml-auto rounded bg-red-500 px-5 py-1 text-center font-medium text-white hover:bg-opacity-90"
         >
-          <FontAwesomeIcon icon={faTrashCan} />{" "}
-          {deleteMode ? "Exit Delete Mode" : "Enter Delete Mode"}
+          <FontAwesomeIcon icon={faTrashCan} /> {deleteMode ? "Exit Delete Mode" : "Enter Delete Mode"}
         </button>
+
         <div className="ml-2">
-          <label
-            htmlFor="upload-image-in-gallery"
-            className="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary px-2 py-2 text-sm font-medium text-white hover:bg-opacity-80 xsm:px-4"
+          <button
+            onClick={() => setIsCategoryModalOpen(true)}
+            className="flex items-center gap-2 rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-80"
           >
-            <input
-              type="file"
-              multiple
-              onChange={(e) => handleFileChange(e, BUSINESS_GALLERY)}
-              name="gallery-image"
-              id="upload-image-in-gallery"
-              accept="image/png, image/jpeg"
-              className="sr-only"
-            />
             <span>
               <svg
                 className="fill-current"
@@ -109,9 +111,43 @@ const Medias = ({ businessId }: Props) => {
               </svg>
             </span>
             <span>Upload</span>
-          </label>
+          </button>
         </div>
       </div>
+
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <h2 className="text-lg font-bold mb-4">Select Category</h2>
+            <div className="space-y-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    setIsCategoryModalOpen(false);
+                    document.getElementById("upload-image-in-gallery")?.click();
+                  }}
+                  className="block w-full px-4 py-2 bg-gray-500 rounded-md text-white hover:bg-gray-900"
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <input
+        type="file"
+        multiple
+        onChange={(e) => handleFileChange(e, BUSINESS_GALLERY)}
+        name="gallery-image"
+        id="upload-image-in-gallery"
+        accept="image/png, image/jpeg"
+        className="hidden"
+      />
+
       <Gallery medias={medias} deleteMode={deleteMode} />
     </div>
   );

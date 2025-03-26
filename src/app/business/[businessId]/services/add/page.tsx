@@ -31,7 +31,10 @@ const AddServices = ({ params }: Props) => {
             <FontAwesomeIcon icon={faArrowRotateLeft} /> Back
           </a>
         </div>
+        
+        <div className=" h-[100%] py-1">
         <ServiceForm businessId={businessId} />
+        </div>
       </div>
     </DefaultLayout>
   );

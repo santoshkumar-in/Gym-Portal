@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
-import Pagination from "@/components/Pagination";
+// import Pagination from "@/components/Pagination";
 import { toastSuccess, toastError } from "@/helpers/toast";
 import { getAllUsers } from "@/actions/business";
 import { BUSINESS_USER } from "@/types/business";
@@ -134,39 +134,39 @@ const BusinessUsers = ({
     getData(bodyParams);
   };
 
-  const handlePageChange = (page: number) => {
-    setPaginationData((prev) => ({ ...prev, currentPage: page }));
+  // const handlePageChange = (page: number) => {
+  //   setPaginationData((prev) => ({ ...prev, currentPage: page }));
 
-    const { perPage, total } = paginationData;
-    const { searchTerm, status } = currentSearchAndFilters;
-    const bodyParams = {
-      perPage,
-      currentPage: page,
-      total,
-      searchTerm,
-      status,
-    };
-    console.log("Sending API request with:", bodyParams);
-    getData(bodyParams);
-  };
+  //   const { perPage, total } = paginationData;
+  //   const { searchTerm, status } = currentSearchAndFilters;
+  //   const bodyParams = {
+  //     perPage,
+  //     currentPage: page,
+  //     total,
+  //     searchTerm,
+  //     status,
+  //   };
+  //   console.log("Sending API request with:", bodyParams);
+  //   getData(bodyParams);
+  // };
 
-  const handlePerPageChange = (perPage: number) => {
-    setPaginationData((prev) => ({ ...prev, perPage }));
-    const { currentPage, total } = paginationData;
-    const { searchTerm, status } = currentSearchAndFilters;
-    const bodyParams = {
-      perPage,
-      currentPage,
-      total,
-      searchTerm,
-      status,
-    };
-    console.log("Sending API request with:", bodyParams);
-    getData(bodyParams);
-  };
+  // const handlePerPageChange = (perPage: number) => {
+  //   setPaginationData((prev) => ({ ...prev, perPage }));
+  //   const { currentPage, total } = paginationData;
+  //   const { searchTerm, status } = currentSearchAndFilters;
+  //   const bodyParams = {
+  //     perPage,
+  //     currentPage,
+  //     total,
+  //     searchTerm,
+  //     status,
+  //   };
+  //   console.log("Sending API request with:", bodyParams);
+  //   getData(bodyParams);
+  // };
 
   return (
-    <DefaultLayout>
+    <DefaultLayout >
       <SearchAndFilterBar
         tableFilterOptions={tableFilters}
         onChange={handleFilterValueChange}
@@ -179,13 +179,13 @@ const BusinessUsers = ({
         users={users}
         businessId={businessId}
       />
-      <Pagination
+      {/* <Pagination
         onPerPageChange={handlePerPageChange}
         onPageChange={handlePageChange}
         currentPage={paginationData.currentPage}
         perPage={paginationData.perPage}
         total={paginationData.total}
-      />
+      /> */}
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">
           <svg

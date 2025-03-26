@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
-import Pagination from "@/components/Pagination";
 import { toastSuccess, toastError } from "@/helpers/toast";
 import {
   deleteBusinessServices,
@@ -30,11 +29,7 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [services, setServices] = useState<BUSINESS_SERVICE[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
-  const [paginationData, setPaginationData] = useState({
-    currentPage: 1,
-    perPage: 10,
-    total: 0,
-  });
+
 
   const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
     [key: string]: unknown;
@@ -55,26 +50,18 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
     if (businessId) {
       fetchServices();
     }
-  }, [businessId, paginationData.currentPage, currentSearchAndFilters]);
+  }, [businessId, currentSearchAndFilters]);
 
   const fetchServices = async () => {
     try {
-      const { success, data, perPage, total, currentPage, message } =
+      const { success, data, message } =
         await getBusinessServices(businessId, {
-          currentPage: paginationData.currentPage,
-          perPage: paginationData.perPage,
           searchTerm: currentSearchAndFilters.searchTerm,
           status: currentSearchAndFilters.status,
         });
 
       if (success) {
         setServices(data as BUSINESS_SERVICE[]);
-        setPaginationData((prev) => ({
-          ...prev,
-          total,
-          currentPage,
-          perPage,
-        }));
       } else {
         console.error("Unexpected response format", message);
       }
@@ -125,13 +112,6 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
     setCurrentSearchAndFilters(filters);
   };
 
-  const handlePageChange = (page: number) => {
-    setPaginationData((prev) => ({ ...prev, currentPage: page }));
-  };
-
-  const handlePerPageChange = (perPage: number) => {
-    setPaginationData((prev) => ({ ...prev, perPage }));
-  };
 
   return (
     <DefaultLayout>
@@ -140,18 +120,14 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
         onChange={handleFilterValueChange}
         enableSearch={true}
         createNewUrl={`/business/${businessId}/services/add`}
+        // services={true}
+        {...({ services: true } as { services: boolean })} 
+      // added for conditonally not show filter or search in service page instand of creating new search component for service , need to figure out how we can do this by creating a new component or by showing condetonaly.
       />
       <BusinessServices
         onDelete={handleDelete}
         services={services}
         businessId={businessId}
-      />
-      <Pagination
-        onPerPageChange={handlePerPageChange}
-        onPageChange={handlePageChange}
-        currentPage={paginationData.currentPage}
-        perPage={paginationData.perPage}
-        total={paginationData.total}
       />
       <Modal modalIsOpen={showDeletePrompt}>
         <span className="mx-auto inline-block">

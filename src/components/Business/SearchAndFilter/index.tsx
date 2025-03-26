@@ -78,10 +78,12 @@ interface Props {
   createNewUrl?: string;
   onChange?: (arg: { [key: string]: unknown }) => void;
   tableFilterOptions?: FILTER_DD_TYPE[];
+  services?: boolean; //added
 }
 
 const SearchAndFilterBar = ({
   enableSearch = true,
+  services, //addded
   createNewUrl = "",
   onChange = () => null,
   tableFilterOptions = [],
@@ -117,7 +119,23 @@ const SearchAndFilterBar = ({
     <>
       <div className="mb-4 rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
         <div className="flex justify-between pb-5">
-          {enableSearch && (
+          {/* also hide on service page  */}
+          {enableSearch && !services && (
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </span>
+              <input
+                type="text"
+                onChange={throttledChangeHandler}
+                className="min-w-75 rounded-md border border-stroke px-5 py-2 pl-12 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:focus:border-primary"
+                placeholder="Search..."
+                value={dataFilters?.searchTerm || ""}
+              />
+            </div>
+          )}
+          {/* second search inpute added here */}
+          {services && (
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -132,11 +150,12 @@ const SearchAndFilterBar = ({
             </div>
           )}
           <div className="flex items-center font-medium">
-            <FilterDropdown
+            {!services && <FilterDropdown
               placeholder="Select filters"
               onChange={handleFilterChange}
               options={tableFilterOptions}
-            />
+            />}
+            
 
             {createNewUrl && (
               <Link
