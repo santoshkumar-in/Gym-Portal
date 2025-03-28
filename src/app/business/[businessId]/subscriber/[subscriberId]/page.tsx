@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import classnames from "classnames";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import {
@@ -18,12 +19,14 @@ const SubscriberDetailPage = ({
 }: {
   params: Promise<{ businessId: string; subscriberId: string }>;
 }) => {
+  const [businessId, setBusinessId] = useState<string>("");
   const [subscriber, setSubscriber] = useState<SUBSCRIBER>({} as SUBSCRIBER);
   const [subscriptions, setSubscriptions] = useState<SUBSCRIPTION[]>([]);
   const [attendance, setAttendance] = useState<SUBSCRIBER_ATTENDANCE[]>([]);
   useEffect(() => {
     async function getData() {
       const bId = (await params).businessId;
+      setBusinessId(bId);
       const subId = (await params).subscriberId;
       const { data = [] } = await getSubscribers(bId);
       const res = data.find(({ id }) => {
@@ -133,9 +136,12 @@ const SubscriberDetailPage = ({
             <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
               All Subscriptions (Programmatic Soft)
             </h4>
-            <button className="ml-auto rounded bg-primary px-5 py-2.5 text-center font-medium text-white hover:bg-opacity-90">
+            <Link
+              href={`/business/${businessId}/subscription/new`}
+              className="ml-auto rounded bg-primary px-5 py-2.5 text-center font-medium text-white hover:bg-opacity-90"
+            >
               Add New
-            </button>
+            </Link>
           </div>
 
           <table className="w-full table-auto">

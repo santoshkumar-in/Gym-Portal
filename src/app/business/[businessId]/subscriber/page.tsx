@@ -91,7 +91,8 @@ const BusinessSubscribers = ({
         tableFilterOptions={tableFilters}
         onChange={handleFilterValueChange}
         enableSearch={true}
-        //createNewUrl={`/business/${businessId}/attendance/add`}
+        createNewUrl={`/business/${businessId}/subscription/new`}
+        createNewLabel="New Subscription"
       />
       <Subscribers
         onDelete={handleDelete}
