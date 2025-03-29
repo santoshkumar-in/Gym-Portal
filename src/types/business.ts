@@ -114,6 +114,7 @@ export type BUSINESS_USER = {
   role?: string;
   status?: string;
   enabled?: boolean;
+  userId?: string;
 };
 
 export type FILTER_DD_TYPE = {

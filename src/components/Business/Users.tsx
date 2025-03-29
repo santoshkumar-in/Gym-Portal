@@ -21,7 +21,7 @@ const BusinessUsers = ({
 }: Props) => {
   // console.log(users)
   return (
-    <div className="rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
+    <div className="rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1 bg-red-900">
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto">
           <thead>
@@ -80,15 +80,16 @@ const BusinessUsers = ({
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
                     <Link
-                      href={`/business/${businessId}/user/${user.id}/update`}
+                      href={`/business/${businessId}/user/${user.userId}/update`}
                       className="w-4 hover:text-primary"
                     >
                       <FontAwesomeIcon icon={faPenToSquare} />
                     </Link>
                     <button
-                      onClick={() => onDelete(user.id)}
+                      onClick={() => user.userId && onDelete(user.userId)}
                       className="w-4 hover:text-primary"
                     >
+
                       <FontAwesomeIcon icon={faTrashCan} />
                     </button>
                   </div>
