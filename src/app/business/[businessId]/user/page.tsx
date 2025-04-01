@@ -63,6 +63,7 @@ const BusinessUsers = ({
   }, [businessId]);
 
   // console.log(paginationData)
+  // console.log(paginationData)
 
   const getData = async (params: { [s: string]: unknown }) => {
     try {
