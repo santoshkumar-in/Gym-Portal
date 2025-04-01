@@ -42,7 +42,7 @@ export const getAllUsers = cache(
 
       const data = await apiClient(
         // `/api/admin/business/${businessId}/get-all-users`,
-        `/api/admin/business/${businessId}/get-all-users?perPage=10&currentPage=1`,
+        `/api/admin/business/${businessId}/get-all-users?perPage=100&currentPage=1`,
         {
           method: "POST",
           // body: JSON.stringify(bodyParams),
@@ -60,6 +60,163 @@ export const getAllUsers = cache(
         total: 0,
         success: false,
         message: "Error",
+      };
+    }
+  },
+);
+
+export const getSingleOperator = cache(
+  async (
+    userId: string,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER;
+    message?: string;
+  }> => {
+    try {
+      const response = await apiClient(`/api/admin/get-operator/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response;
+
+      if (!response) {
+        throw new Error(result.message || "Failed to fetch operator details");
+      }
+
+      return { success: true, data: result };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Error fetching operator",
+      };
+    }
+  },
+);
+
+export const addOrUpdateUser = cache(
+  async (
+    formData: FormData,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER;
+    message?: string;
+  }> => {
+    const userId = formData.get("userId");
+
+    console.log(userId);
+
+    const validatedFields = BusinessUserSchema.safeParse({
+      businessId: formData.get("businessId"),
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      status: formData.get("status") || "INACTIVE",
+      email: formData.get("email"),
+      mobile: Number(formData.get("mobile")),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+      phone: formData.get("phone"),
+      role: formData.get("role"),
+    });
+
+    if (!validatedFields.success) {
+      console.error("errors", validatedFields.error);
+      return {
+        success: false,
+        message: "Validation Error",
+      };
+    }
+
+    const body: {
+      businessId: FormDataEntryValue | null;
+      fullName: FormDataEntryValue | null;
+      userName: FormDataEntryValue | null;
+      emailId: FormDataEntryValue | null;
+      mobile: number;
+      password: FormDataEntryValue | null;
+      role: FormDataEntryValue | null;
+      isd: string;
+      userId?: FormDataEntryValue | null;
+    } = {
+      businessId: formData.get("businessId"),
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      emailId: formData.get("email"),
+      mobile: Number(formData.get("mobile")),
+      password: formData.get("password"),
+      role: formData.get("role"),
+      isd: "UH1jADHmrx9lddZkWFAWnQ",
+    };
+
+    const apiEndpoint = userId
+      ? `/api/admin/update-operator/${userId}`
+      : `/api/admin/create-operator`;
+
+    if (userId) {
+      body["userId"] = userId;
+    }
+
+    console.log("Validated Data:", body);
+
+    try {
+      const data = await apiClient(apiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (e: unknown) {
+      let message = "";
+      if (typeof e === "string") {
+        message = e.toUpperCase();
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      toastError(message || "Error while updating the detail");
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+);
+
+export const deleteBusinessOperator = cache(
+  async (
+    userId: string,
+  ): Promise<{
+    success: boolean;
+    message?: string;
+  }> => {
+    try {
+      const response = await apiClient(`/api/admin/delete-operator/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response;
+
+      if (response.error) {
+        throw new Error(result.message || "Failed to delete user");
+      }
+
+      return { success: !result.error, message: result.message };
+    } catch (error) {
+      console.error("Delete error:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Error deleting user",
       };
     }
   },
@@ -185,77 +342,6 @@ export const getAllServices = cache(
       return {
         success: false,
         message: "Error",
-      };
-    }
-  },
-);
-
-export const addOrUpdateUser = cache(
-  async (
-    formData: FormData,
-  ): Promise<{
-    success: boolean;
-    data?: BUSINESS_USER;
-    message?: string;
-  }> => {
-    const validatedFields = BusinessUserSchema.safeParse({
-      businessId: formData.get("businessId"),
-      fullName: formData.get("fullName"),
-      userName: formData.get("userName"),
-      status: formData.get("status") || "INACTIVE",
-      email: formData.get("email"),
-      mobile: Number(formData.get("mobile")),
-      password: formData.get("password"),
-      confirmPassword: formData.get("confirmPassword"),
-      phone: formData.get("phone"),
-      role: formData.get("role"),
-    });
-
-    // If any form fields are invalid, return early
-    if (!validatedFields.success) {
-      console.error("errors", validatedFields.error);
-      return {
-        success: false,
-        message: "Validation Error",
-      };
-    }
-
-    const body = {
-      businessId: formData.get("businessId"),
-      fullName: formData.get("fullName"),
-      userName: formData.get("userName"),
-      //status: formData.get("status") || "INACTIVE",
-      emailId: formData.get("email"),
-      mobile: Number(formData.get("mobile")),
-      password: formData.get("password"),
-      role: formData.get("role"),
-      isd: "UH1jADHmrx9lddZkWFAWnQ", //Remove later with dynamic value
-    };
-
-    console.log("validated", body);
-
-    try {
-      const data = await apiClient(`/api/admin/create-operator`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      return {
-        success: true,
-        data,
-      };
-    } catch (e: unknown) {
-      let message = "";
-      if (typeof e === "string") {
-        message = e.toUpperCase();
-      } else if (e instanceof Error) {
-        message = e.message;
-      }
-      toastError(message || "Error while updating the detail");
-      return {
-        success: false,
-        message,
       };
     }
   },

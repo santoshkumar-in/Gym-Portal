@@ -4,7 +4,7 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Modal from "@/components/Modal";
 // import Pagination from "@/components/Pagination";
 import { toastSuccess, toastError } from "@/helpers/toast";
-import { getAllUsers } from "@/actions/business";
+import { deleteBusinessOperator, getAllUsers } from "@/actions/business";
 import { BUSINESS_USER } from "@/types/business";
 import Users from "@/components/Business/Users";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
@@ -63,6 +63,7 @@ const BusinessUsers = ({
   }, [businessId]);
 
   // console.log(paginationData)
+  // console.log(paginationData)
 
   const getData = async (params: { [s: string]: unknown }) => {
     try {
@@ -93,16 +94,31 @@ const BusinessUsers = ({
     }
   };
 
-  const onConfirmDelete = () => {
-    if (selected) {
-      onDeleteCancel();
-      toastSuccess(`User is deleted successfully`);
+  const onConfirmDelete = async () => {
+    if (!selected) return;
+    try {
+      const response = await deleteBusinessOperator(selected);
+      if (!response.success) {
+        toastError(response.message || "Failed to delete user");
+      } else {
+        toastSuccess("User deleted successfully");
+        setUsers((prev) => prev.filter((user) => user.id !== selected));
+        console.log(response.message);
+        getData({ businessId });
+      }
+    } catch (error) {
+      toastError("Error deleting user");
+      console.error("Delete error:", error);
     }
+    setShowDeletePrompt(false);
+    setSelected("");
   };
+
 
   const onDeleteCancel = () => {
     setShowDeletePrompt(false);
     setSelected("");
+    console.log("Delete cancelled");
   };
 
   const handleStatusChange = async (
@@ -242,3 +258,5 @@ const BusinessUsers = ({
 };
 
 export default BusinessUsers;
+
+
