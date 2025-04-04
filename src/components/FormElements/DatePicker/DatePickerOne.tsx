@@ -10,6 +10,7 @@ interface Props {
   className?: string;
   containerClass?: string;
   placeholder?: string;
+  clickOpens?: boolean;
 }
 const DatePickerOne = ({
   label = "",
@@ -19,6 +20,7 @@ const DatePickerOne = ({
   className = "",
   containerClass = "",
   placeholder = "mm/dd/yyyy",
+  clickOpens = true,
 }: Props) => {
   useEffect(() => {
     // Init flatpickr
@@ -27,6 +29,7 @@ const DatePickerOne = ({
       static: true,
       monthSelectorType: "static",
       dateFormat: "M j, Y",
+      clickOpens,
       onChange,
       prevArrow:
         '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',

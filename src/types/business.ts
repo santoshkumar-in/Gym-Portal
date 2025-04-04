@@ -56,11 +56,14 @@ export type MEDIA = {
 export type SUBSCRIBER = {
   id: string;
   name: string;
-  gender: string;
-  mobile: string;
-  subscription: string;
-  startDate: string;
-  endDate: string;
+  email?: string;
+  gender?: string;
+  mobile?: string;
+  dateOfBirth?: string;
+  heightWeightRatio?: string;
+  subscription?: string;
+  startDate?: string;
+  endDate?: string;
   business?: BUSINESS;
 };
 
