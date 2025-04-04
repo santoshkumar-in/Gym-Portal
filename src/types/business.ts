@@ -60,6 +60,8 @@ export type SUBSCRIBER = {
   gender?: string;
   mobile?: string;
   dateOfBirth?: string;
+  height?: number;
+  weight?: number;
   heightWeightRatio?: string;
   subscription?: string;
   startDate?: string;

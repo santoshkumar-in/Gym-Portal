@@ -8,6 +8,7 @@ interface Props {
   placeholder?: string;
   name?: string;
   defaultValue?: SingleValue<OptionType>;
+  isDisabled?: boolean;
 }
 
 function FitNxtReactSelect({
@@ -16,6 +17,7 @@ function FitNxtReactSelect({
   placeholder,
   name,
   defaultValue,
+  isDisabled = false,
 }: Props) {
   const [selectedOption, setSelectedOption] =
     useState<SingleValue<OptionType>>();
@@ -27,6 +29,7 @@ function FitNxtReactSelect({
 
   return (
     <ReactSelect
+      isDisabled={isDisabled}
       name={name}
       placeholder={placeholder}
       className="mr-2 min-w-50"

@@ -83,7 +83,11 @@ const BasicInfoForm = ({ businessId }: BasicInfoFormProps) => {
             <div className="w-full xl:w-1/2">
               <DatePickerOne
                 name="establishedOn"
-                value={businessData?.establishedOn}
+                defaultDate={
+                  businessData
+                    ? new Date(businessData.establishedOn)
+                    : new Date()
+                }
                 label="Established on"
               />
             </div>

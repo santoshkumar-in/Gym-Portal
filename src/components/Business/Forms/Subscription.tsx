@@ -1,72 +1,101 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { SingleValue } from "react-select";
 import { getPackages } from "@/actions/business";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
-import { FILTER_DD_TYPE, SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
 import useThrottle from "@/hooks/useThrottle";
-
+import { FILTER_DD_TYPE, SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
+import StepProgress from "./StepProgress";
 interface SubscriptionFormProps {
   businessId: string;
 }
 
-const SubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
+const steps = [
+  { name: "Select Subscriber", number: 1 },
+  { name: "Subscribe", number: 2 },
+];
+
+const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
+  const [step, setStep] = useState<1 | 2>(1);
   const [packages, setPackages] = useState<BUSINESS_PACKAGE[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
     {} as BUSINESS_PACKAGE,
   );
   const [packageOptions, setPackageOptions] = useState<FILTER_DD_TYPE[]>([]);
-
-  const [fetchingSubscriber, setFetchingSubscriber] = useState<boolean>(false);
   const [subscriberDetails, setSubscriberDetails] = useState<SUBSCRIBER>({
     id: "",
     name: "",
     mobile: "",
     email: "",
     gender: "",
-    heightWeightRatio: "",
+    height: 0,
+    weight: 0,
   });
+
+  const [fetchingSubscriber, setFetchingSubscriber] = useState(false);
+  const [mobile, setMobile] = useState("");
+
+  // Fetch packages
   useEffect(() => {
     async function getData() {
       const { success, data = [] } = await getPackages(businessId);
       if (success) {
         setPackages(data);
-        const options = data.map(({ packageName, packageId }) => {
-          return { label: packageName, value: packageId };
-        });
+        const options = data.map(({ packageName, packageId }) => ({
+          label: packageName,
+          value: packageId,
+        }));
         setPackageOptions(options);
-      } else {
-        setPackageOptions([]);
       }
     }
     getData();
   }, [businessId]);
 
-  const handleFormSubmit = async (formData: FormData) => {
-    console.log(formData);
-    // const { success, data } = await updateBusinessDetails(formData);
-    // if (success) {
-    //   setBusinessData(data);
-    // }
-  };
-
   const throttledChangeHandler = useThrottle(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      //console.log("Throttled Value:", event.target.value);
+      const value = event.target.value;
+      setMobile(value);
       setFetchingSubscriber(true);
+
       setTimeout(() => {
-        console.log("Entered ", event.target.value);
-        setSubscriberDetails({
-          ...subscriberDetails,
-          mobile: event.target.value,
-        });
+        // Mock fetching subscriber
+        if (value === "1234567890") {
+          setSubscriberDetails({
+            id: "sub123",
+            name: "John Doe",
+            mobile: value,
+            email: "john@example.com",
+            gender: "M",
+            height: 170,
+            weight: 70,
+            dateOfBirth: "1995-03-13",
+          });
+        } else {
+          setSubscriberDetails({
+            id: "",
+            name: "",
+            mobile: value,
+            email: "",
+            gender: "",
+            height: 0,
+            weight: 0,
+            dateOfBirth: "",
+          });
+        }
+
         setFetchingSubscriber(false);
-      }, 1500);
+      }, 1000);
     },
     300,
   );
 
+  const handleSubscriberFieldChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSubscriberDetails({
+      ...subscriberDetails,
+      [e.target.name]: e.target.value,
+    });
+  };
   const handlePackageSelection = (v: SingleValue<FILTER_DD_TYPE>) => {
     const item = packages.find(({ packageId }) => packageId === v?.value);
     if (item) {
@@ -76,174 +105,220 @@ const SubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     }
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const formData = {
+      businessId,
+      subscriberId: subscriberDetails.id,
+      packageId: selectedPackage.packageId,
+      price: selectedPackage.price,
+    };
+    console.log("Form Data to submit:", formData);
+  };
+
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-        <h3 className="font-medium text-black dark:text-white">
-          New Subscription
-        </h3>
-      </div>
-      <form action={handleFormSubmit}>
-        <input type="hidden" name="businessId" value={businessId} />
-        <div className="p-6.5">
-          <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-            <div className="w-full xl:w-1/2">
-              <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                Package
-              </label>
-              <FitNxtReactSelect
-                onChange={handlePackageSelection}
-                allOptions={packageOptions}
-                placeholder="Select Package"
-                name="packageId"
-              />
-            </div>
-            <div className="w-full xl:w-1/2">
-              <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                Subscriber Mobile
-              </label>
-              <input
-                name="mobile"
-                type="text"
-                placeholder="Enter Mobile Number"
-                onChange={throttledChangeHandler}
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              />
-            </div>
+    <div className="rounded-sm border border-stroke bg-white p-6 shadow-md dark:border-strokedark dark:bg-boxdark">
+      <h3 className="mb-4 text-center text-lg font-semibold text-black dark:text-white">
+        New Subscription
+      </h3>
+
+      <StepProgress steps={steps} currentStep={step} />
+
+      {step === 1 && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setStep(2);
+          }}
+        >
+          <div className="mb-4">
+            <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+              Mobile Number
+            </label>
+            <input
+              type="text"
+              name="mobile"
+              value={mobile}
+              onChange={throttledChangeHandler}
+              placeholder="Enter Mobile Number"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              required
+            />
           </div>
 
-          <div className="mb-6">
-            {!fetchingSubscriber && (
-              <fieldset className="rounded border border-gray-300 px-5 py-3">
-                <legend>Subscriber Details</legend>
-                <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Name
-                    </label>
-                    <input
-                      name="name"
-                      type="text"
-                      readOnly={subscriberDetails.id ? true : false}
-                      defaultValue={subscriberDetails.name}
-                      placeholder="Full Name"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Email
-                    </label>
-                    <input
-                      name="email"
-                      type="email"
-                      defaultValue={subscriberDetails.email}
-                      readOnly={subscriberDetails.id ? true : false}
-                      placeholder="Email"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
+          {!fetchingSubscriber && (
+            <fieldset className="rounded border border-gray-300 px-5 py-3">
+              <legend>Subscriber Details</legend>
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Name
+                  </label>
+                  <input
+                    name="name"
+                    type="text"
+                    readOnly={subscriberDetails.id !== ""}
+                    value={subscriberDetails.name}
+                    onChange={handleSubscriberFieldChange}
+                    placeholder="Full Name"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
                 </div>
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={subscriberDetails.email}
+                    readOnly={subscriberDetails.id !== ""}
+                    placeholder="Email"
+                    onChange={handleSubscriberFieldChange}
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+              </div>
 
-                <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Height
-                    </label>
-                    <input
-                      name="height"
-                      type="number"
-                      readOnly={subscriberDetails.id ? true : false}
-                      defaultValue={subscriberDetails.heightWeightRatio}
-                      placeholder="Height (In cm)"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Weight
-                    </label>
-                    <input
-                      name="weight"
-                      type="text"
-                      readOnly={subscriberDetails.id ? true : false}
-                      defaultValue={subscriberDetails.heightWeightRatio}
-                      placeholder="Weight (in Kg)"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Height
+                  </label>
+                  <input
+                    name="height"
+                    type="number"
+                    readOnly={subscriberDetails.id !== ""}
+                    value={subscriberDetails.height}
+                    placeholder="Height (In CM)"
+                    onChange={handleSubscriberFieldChange}
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
                 </div>
-                <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Date Of Birth
-                    </label>
-                    <DatePickerOne
-                      clickOpens={subscriberDetails.id ? true : false}
-                    />
-                  </div>
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                      Gender
-                    </label>
-                    <FitNxtReactSelect
-                      onChange={() => null}
-                      allOptions={[
-                        { value: "M", label: "Male" },
-                        { value: "F", label: "Female" },
-                        { value: "OTHER", label: "Other" },
-                      ]}
-                      placeholder="Select Gender"
-                      name="gender"
-                      defaultValue={{
-                        value: subscriberDetails.gender || "M",
-                        label: subscriberDetails.gender || "Male",
-                      }}
-                    />
-                  </div>
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Weight
+                  </label>
+                  <input
+                    name="weight"
+                    type="number"
+                    readOnly={subscriberDetails.id !== ""}
+                    value={subscriberDetails.weight}
+                    placeholder="Weight (in Kg)"
+                    onChange={handleSubscriberFieldChange}
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
                 </div>
-              </fieldset>
-            )}
-            {fetchingSubscriber && (
-              <p>Fetching Subscriber&lsquo;s details...</p>
-            )}
+              </div>
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Date Of Birth
+                  </label>
+                  <DatePickerOne
+                    defaultDate={
+                      subscriberDetails.dateOfBirth
+                        ? new Date(subscriberDetails.dateOfBirth)
+                        : new Date()
+                    }
+                  />
+                </div>
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Gender
+                  </label>
+                  <FitNxtReactSelect
+                    onChange={() => null}
+                    allOptions={[
+                      { value: "M", label: "Male" },
+                      { value: "F", label: "Female" },
+                      { value: "OTHER", label: "Other" },
+                    ]}
+                    isDisabled={subscriberDetails.id !== ""}
+                    placeholder="Select Gender"
+                    name="gender"
+                    defaultValue={{
+                      value: subscriberDetails.gender || "M",
+                      label: subscriberDetails.gender || "Male",
+                    }}
+                  />
+                </div>
+              </div>
+            </fieldset>
+          )}
+
+          {fetchingSubscriber ? (
+            <p>Loading subscriber info...</p>
+          ) : (
+            <div className="mt-4 flex justify-end gap-4">
+              <button
+                type="submit"
+                className="rounded bg-primary px-6 py-2 font-medium text-white"
+              >
+                Continue
+              </button>
+            </div>
+          )}
+        </form>
+      )}
+
+      {step === 2 && (
+        <form onSubmit={handleSubmit}>
+          <input
+            type="hidden"
+            name="subscriberId"
+            value={subscriberDetails.id}
+          />
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+              Package
+            </label>
+            <FitNxtReactSelect
+              onChange={handlePackageSelection}
+              allOptions={packageOptions}
+              placeholder="Select Package"
+              name="packageId"
+            />
           </div>
 
-          <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-            <div className="w-full xl:w-1/2">
-              <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                Discounted Price
-              </label>
-              <input
-                name="price"
-                type="number"
-                placeholder="Enter Price"
-                defaultValue={selectedPackage?.price}
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              />
-            </div>
-            <div className="w-full xl:w-1/2">
-              <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                Start Date
-              </label>
-              <DatePickerOne />
-            </div>
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+              Price
+            </label>
+            <input
+              name="price"
+              type="number"
+              defaultValue={selectedPackage?.price}
+              className="w-full rounded border px-4 py-2 dark:bg-form-input dark:text-white"
+            />
           </div>
-          <div className="flex">
-            <button className="rounded bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90">
-              Cancel
+
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-medium text-black dark:text-white">
+              Start Date
+            </label>
+            <DatePickerOne name="startDate" />
+          </div>
+
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="rounded bg-gray-600 px-6 py-2 font-medium text-white"
+            >
+              Back
             </button>
             <button
               type="submit"
-              className="ml-auto rounded bg-primary px-10 py-4 font-medium text-gray hover:bg-opacity-90"
+              className="rounded bg-primary px-6 py-2 font-medium text-white"
             >
               Submit
             </button>
           </div>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 };
 
-export default SubscriptionForm;
+export default MultiStepSubscriptionForm;

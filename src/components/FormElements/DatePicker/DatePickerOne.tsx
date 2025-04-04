@@ -6,21 +6,19 @@ interface Props {
   name?: string;
   label?: string;
   onChange?: (arg: unknown) => void;
-  value?: string | number | readonly string[] | undefined;
   className?: string;
   containerClass?: string;
   placeholder?: string;
-  clickOpens?: boolean;
+  defaultDate?: Date | Date[];
 }
 const DatePickerOne = ({
   label = "",
   onChange,
   name = "date",
-  value = "",
   className = "",
   containerClass = "",
   placeholder = "mm/dd/yyyy",
-  clickOpens = true,
+  defaultDate = new Date(),
 }: Props) => {
   useEffect(() => {
     // Init flatpickr
@@ -28,8 +26,8 @@ const DatePickerOne = ({
       mode: "single",
       static: true,
       monthSelectorType: "static",
-      dateFormat: "M j, Y",
-      clickOpens,
+      dateFormat: "F j, Y",
+      defaultDate,
       onChange,
       prevArrow:
         '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
@@ -48,7 +46,6 @@ const DatePickerOne = ({
       <div className="relative">
         <input
           name={name}
-          defaultValue={value}
           className={classnames(
             "form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary",
             className,
