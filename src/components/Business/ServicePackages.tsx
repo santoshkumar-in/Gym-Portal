@@ -39,7 +39,9 @@ const ServicePackages = ({ businessId }: Props) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>();
 
-  const [expandedPackages, setExpandedPackages] = useState<Record<string, boolean>>({});
+  const [expandedPackages, setExpandedPackages] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     async function getData() {
@@ -113,8 +115,9 @@ const ServicePackages = ({ businessId }: Props) => {
         <Slider {...settings}>
           {packages.map((pack: BUSINESS_PACKAGE) => {
             const isExpanded = expandedPackages[pack.packageId] || false;
-            const serviceHTML = pack.services.slice(0, isExpanded ? undefined : 4).map(
-              ({ serviceMappingId, serviceName }) => {
+            const serviceHTML = pack.services
+              .slice(0, isExpanded ? undefined : 4)
+              .map(({ serviceMappingId, serviceName }) => {
                 return (
                   <li key={serviceMappingId} className="font-medium">
                     <span>
@@ -123,12 +126,11 @@ const ServicePackages = ({ businessId }: Props) => {
                     {serviceName}
                   </li>
                 );
-              },
-            );
+              });
             return (
               <div
                 key={pack.packageId}
-                className="relative rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark md:p-9 xl:p-11.5 h-[480px] overflow-hidden"
+                className="relative h-[480px] overflow-hidden rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark md:p-9 xl:p-11.5"
               >
                 <span className="absolute right-3 top-3.5">
                   {/* <svg
@@ -205,11 +207,13 @@ const ServicePackages = ({ businessId }: Props) => {
                 <h4 className="my-5 text-lg font-medium text-black dark:text-white">
                   Services
                 </h4>
-                <ul className="flex flex-col gap-3.5 max-h-[150px] overflow-y-auto">{serviceHTML}</ul>
+                <ul className="flex max-h-[150px] flex-col gap-3.5 overflow-y-auto">
+                  {serviceHTML}
+                </ul>
                 {pack.services.length > 2 && (
                   <button
                     onClick={() => toggleExpand(pack.packageId)}
-                    className=" text-sm text-blue-600 underline"
+                    className="text-sm text-blue-600 underline"
                   >
                     {isExpanded ? "See Less" : "See More"}
                   </button>
@@ -277,178 +281,3 @@ const ServicePackages = ({ businessId }: Props) => {
 };
 
 export default ServicePackages;
-
-// "use client";
-// import { useState, useEffect } from "react";
-// import { redirect } from "next/navigation";
-
-// import Slider from "react-slick";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faPlus } from "@fortawesome/free-solid-svg-icons";
-// import {
-//   faCircleCheck,
-//   faPenToSquare,
-//   faTrashCan,
-// } from "@fortawesome/free-regular-svg-icons";
-
-// import FitNxtDropDowns from "@/components/Dropdowns/FitNxtDropDowns";
-// import { getPackages } from "@/actions/business";
-// import Modal from "@/components/Modal";
-// import { BUSINESS_PACKAGES, BUSINESS_PACKAGE } from "@/types/business";
-// import { toastSuccess } from "@/helpers/toast";
-// import "slick-carousel/slick/slick.css";
-// import "slick-carousel/slick/slick-theme.css";
-
-// const settings = {
-//   dots: true,
-//   infinite: false,
-//   speed: 500,
-//   slidesToShow: 3,
-//   slidesToScroll: 1,
-//   arrows: false,
-//   className:
-//     "service-package-slick-slider after:content-[''] after:block after:clear-both",
-// };
-
-// interface Props {
-//   businessId: string;
-// }
-
-// const ServicePackages = ({ businessId }: Props) => {
-//   const [packages, setPackages] = useState<BUSINESS_PACKAGES>([]);
-//   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
-//   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>();
-
-//   const [expandedPackages, setExpandedPackages] = useState<Record<string, boolean>>({});
-
-//   useEffect(() => {
-//     async function getData() {
-//       const { success, data = [] } = await getPackages(businessId);
-//       if (success) {
-//         setPackages(data);
-//       } else {
-//         setPackages([]);
-//       }
-//     }
-//     getData();
-//   }, [businessId]);
-
-//   const toggleExpand = (packageId: string) => {
-//     setExpandedPackages((prev) => ({
-//       ...prev,
-//       [packageId]: !prev[packageId],
-//     }));
-//   };
-
-//   const onEdit = (packageId: string) => {
-//     redirect(`/business/${businessId}/edit/package/${packageId}`);
-//   };
-
-//   const handleAddPackage = () => {
-//     redirect(`/business/${businessId}/add/package`);
-//   };
-
-//   const onDelete = (pack: BUSINESS_PACKAGE) => {
-//     setShowDeletePrompt(true);
-//     setSelectedPackage(pack);
-//   };
-
-//   const onConfirmDelete = () => {
-//     if (selectedPackage) {
-//       onDeleteCancel();
-//       toastSuccess(`${selectedPackage.packageName} is deleted successfully`);
-//     }
-//   };
-
-//   const onDeleteCancel = () => {
-//     setShowDeletePrompt(false);
-//     setSelectedPackage(undefined);
-//   };
-
-//   if (!packages) {
-//     return "Loading...";
-//   }
-
-//   return (
-//     <div className="mt-4">
-//       <div className="mb-4 flex items-center rounded-sm bg-white px-4 py-4 shadow-default sm:px-6 xl:px-7.5">
-//         <h3 className="font-bold text-black dark:text-white">Service Packages</h3>
-//         <div className="ml-auto">
-//           <button
-//             onClick={handleAddPackage}
-//             className="inline-flex items-center justify-center rounded bg-primary px-5 py-1 text-center font-medium text-white hover:bg-opacity-90"
-//           >
-//             <span className="mr-1">
-//               <FontAwesomeIcon icon={faPlus} />
-//             </span>
-//             <span className="text-sm">Add</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Packages */}
-//       <div className="mb-10">
-//         <Slider {...settings}>
-//           {packages.map((pack: BUSINESS_PACKAGE) => {
-//             const isExpanded = expandedPackages[pack.packageId] || false;
-//             const serviceHTML = pack.services.slice(0, isExpanded ? undefined : 2).map(
-//               ({ serviceMappingId, serviceName }) => (
-//                 <li key={serviceMappingId} className="font-medium">
-//                   <span>
-//                     <FontAwesomeIcon icon={faCircleCheck} />
-//                   </span> {serviceName}
-//                 </li>
-//               )
-//             );
-//             return (
-//               <div
-//                 key={pack.packageId}
-//                 className="relative rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark md:p-9 xl:p-11.5 h-[400px] overflow-hidden"
-//               >
-//                 <span className="absolute right-3 top-3.5">
-//                   <FitNxtDropDowns>
-//                     <button
-//                       onClick={() => onEdit(pack.packageId)}
-//                       className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
-//                     >
-//                       <FontAwesomeIcon icon={faPenToSquare} /> Edit
-//                     </button>
-//                     <button
-//                       onClick={() => onDelete(pack)}
-//                       className="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4"
-//                     >
-//                       <FontAwesomeIcon icon={faTrashCan} /> Delete
-//                     </button>
-//                   </FitNxtDropDowns>
-//                 </span>
-//                 <span className="mb-2.5 block text-title-sm2 font-bold text-black dark:text-white">
-//                   {pack.packageName}
-//                 </span>
-//                 <h3>
-//                   <span className="text-xl font-medium text-black dark:text-white">₹</span>
-//                   <span className="text-title-xxl2 font-bold text-black dark:text-white">{pack.price}</span>
-//                 </h3>
-//                 <h4 className="my-5 text-lg font-medium text-black dark:text-white">Services</h4>
-//                 <ul className="flex flex-col gap-3.5 max-h-[150px] overflow-y-auto">
-//                   {serviceHTML}
-//                 </ul>
-//                 {pack.services.length > 2 && (
-//                   <button
-//                     onClick={() => toggleExpand(pack.packageId)}
-//                     className="mt-2 text-sm text-blue-600 underline"
-//                   >
-//                     {isExpanded ? "See Less" : "See More"}
-//                   </button>
-//                 )}
-//               </div>
-//             );
-//           })}
-//         </Slider>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ServicePackages;
-
-// //esko mearge krnA HAI UPER BALE MAIN 

@@ -6,6 +6,7 @@ import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
 import useThrottle from "@/hooks/useThrottle";
 import { FILTER_DD_TYPE, SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
+import PackageSelection from "./PackageSelection";
 import StepProgress from "./StepProgress";
 interface SubscriptionFormProps {
   businessId: string;
@@ -13,11 +14,12 @@ interface SubscriptionFormProps {
 
 const steps = [
   { name: "Select Subscriber", number: 1 },
-  { name: "Subscribe", number: 2 },
+  { name: "Select Package", number: 2 },
+  { name: "Subscribe", number: 3 },
 ];
 
 const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [packages, setPackages] = useState<BUSINESS_PACKAGE[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
     {} as BUSINESS_PACKAGE,
@@ -263,6 +265,37 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
       )}
 
       {step === 2 && (
+        <>
+          <div className="my-8">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setStep(3);
+              }}
+            >
+              <PackageSelection businessId={businessId} />
+            </form>
+          </div>
+
+          <div className="mt-4 flex justify-between">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="rounded bg-gray-600 px-6 py-2 font-medium text-white"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              className="rounded bg-primary px-6 py-2 font-medium text-white"
+            >
+              Submit
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === 3 && (
         <form onSubmit={handleSubmit}>
           <input
             type="hidden"
