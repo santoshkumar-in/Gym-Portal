@@ -1,11 +1,9 @@
 "use client";
-import { useEffect, useState, ChangeEvent, FormEvent } from "react";
-import { SingleValue } from "react-select";
-import { getPackages } from "@/actions/business";
+import { useState, ChangeEvent, FormEvent } from "react";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
 import useThrottle from "@/hooks/useThrottle";
-import { FILTER_DD_TYPE, SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
+import { SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
 import PackageSelection from "./PackageSelection";
 import StepProgress from "./StepProgress";
 interface SubscriptionFormProps {
@@ -20,11 +18,9 @@ const steps = [
 
 const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [packages, setPackages] = useState<BUSINESS_PACKAGE[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
     {} as BUSINESS_PACKAGE,
   );
-  const [packageOptions, setPackageOptions] = useState<FILTER_DD_TYPE[]>([]);
   const [subscriberDetails, setSubscriberDetails] = useState<SUBSCRIBER>({
     id: "",
     name: "",
@@ -37,22 +33,6 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
 
   const [fetchingSubscriber, setFetchingSubscriber] = useState(false);
   const [mobile, setMobile] = useState("");
-
-  // Fetch packages
-  useEffect(() => {
-    async function getData() {
-      const { success, data = [] } = await getPackages(businessId);
-      if (success) {
-        setPackages(data);
-        const options = data.map(({ packageName, packageId }) => ({
-          label: packageName,
-          value: packageId,
-        }));
-        setPackageOptions(options);
-      }
-    }
-    getData();
-  }, [businessId]);
 
   const throttledChangeHandler = useThrottle(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,14 +77,6 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
       ...subscriberDetails,
       [e.target.name]: e.target.value,
     });
-  };
-  const handlePackageSelection = (v: SingleValue<FILTER_DD_TYPE>) => {
-    const item = packages.find(({ packageId }) => packageId === v?.value);
-    if (item) {
-      setSelectedPackage(item);
-    } else {
-      setSelectedPackage({} as BUSINESS_PACKAGE);
-    }
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -265,16 +237,19 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
       )}
 
       {step === 2 && (
-        <>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (Object.keys(selectedPackage).length > 0) {
+              setStep(3);
+            }
+          }}
+        >
           <div className="my-8">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setStep(3);
-              }}
-            >
-              <PackageSelection businessId={businessId} />
-            </form>
+            <PackageSelection
+              businessId={businessId}
+              onSelectPackage={(pack) => setSelectedPackage(pack)}
+            />
           </div>
 
           <div className="mt-4 flex justify-between">
@@ -289,10 +264,10 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
               type="submit"
               className="rounded bg-primary px-6 py-2 font-medium text-white"
             >
-              Submit
+              Continue
             </button>
           </div>
-        </>
+        </form>
       )}
 
       {step === 3 && (
@@ -302,17 +277,11 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
             name="subscriberId"
             value={subscriberDetails.id}
           />
-          <div className="mb-4">
-            <label className="mb-2 block text-sm font-medium text-black dark:text-white">
-              Package
-            </label>
-            <FitNxtReactSelect
-              onChange={handlePackageSelection}
-              allOptions={packageOptions}
-              placeholder="Select Package"
-              name="packageId"
-            />
-          </div>
+          <input
+            type="hidden"
+            name="packageId"
+            value={selectedPackage.packageId}
+          />
 
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium text-black dark:text-white">
@@ -336,7 +305,10 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
           <div className="flex justify-between">
             <button
               type="button"
-              onClick={() => setStep(1)}
+              onClick={() => {
+                setStep(2);
+                setSelectedPackage({} as BUSINESS_PACKAGE);
+              }}
               className="rounded bg-gray-600 px-6 py-2 font-medium text-white"
             >
               Back
