@@ -54,3 +54,16 @@ export const BusinessAttendanceSchema = z.object({
   inTime: z.string().trim(),
   outTime: z.string().trim(),
 });
+
+export const SubscriberSchema = z.object({
+  fullName: z.string().nonempty("Full Name is required").trim(),
+  userName: z.string().nonempty("User Name is required").trim(),
+  email: z.string().nonempty("Email is required").email().trim(),
+  mobile: z
+    .string()
+    .nonempty("Mobile is required")
+    .length(10, "Mobile must be 10 digit")
+    .trim(),
+  height: z.number().min(1, "Height is Invalid"),
+  weight: z.number().min(1, "Weight is Invalid"),
+});

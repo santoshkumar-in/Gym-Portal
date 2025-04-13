@@ -21,7 +21,7 @@ const BusinessUsers = ({
 }: Props) => {
   // console.log(users)
   return (
-    <div className="rounded-sm border border-stroke bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1 bg-red-900">
+    <div className="rounded-sm border border-stroke bg-red-900 bg-white px-5 py-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 sm:py-6 xl:pb-1">
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto">
           <thead>
@@ -74,7 +74,7 @@ const BusinessUsers = ({
                     name="status"
                     // defaultChecked={user.status === "ACTIVE"}
                     defaultChecked={user.enabled} // True = active, False = inactive
-                    onChange={(e) => onStatusChange(e, user.businessid)}
+                    onChange={(e) => onStatusChange(e, user.businessid || "")}
                   />
                 </td>
                 <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
@@ -89,7 +89,6 @@ const BusinessUsers = ({
                       onClick={() => user.userId && onDelete(user.userId)}
                       className="w-4 hover:text-primary"
                     >
-
                       <FontAwesomeIcon icon={faTrashCan} />
                     </button>
                   </div>

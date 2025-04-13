@@ -54,19 +54,32 @@ export type MEDIA = {
 };
 
 export type SUBSCRIBER = {
-  id: string;
-  name: string;
+  businessid?: string;
+  userName?: string;
   email?: string;
+  mobile?: number;
+  isd?: string;
+  isdId?: string;
+  password?: string;
   gender?: string;
-  mobile?: string;
-  dateOfBirth?: string;
+  userGender?: string;
+  confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  logoUrl?: string | null;
+  role?: string;
+  status?: string;
+  enabled?: boolean;
+  userId?: string;
+  userExist?: boolean;
+  dob?: string;
   height?: number;
   weight?: number;
-  heightWeightRatio?: string;
+  business?: BUSINESS;
   subscription?: string;
   startDate?: string;
   endDate?: string;
-  business?: BUSINESS;
 };
 
 export type SUBSCRIBER_ATTENDANCE = {
@@ -103,14 +116,15 @@ export type ATTENDANCE = {
 };
 
 export type BUSINESS_USER = {
-  id: string;
-  businessid: string;
+  businessid?: string;
   userName?: string;
   email?: string;
   mobile?: number;
   isd?: string;
+  isdId?: string;
   password?: string;
   gender?: string;
+  userGender?: string;
   confirmPassword?: string;
   firstName?: string;
   lastName?: string;
@@ -120,6 +134,10 @@ export type BUSINESS_USER = {
   status?: string;
   enabled?: boolean;
   userId?: string;
+  userExist?: boolean;
+  dob?: string;
+  height?: number;
+  weight?: number;
 };
 
 export type FILTER_DD_TYPE = {

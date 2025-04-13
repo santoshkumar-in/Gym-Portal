@@ -45,9 +45,9 @@ const Subscribers = ({ subscribers, businessId, onDelete }: Props) => {
                   <h5 className="font-medium text-black dark:text-white">
                     <Link
                       className="text-primary"
-                      href={`/business/${businessId}/subscriber/${subscriber.id}`}
+                      href={`/business/${businessId}/subscriber/${subscriber.userId}`}
                     >
-                      {subscriber.name}
+                      {subscriber.fullName}
                     </Link>
                   </h5>
                 </td>
@@ -82,7 +82,7 @@ const Subscribers = ({ subscribers, businessId, onDelete }: Props) => {
                       <FontAwesomeIcon icon={faRepeat} />
                     </button>
                     <button
-                      onClick={() => onDelete(subscriber.id)}
+                      onClick={() => onDelete(subscriber.userId || "")}
                       className="w-4 hover:text-primary"
                     >
                       <FontAwesomeIcon icon={faTrashCan} />

@@ -1,11 +1,14 @@
 "use client";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import cn from "classnames";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
-import useThrottle from "@/hooks/useThrottle";
+import { getUserByMobile, createSubscriber } from "@/actions/business";
+import { formatDate } from "@/helpers";
 import { SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
 import PackageSelection from "./PackageSelection";
 import StepProgress from "./StepProgress";
+import { SubscriberSchemaError } from "@/types/zod-errors";
 interface SubscriptionFormProps {
   businessId: string;
 }
@@ -22,55 +25,59 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     {} as BUSINESS_PACKAGE,
   );
   const [subscriberDetails, setSubscriberDetails] = useState<SUBSCRIBER>({
-    id: "",
-    name: "",
-    mobile: "",
+    userId: "",
+    fullName: "",
+    userName: "",
+    mobile: 0,
     email: "",
-    gender: "",
+    userGender: "",
     height: 0,
     weight: 0,
   });
 
   const [fetchingSubscriber, setFetchingSubscriber] = useState(false);
-  const [mobile, setMobile] = useState("");
+  const [subscriberDOB, setSubscriberDOB] = useState<Date>(new Date());
 
-  const throttledChangeHandler = useThrottle(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      setMobile(value);
-      setFetchingSubscriber(true);
+  const [form1Errors, setForm1Errors] = useState<SubscriberSchemaError>(
+    {} as SubscriberSchemaError,
+  );
 
-      setTimeout(() => {
-        // Mock fetching subscriber
-        if (value === "1234567890") {
+  useEffect(() => {
+    async function getData() {
+      if (subscriberDetails?.mobile?.toString()?.length === 10) {
+        setFetchingSubscriber(true);
+        const { data, success } = await getUserByMobile(
+          "UH1jADHmrx9lddZkWFAWnQ",
+          Number(subscriberDetails.mobile),
+        );
+        if (success && data?.userExist) {
           setSubscriberDetails({
-            id: "sub123",
-            name: "John Doe",
-            mobile: value,
-            email: "john@example.com",
-            gender: "M",
-            height: 170,
-            weight: 70,
-            dateOfBirth: "1995-03-13",
+            userId: data.userId,
+            fullName: data.fullName,
+            userName: data.userName,
+            mobile: data.mobile,
+            email: data.email,
+            userGender: data.userGender || "M",
+            height: data.height,
+            weight: data.weight,
           });
         } else {
           setSubscriberDetails({
-            id: "",
-            name: "",
-            mobile: value,
+            userId: "",
+            fullName: "",
+            userName: "",
+            mobile: subscriberDetails.mobile,
             email: "",
-            gender: "",
+            userGender: "",
             height: 0,
             weight: 0,
-            dateOfBirth: "",
           });
         }
-
         setFetchingSubscriber(false);
-      }, 1000);
-    },
-    300,
-  );
+      }
+    }
+    getData();
+  }, [subscriberDetails.mobile]);
 
   const handleSubscriberFieldChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSubscriberDetails({
@@ -79,15 +86,48 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     });
   };
 
+  const handleSubmitStep1 = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (subscriberDetails.userId) {
+      setStep(2);
+      return;
+    }
+
+    const formData = new FormData();
+    Object.entries(subscriberDetails).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value.toString());
+      } else {
+        formData.append(key, "");
+      }
+    });
+
+    formData.append("dob", formatDate(subscriberDOB));
+
+    const { success, data, errors } = await createSubscriber(formData);
+
+    if (errors || !success) {
+      setForm1Errors(errors || ({} as SubscriberSchemaError));
+      console.log("Form Data to submit:", errors);
+      return;
+    }
+
+    setForm1Errors({} as SubscriberSchemaError);
+    setSubscriberDetails({ ...subscriberDetails, userId: data?.userId || "" });
+    setStep(2);
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const formData = {
       businessId,
-      subscriberId: subscriberDetails.id,
+      subscriberId: subscriberDetails.userId,
       packageId: selectedPackage.packageId,
       price: selectedPackage.price,
     };
     console.log("Form Data to submit:", formData);
+    setStep(2);
   };
 
   return (
@@ -99,12 +139,7 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
       <StepProgress steps={steps} currentStep={step} />
 
       {step === 1 && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setStep(2);
-          }}
-        >
+        <form onSubmit={handleSubmitStep1}>
           <div className="mb-4">
             <label className="mb-3 block text-sm font-medium text-black dark:text-white">
               Mobile Number
@@ -112,12 +147,22 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
             <input
               type="text"
               name="mobile"
-              value={mobile}
-              onChange={throttledChangeHandler}
+              value={subscriberDetails.mobile}
+              onChange={handleSubscriberFieldChange}
               placeholder="Enter Mobile Number"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              required
+              className={cn(
+                "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                {
+                  "border-stroke": !form1Errors.mobile,
+                  "border-red-500": form1Errors.mobile,
+                },
+              )}
             />
+            {form1Errors.mobile && (
+              <p className="pt-1 text-xs text-red-500">
+                {form1Errors.mobile._errors[0]}
+              </p>
+            )}
           </div>
 
           {!fetchingSubscriber && (
@@ -126,17 +171,28 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full xl:w-1/2">
                   <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                    Name
+                    Full Name
                   </label>
                   <input
-                    name="name"
+                    name="fullName"
                     type="text"
-                    readOnly={subscriberDetails.id !== ""}
-                    value={subscriberDetails.name}
+                    readOnly={subscriberDetails.userId !== ""}
+                    value={subscriberDetails.fullName}
                     onChange={handleSubscriberFieldChange}
                     placeholder="Full Name"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    className={cn(
+                      "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                      {
+                        "border-stroke": !form1Errors.fullName,
+                        "border-red-500": form1Errors.fullName,
+                      },
+                    )}
                   />
+                  {form1Errors.fullName && (
+                    <p className="pt-1 text-xs text-red-500">
+                      {form1Errors.fullName._errors[0]}
+                    </p>
+                  )}
                 </div>
                 <div className="w-full xl:w-1/2">
                   <label className="mb-3 block text-sm font-medium text-black dark:text-white">
@@ -144,44 +200,77 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
                   </label>
                   <input
                     name="email"
-                    type="email"
+                    type="text"
                     value={subscriberDetails.email}
-                    readOnly={subscriberDetails.id !== ""}
+                    readOnly={subscriberDetails.userId !== ""}
                     placeholder="Email"
                     onChange={handleSubscriberFieldChange}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    className={cn(
+                      "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                      {
+                        "border-stroke": !form1Errors.email,
+                        "border-red-500": form1Errors.email,
+                      },
+                    )}
                   />
+                  {form1Errors.email && (
+                    <p className="pt-1 text-xs text-red-500">
+                      {form1Errors.email._errors[0]}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full xl:w-1/2">
                   <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                    Height
+                    Height (In CM)
                   </label>
                   <input
                     name="height"
                     type="number"
-                    readOnly={subscriberDetails.id !== ""}
+                    readOnly={subscriberDetails.userId !== ""}
                     value={subscriberDetails.height}
                     placeholder="Height (In CM)"
                     onChange={handleSubscriberFieldChange}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    className={cn(
+                      "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                      {
+                        "border-stroke": !form1Errors.height,
+                        "border-red-500": form1Errors.height,
+                      },
+                    )}
                   />
+                  {form1Errors.height && (
+                    <p className="pt-1 text-xs text-red-500">
+                      {form1Errors.height._errors[0]}
+                    </p>
+                  )}
                 </div>
                 <div className="w-full xl:w-1/2">
                   <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                    Weight
+                    Weight (in Kg)
                   </label>
                   <input
                     name="weight"
                     type="number"
-                    readOnly={subscriberDetails.id !== ""}
+                    readOnly={subscriberDetails.userId !== ""}
                     value={subscriberDetails.weight}
                     placeholder="Weight (in Kg)"
                     onChange={handleSubscriberFieldChange}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    className={cn(
+                      "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                      {
+                        "border-stroke": !form1Errors.weight,
+                        "border-red-500": form1Errors.weight,
+                      },
+                    )}
                   />
+                  {form1Errors.weight && (
+                    <p className="pt-1 text-xs text-red-500">
+                      {form1Errors.weight._errors[0]}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -190,9 +279,12 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
                     Date Of Birth
                   </label>
                   <DatePickerOne
+                    onChange={(date) => {
+                      setSubscriberDOB(date as Date);
+                    }}
                     defaultDate={
-                      subscriberDetails.dateOfBirth
-                        ? new Date(subscriberDetails.dateOfBirth)
+                      subscriberDetails.dob
+                        ? new Date(subscriberDetails.dob)
                         : new Date()
                     }
                   />
@@ -208,14 +300,42 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
                       { value: "F", label: "Female" },
                       { value: "OTHER", label: "Other" },
                     ]}
-                    isDisabled={subscriberDetails.id !== ""}
+                    isDisabled={subscriberDetails.userId !== ""}
                     placeholder="Select Gender"
-                    name="gender"
+                    name="userGender"
                     defaultValue={{
-                      value: subscriberDetails.gender || "M",
-                      label: subscriberDetails.gender || "Male",
+                      value: subscriberDetails.userGender || "M",
+                      label: subscriberDetails.userGender || "Male",
                     }}
                   />
+                </div>
+              </div>
+
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Username
+                  </label>
+                  <input
+                    name="userName"
+                    type="text"
+                    readOnly={subscriberDetails.userId !== ""}
+                    value={subscriberDetails.userName}
+                    onChange={handleSubscriberFieldChange}
+                    placeholder="Username"
+                    className={cn(
+                      "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                      {
+                        "border-stroke": !form1Errors.userName,
+                        "border-red-500": form1Errors.userName,
+                      },
+                    )}
+                  />
+                  {form1Errors.userName && (
+                    <p className="pt-1 text-xs text-red-500">
+                      {form1Errors.userName._errors[0]}
+                    </p>
+                  )}
                 </div>
               </div>
             </fieldset>
@@ -229,7 +349,9 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
                 type="submit"
                 className="rounded bg-primary px-6 py-2 font-medium text-white"
               >
-                Continue
+                {!subscriberDetails.userId && subscriberDetails.mobile
+                  ? "Create Subscriber"
+                  : `Continue`}
               </button>
             </div>
           )}
@@ -275,7 +397,7 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
           <input
             type="hidden"
             name="subscriberId"
-            value={subscriberDetails.id}
+            value={subscriberDetails.userId}
           />
           <input
             type="hidden"

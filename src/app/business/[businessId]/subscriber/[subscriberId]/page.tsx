@@ -29,8 +29,8 @@ const SubscriberDetailPage = ({
       setBusinessId(bId);
       const subId = (await params).subscriberId;
       const { data = [] } = await getSubscribers(bId);
-      const res = data.find(({ id }) => {
-        return id === subId;
+      const res = data.find(({ userId }) => {
+        return userId === subId;
       });
       if (res) {
         setSubscriber(res);
@@ -73,7 +73,7 @@ const SubscriberDetailPage = ({
                   First Name
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {subscriber.name}
+                  {subscriber.fullName}
                 </p>
               </div>
               <div>

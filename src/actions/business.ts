@@ -1,10 +1,12 @@
 import { cache } from "react";
+import uuid4 from "uuid4";
 import { toastSuccess, toastError } from "@/helpers/toast";
 import {
   BusinessAttendanceSchema,
   BusinessInfoFormSchema,
   BusinessPackageSchema,
   BusinessUserSchema,
+  SubscriberSchema,
 } from "@/schemas/business";
 import {
   BUSINESS,
@@ -20,7 +22,10 @@ import {
   BUSINESS_SERVICE,
   MASTER_SERVICE_CATEGORY,
 } from "@/types/business";
+
+import { SubscriberSchemaError } from "@/types/zod-errors";
 import { apiClient } from "@/helpers/api";
+import { ROLE_SUBSCRIBER } from "@/enums";
 
 export const getAllUsers = cache(
   async (
@@ -609,37 +614,37 @@ export const getSubscribers = cache(
         success: true,
         data: [
           {
-            id: "2301",
-            name: "Sandeep",
-            gender: "F",
-            mobile: "+9112345343",
+            userId: "2301",
+            fullName: "Sandeep",
+            userGender: "F",
+            mobile: 12345343,
             subscription: "Package 1, Package 2",
             startDate: "1st Jan 2025",
             endDate: "31st March 2025",
           },
           {
-            id: "2301",
-            name: "Amit",
-            gender: "F",
-            mobile: "+911283633",
+            userId: "2301",
+            fullName: "Amit",
+            userGender: "F",
+            mobile: 911283633,
             subscription: "Package 3, Package 7",
             startDate: "18th March 2025",
             endDate: "31st March 2025",
           },
           {
-            id: "2301",
-            name: "Krish",
-            gender: "F",
-            mobile: "+911284843",
+            userId: "2301",
+            fullName: "Krish",
+            userGender: "F",
+            mobile: 911284843,
             subscription: "Package 4, Package 5",
             startDate: "20th Feb 2025",
             endDate: "25th Feb 2025",
           },
           {
-            id: "2301",
-            name: "Keshav",
-            gender: "F",
-            mobile: "+919494843",
+            userId: "2301",
+            fullName: "Keshav",
+            userGender: "F",
+            mobile: 919494843,
             subscription: "Package 2",
             startDate: "10th Feb 2025",
             endDate: "25th May 2025",
@@ -911,3 +916,98 @@ export const addAttendance = async (formData: FormData) => {
     toastError(message || "Error while updating the detail");
   }
 };
+
+export const getUserByMobile = cache(
+  async (
+    isdId: string,
+    mobile: number,
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    data?: SUBSCRIBER;
+  }> => {
+    try {
+      const data = await apiClient(`/api/service/search-user`, {
+        method: "POST",
+        body: JSON.stringify({
+          mobile,
+          isdId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return { success: true, data };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error while searching",
+      };
+    }
+  },
+);
+
+export const createSubscriber = cache(
+  async (
+    formData: FormData,
+  ): Promise<{
+    success: boolean;
+    data?: BUSINESS_USER;
+    errors?: SubscriberSchemaError;
+    message?: string;
+  }> => {
+    const uniqueId = uuid4();
+    console.log(uniqueId);
+
+    const validatedFields = SubscriberSchema.safeParse({
+      fullName: formData.get("fullName"),
+      userName: formData.get("userName"),
+      email: formData.get("email"),
+      mobile: formData.get("mobile"),
+      height: Number(formData.get("height")),
+      weight: Number(formData.get("weight")),
+      //userGender: formData.get("userGender"),
+      //dob: formData.get("dob"),
+    });
+
+    if (!validatedFields.success) {
+      console.error("errors", validatedFields.error.format());
+      return {
+        success: false,
+        errors: validatedFields.error.format(),
+        message: "Invalid data",
+      };
+    }
+
+    try {
+      const data = await apiClient(`/api/admin/create-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...validatedFields.data,
+          isd: "UH1jADHmrx9lddZkWFAWnQ",
+          role: ROLE_SUBSCRIBER,
+          password: uniqueId,
+        }),
+      });
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (e: unknown) {
+      let message = "";
+      if (typeof e === "string") {
+        message = e.toUpperCase();
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      toastError(message || "Error while updating the detail");
+      return {
+        success: false,
+        message,
+      };
+    }
+  },
+);

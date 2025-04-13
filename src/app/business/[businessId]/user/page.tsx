@@ -32,7 +32,7 @@ const BusinessUsers = ({
   const [users, setUsers] = useState<BUSINESS_USER[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
   const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
-    { currentPage: 1, perPage: 10, total: 0, },
+    { currentPage: 1, perPage: 10, total: 0 },
   );
 
   const [currentSearchAndFilters, setCurrentSearchAndFilters] = useState<{
@@ -68,13 +68,13 @@ const BusinessUsers = ({
   const getData = async (params: { [s: string]: unknown }) => {
     try {
       const res = await getAllUsers(businessId, params);
-      console.log(res)
+      console.log(res);
 
       setPaginationData((prev) => ({
         ...prev,
         currentPage: res.currentPage,
         perPage: res.perPage,
-        total: res.total
+        total: res.total,
       }));
 
       if (Array.isArray(res.data)) {
@@ -102,7 +102,7 @@ const BusinessUsers = ({
         toastError(response.message || "Failed to delete user");
       } else {
         toastSuccess("User deleted successfully");
-        setUsers((prev) => prev.filter((user) => user.id !== selected));
+        setUsers((prev) => prev.filter((user) => user.userId !== selected));
         console.log(response.message);
         getData({ businessId });
       }
@@ -114,7 +114,6 @@ const BusinessUsers = ({
     setSelected("");
   };
 
-
   const onDeleteCancel = () => {
     setShowDeletePrompt(false);
     setSelected("");
@@ -123,14 +122,14 @@ const BusinessUsers = ({
 
   const handleStatusChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    userId: string
+    userId: string,
   ) => {
     const newStatus = e.target.checked;
     console.log("Updating status for user:", userId, "New Status:", newStatus);
 
     try {
       const response = await getData({ userId, enabled: newStatus });
-      console.log(response)
+      console.log(response);
 
       toastSuccess(`User status updated successfully`);
     } catch (error) {
@@ -182,7 +181,7 @@ const BusinessUsers = ({
   // };
 
   return (
-    <DefaultLayout >
+    <DefaultLayout>
       <SearchAndFilterBar
         tableFilterOptions={tableFilters}
         onChange={handleFilterValueChange}
@@ -258,5 +257,3 @@ const BusinessUsers = ({
 };
 
 export default BusinessUsers;
-
-
