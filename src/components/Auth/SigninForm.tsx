@@ -1,12 +1,41 @@
+
 "use client";
-import React from "react";
-//import classNames from "classnames";
+import React, { useState } from "react";
 import { doSignIn } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LoginSchemaError } from "@/types/zod-errors";
+import cn from "classnames";
 
 const SignInForm: React.FC = () => {
+  const [formErrors, setFormErrors] = useState<LoginSchemaError>({} as LoginSchemaError);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormErrors({} as LoginSchemaError);
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+    const res = await doSignIn(formData);
+
+    const { success, errors } = res;
+
+    if (errors || !success) {
+      setFormErrors(errors || ({} as LoginSchemaError));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (res.redirectTo) {
+      router.push(res.redirectTo);
+    }
+  };
+
   return (
-    <form action={doSignIn}>
+    <form onSubmit={handleSubmit}>
+      {/* Username */}
       <div className="mb-4">
         <label className="mb-2.5 block font-medium text-black dark:text-white">
           Username
@@ -16,9 +45,20 @@ const SignInForm: React.FC = () => {
             type="text"
             name="username"
             placeholder="Enter your username"
-            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            className={cn(
+              "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+              {
+                "border-stroke": !formErrors.username,
+                "border-red-500": formErrors.username,
+              },
+            )}
+            disabled={isSubmitting}
           />
-
+          {formErrors.username && (
+            <p className="pt-1 text-xs text-red-500">
+              {formErrors.username._errors[0]}
+            </p>
+          )}
           <span className="absolute right-4 top-4">
             <svg
               className="fill-current"
@@ -39,6 +79,7 @@ const SignInForm: React.FC = () => {
         </div>
       </div>
 
+      {/* Password */}
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white">
           Password
@@ -48,8 +89,20 @@ const SignInForm: React.FC = () => {
             type="password"
             name="password"
             placeholder="Enter your password"
-            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            className={cn(
+              "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+              {
+                "border-stroke": !formErrors.password,
+                "border-red-500": formErrors.password,
+              },
+            )}
+            disabled={isSubmitting}
           />
+          {formErrors.password && (
+            <p className="pt-1 text-xs text-red-500">
+              {formErrors.password._errors[0]}
+            </p>
+          )}
 
           <span className="absolute right-4 top-4">
             <svg
@@ -75,12 +128,19 @@ const SignInForm: React.FC = () => {
         </div>
       </div>
 
+      {/* Submit */}
       <div className="mb-5">
         <button
           type="submit"
-          className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+          disabled={isSubmitting}
+          className={cn(
+            "w-full rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90",
+            {
+              "opacity-50 cursor-not-allowed": isSubmitting,
+            },
+          )}
         >
-          Sign In
+          {isSubmitting ? "Signing In..." : "Sign In"}
         </button>
       </div>
 
