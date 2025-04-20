@@ -15,13 +15,12 @@ import { toastSuccess, toastError } from "@/helpers/toast";
 import cn from "classnames";
 import { BusinessPackageSchemaError } from "@/types/zod-errors";
 
-
 interface Props {
   businessId: string;
   packageId?: string;
 }
 const PackageForm = ({ businessId, packageId = "" }: Props) => {
-  console.log("llll"+packageId)
+  console.log("llll" + packageId);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
     {} as BUSINESS_PACKAGE,
   );
@@ -65,11 +64,11 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
     } else {
       setSelectedPackage({
         businessId,
-        packageId:"wertyuiop",
+        packageId: "wertyuiop",
         packageName: "",
         price: 10,
         discount: 10,
-        minPrice: 10, 
+        minPrice: 10,
         validityId: "",
         subscriptionLimit: 110,
         popular: false,
@@ -131,12 +130,12 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
         services.push(value);
       }
     }
-    newFormData.append("availableServices", services);
+    newFormData.append("availableServices", JSON.stringify(services));
     newFormData.append("popular", popular ? "1" : "0");
 
     const { success, errors } = await addOrUpdatePackage(newFormData);
     console.log("Form Data to submit:", success);
-    console.log(success, errors)
+    console.log(success, errors);
     if (errors || !success) {
       setFormErrors(errors || ({} as BusinessPackageSchemaError));
       console.log("Form Data to submit:", errors);
@@ -331,7 +330,8 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
               />
               {formErrors.availableServices && (
                 <p className="pt-1 text-xs text-red-500">
-                  {formErrors.availableServices._errors?.[0] || "Please select at least one service."}
+                  {formErrors.availableServices._errors?.[0] ||
+                    "Please select at least one service."}
                 </p>
               )}
             </div>

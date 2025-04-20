@@ -26,7 +26,7 @@ import {
 import {
   SubscriberSchemaError,
   UserSchemaError,
-  BusinessAttendanceSchemaError,
+  //BusinessAttendanceSchemaError,
   BusinessPackageSchemaError,
   BusinessInfoFormSchemaError,
 } from "@/types/zod-errors";
@@ -474,7 +474,6 @@ export const addOrUpdatePackage = cache(
       popular: formData.get("popular") === "on",
       // availableServices: formData.get("availableServices"),
       availableServices: formData.getAll("availableServices"),
-
     };
     console.log("services " + fieldList.availableServices);
     console.log("package" + fieldList.packageId);
@@ -925,11 +924,11 @@ export const updateBusinessDetails = async (
     reviews: formData.get("reviews"),
     rating: formData.get("rating"),
     reviewRatingUrl: formData.get("reviewRatingUrl"),
-    geolocation: formData.get("geolocation"), 
+    geolocation: formData.get("geolocation"),
     phone: formData.get("phone"),
     bio: formData.get("bio"),
     socialProfiles: {
-      facebook: formData.get("facebook"), 
+      facebook: formData.get("facebook"),
       instagram: formData.get("instagram"),
       youtube: formData.get("youtube"),
       twitter: formData.get("twitter"),
