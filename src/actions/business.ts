@@ -23,7 +23,13 @@ import {
   MASTER_SERVICE_CATEGORY,
 } from "@/types/business";
 
-import { SubscriberSchemaError } from "@/types/zod-errors";
+import {
+  SubscriberSchemaError,
+  UserSchemaError,
+  //BusinessAttendanceSchemaError,
+  BusinessPackageSchemaError,
+  BusinessInfoFormSchemaError,
+} from "@/types/zod-errors";
 import { apiClient } from "@/helpers/api";
 import { ROLE_SUBSCRIBER } from "@/enums";
 
@@ -110,6 +116,7 @@ export const addOrUpdateUser = cache(
   ): Promise<{
     success: boolean;
     data?: BUSINESS_USER;
+    errors?: UserSchemaError;
     message?: string;
   }> => {
     const userId = formData.get("userId");
@@ -130,9 +137,10 @@ export const addOrUpdateUser = cache(
     });
 
     if (!validatedFields.success) {
-      console.error("errors", validatedFields.error);
+      console.error("errors", validatedFields.error.format());
       return {
         success: false,
+        errors: validatedFields.error.format(),
         message: "Validation Error",
       };
     }
@@ -451,6 +459,7 @@ export const addOrUpdatePackage = cache(
   ): Promise<{
     success: boolean;
     data?: BUSINESS_PACKAGE;
+    errors?: BusinessPackageSchemaError;
     message?: string;
   }> => {
     const fieldList = {
@@ -463,12 +472,11 @@ export const addOrUpdatePackage = cache(
       minPrice: Number(formData.get("minPrice")),
       subcriptionLimit: Number(formData.get("subscriptionLimit")),
       popular: formData.get("popular") === "on",
-      availableServices: formData
-        .get("availableServices")
-        ?.toString()
-        .split(","),
+      // availableServices: formData.get("availableServices"),
+      availableServices: formData.getAll("availableServices"),
     };
-
+    console.log("services " + fieldList.availableServices);
+    console.log("package" + fieldList.packageId);
     const validatedFields = BusinessPackageSchema.safeParse(fieldList);
 
     // If any form fields are invalid, return early
@@ -476,6 +484,7 @@ export const addOrUpdatePackage = cache(
       console.error("errors", validatedFields.error);
       return {
         success: false,
+        errors: validatedFields.error.format(),
         message: "Validation Error",
       };
     }
@@ -818,72 +827,13 @@ export const getAttendance = cache(
   },
 );
 
-export const updateBusinessDetails = async (
-  formData: FormData,
-): Promise<{
-  success: boolean;
-  data?: BUSINESS;
-  message?: string;
-}> => {
-  const businessId = formData.get("businessId");
-  const validatedFields = BusinessInfoFormSchema.safeParse({
-    establishedOn: formData.get("establishedOn"),
-    reviews: formData.get("reviews"),
-    rating: formData.get("rating"),
-    reviewRatingUrl: formData.get("reviewRatingUrl"),
-    geolocation: formData.get("reviewRatingUrl"),
-    phone: formData.get("phone"),
-    bio: formData.get("bio"),
-    socialProfiles: {
-      facebook: formData.get("socialProfiles['facebook']"),
-      instagram: formData.get("socialProfiles['instagram']"),
-      youtube: formData.get("socialProfiles['youtube']"),
-      twitter: formData.get("socialProfiles['twitter']"),
-    },
-  });
-
-  // If any form fields are invalid, return early
-  if (!validatedFields.success) {
-    console.error("errors", validatedFields.error);
-    return {
-      success: false,
-      message: "Validation Error",
-    };
-  }
-
-  //console.log("validated", validatedFields.data);
-
-  try {
-    const response = await apiClient(
-      `/api/admin/business/details-part1/${businessId}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(validatedFields.data),
-      },
-    );
-    toastSuccess("Details updated successfully");
-    return response;
-  } catch (e: unknown) {
-    let message = "";
-    if (typeof e === "string") {
-      message = e.toUpperCase();
-    } else if (e instanceof Error) {
-      message = e.message;
-    }
-    toastError(message || "Error while updating the detail");
-    return {
-      success: false,
-      message,
-    };
-  }
-};
-
 export const addAttendance = async (formData: FormData) => {
   const rawInput = {
     businessId: formData.get("businessId"),
-    firstName: formData.get("firstName"),
-    lastName: formData.get("lastName"),
-    mobile: formData.get("mobile"),
+    // firstName: formData.get("firstName"),
+    fullName: formData.get("fullName"),
+    // lastName: formData.get("lastName"),
+    mobile: Number(formData.get("mobile")),
     inTime: formData.get("inTime"),
     outTime: formData.get("outTime"),
     subscriptionId: formData.get("subscriptionId"),
@@ -893,8 +843,11 @@ export const addAttendance = async (formData: FormData) => {
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
-    console.error("errors", validatedFields.error);
-    return;
+    console.error("errors", validatedFields.error.format());
+    return {
+      success: false,
+      errors: validatedFields.error.format(), // zod formatted errors
+    };
   }
 
   console.log("validated", validatedFields.data);
@@ -906,6 +859,10 @@ export const addAttendance = async (formData: FormData) => {
     });
     toastSuccess("Details updated successfully");
     console.log("Response:", response);
+    return {
+      success: true,
+      data: response,
+    };
   } catch (e: unknown) {
     let message = "";
     if (typeof e === "string") {
@@ -914,6 +871,10 @@ export const addAttendance = async (formData: FormData) => {
       message = e.message;
     }
     toastError(message || "Error while updating the detail");
+    return {
+      success: false,
+      errorMessage: message || "Unknown error",
+    };
   }
 };
 
@@ -947,6 +908,67 @@ export const getUserByMobile = cache(
     }
   },
 );
+
+export const updateBusinessDetails = async (
+  formData: FormData,
+): Promise<{
+  success: boolean;
+  data?: BUSINESS;
+  errors?: BusinessInfoFormSchemaError;
+  message?: string;
+}> => {
+  const businessId = formData.get("businessId");
+
+  const validatedFields = BusinessInfoFormSchema.safeParse({
+    establishedOn: formData.get("establishedOn"),
+    reviews: formData.get("reviews"),
+    rating: formData.get("rating"),
+    reviewRatingUrl: formData.get("reviewRatingUrl"),
+    geolocation: formData.get("geolocation"),
+    phone: formData.get("phone"),
+    bio: formData.get("bio"),
+    socialProfiles: {
+      facebook: formData.get("facebook"),
+      instagram: formData.get("instagram"),
+      youtube: formData.get("youtube"),
+      twitter: formData.get("twitter"),
+    },
+  });
+
+  // Handle validation failure
+  if (!validatedFields.success) {
+    console.error("errors", validatedFields.error.format());
+    return {
+      success: false,
+      errors: validatedFields.error.format(),
+      message: "Validation Error",
+    };
+  }
+
+  try {
+    const response = await apiClient(
+      `/api/admin/business/details-part1/${businessId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(validatedFields.data),
+      },
+    );
+    toastSuccess("Details updated successfully");
+    return response;
+  } catch (e: unknown) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while updating the detail");
+    return {
+      success: false,
+      message,
+    };
+  }
+};
 
 export const createSubscriber = cache(
   async (

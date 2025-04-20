@@ -106,7 +106,7 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     formData.append("dob", formatDate(subscriberDOB));
 
     const { success, data, errors } = await createSubscriber(formData);
-
+console.log(errors,success)
     if (errors || !success) {
       setForm1Errors(errors || ({} as SubscriberSchemaError));
       console.log("Form Data to submit:", errors);

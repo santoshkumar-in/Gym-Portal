@@ -12,11 +12,15 @@ import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect
 import FitNxtMultiReactSelect from "@/components/Business/SearchAndFilter/ReactSelectMultiSelect";
 import { BUSINESS_PACKAGE, FILTER_DD_TYPE } from "@/types/business";
 import { toastSuccess, toastError } from "@/helpers/toast";
+import cn from "classnames";
+import { BusinessPackageSchemaError } from "@/types/zod-errors";
+
 interface Props {
   businessId: string;
   packageId?: string;
 }
 const PackageForm = ({ businessId, packageId = "" }: Props) => {
+  console.log("llll" + packageId);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
     {} as BUSINESS_PACKAGE,
   );
@@ -28,6 +32,10 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
     useState<FILTER_DD_TYPE | null>(null);
   const [selectedServices, setSelectedServices] = useState<FILTER_DD_TYPE[]>(
     [],
+  );
+
+  const [formErrors, setFormErrors] = useState<BusinessPackageSchemaError>(
+    {} as BusinessPackageSchemaError,
   );
 
   const [popular, setPopular] = useState<boolean>(false);
@@ -56,7 +64,7 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
     } else {
       setSelectedPackage({
         businessId,
-        packageId,
+        packageId: "wertyuiop",
         packageName: "",
         price: 10,
         discount: 10,
@@ -122,10 +130,17 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
         services.push(value);
       }
     }
-    newFormData.append("availableServices", services.toString());
+    newFormData.append("availableServices", JSON.stringify(services));
     newFormData.append("popular", popular ? "1" : "0");
 
-    const { success } = await addOrUpdatePackage(newFormData);
+    const { success, errors } = await addOrUpdatePackage(newFormData);
+    console.log("Form Data to submit:", success);
+    console.log(success, errors);
+    if (errors || !success) {
+      setFormErrors(errors || ({} as BusinessPackageSchemaError));
+      console.log("Form Data to submit:", errors);
+      return;
+    }
     if (success) {
       toastSuccess("Package Added/updated Successfully");
       router.push(`/business/${businessId}`);
@@ -159,8 +174,19 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 type="text"
                 placeholder="Package name"
                 defaultValue={selectedPackage.packageName}
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                className={cn(
+                  "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                  {
+                    "border-stroke": !formErrors.packageName,
+                    "border-red-500": formErrors.packageName,
+                  },
+                )}
               />
+              {formErrors.packageName && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.packageName._errors[0]}
+                </p>
+              )}
             </div>
 
             <div className="w-full xl:w-1/2">
@@ -184,8 +210,19 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 type="number"
                 defaultValue={selectedPackage.price}
                 placeholder="Price"
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                className={cn(
+                  "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                  {
+                    "border-stroke": !formErrors.price,
+                    "border-red-500": formErrors.price,
+                  },
+                )}
               />
+              {formErrors.price && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.price._errors[0]}
+                </p>
+              )}
             </div>
 
             <div className="w-full xl:w-1/2">
@@ -197,8 +234,19 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 type="number"
                 defaultValue={selectedPackage.discount}
                 placeholder="Discount"
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                className={cn(
+                  "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                  {
+                    "border-stroke": !formErrors.discount,
+                    "border-red-500": formErrors.discount,
+                  },
+                )}
               />
+              {formErrors.discount && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.discount._errors[0]}
+                </p>
+              )}
             </div>
           </div>
           <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -211,8 +259,19 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 type="number"
                 defaultValue={selectedPackage.sellingPrice}
                 placeholder="minPrice"
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                className={cn(
+                  "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                  {
+                    "border-stroke": !formErrors.minPrice,
+                    "border-red-500": formErrors.minPrice,
+                  },
+                )}
               />
+              {formErrors.minPrice && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.minPrice._errors[0]}
+                </p>
+              )}
             </div>
 
             <div className="w-full xl:w-1/2">
@@ -220,12 +279,23 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 Subscription Limit
               </label>
               <input
-                name="subscriptionLimit"
+                name="subcriptionLimit"
                 type="number"
                 defaultValue={selectedPackage.subscriptionLimit || 1000}
                 placeholder="Subscription Limit"
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                className={cn(
+                  "w-full rounded border-[1.5px] bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
+                  {
+                    "border-stroke": !formErrors.subcriptionLimit,
+                    "border-red-500": formErrors.subcriptionLimit,
+                  },
+                )}
               />
+              {formErrors.subcriptionLimit && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.subcriptionLimit._errors[0]}
+                </p>
+              )}
             </div>
           </div>
 
@@ -241,6 +311,11 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 name="validityId"
                 defaultValue={selectedValidity}
               />
+              {formErrors.validityId && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.validityId._errors?.[0]}
+                </p>
+              )}
             </div>
             <div className="w-full xl:w-1/2">
               <label className="mb-3 block text-sm font-medium text-black dark:text-white">
@@ -253,6 +328,12 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 name="availableServices"
                 defaultValue={selectedServices}
               />
+              {formErrors.availableServices && (
+                <p className="pt-1 text-xs text-red-500">
+                  {formErrors.availableServices._errors?.[0] ||
+                    "Please select at least one service."}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex">
