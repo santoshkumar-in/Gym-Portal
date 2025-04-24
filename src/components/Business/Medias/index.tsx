@@ -8,13 +8,31 @@ import { MEDIAS } from "@/types/business";
 import Gallery from "./Gallery";
 import { uploadFile } from "@/actions/media";
 import { useUploadContext } from "@/context/UploadProvider";
-import { BUSINESS_GALLERY } from "@/enums";
+import {
+  BUSINESS_GALLERY,
+  CAT_SERVICE_IMAGE,
+  CAT_INTERIOR_IMAGE,
+  CAT_OTHER_IMAGE,
+} from "@/enums";
 
 interface Props {
   businessId: string;
 }
 
-const categories = ["Workout", "Equipment", "Facility", "Events"];
+const categories = [
+  {
+    value: CAT_SERVICE_IMAGE,
+    label: "Service",
+  },
+  {
+    value: CAT_INTERIOR_IMAGE,
+    label: "Interior",
+  },
+  {
+    value: CAT_OTHER_IMAGE,
+    label: "Other",
+  },
+];
 
 const Medias = ({ businessId }: Props) => {
   const [medias, setMedias] = useState<MEDIAS>();
@@ -48,7 +66,6 @@ const Medias = ({ businessId }: Props) => {
         businessId,
         type,
         category: selectedCategory,
-        gallery: "gallery",
       };
 
       dispatch({
@@ -73,13 +90,13 @@ const Medias = ({ businessId }: Props) => {
   return (
     <div className="mt-4">
       <div className="mb-4 flex items-center rounded-sm bg-white px-4 py-4 shadow-default sm:px-6 xl:px-7.5">
-
         <h3 className="font-bold text-black dark:text-white">Image Gallery</h3>
         <button
           onClick={toggle}
           className="ml-auto rounded bg-red-500 px-5 py-1 text-center font-medium text-white hover:bg-opacity-90"
         >
-          <FontAwesomeIcon icon={faTrashCan} /> {deleteMode ? "Exit Delete Mode" : "Enter Delete Mode"}
+          <FontAwesomeIcon icon={faTrashCan} />{" "}
+          {deleteMode ? "Exit Delete Mode" : "Enter Delete Mode"}
         </button>
 
         <div className="ml-2">
@@ -116,21 +133,21 @@ const Medias = ({ businessId }: Props) => {
       </div>
 
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-md shadow-md">
-            <h2 className="text-lg font-bold mb-4">Select Category</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-md bg-white p-6 shadow-md">
+            <h2 className="mb-4 text-lg font-bold">Select Category</h2>
             <div className="space-y-2">
-              {categories.map((category) => (
+              {categories.map(({ value, label }) => (
                 <button
-                  key={category}
+                  key={value}
                   onClick={() => {
-                    setSelectedCategory(category);
+                    setSelectedCategory(value);
                     setIsCategoryModalOpen(false);
                     document.getElementById("upload-image-in-gallery")?.click();
                   }}
-                  className="block w-full px-4 py-2 bg-gray-500 rounded-md text-white hover:bg-gray-900"
+                  className="block w-full rounded-md bg-gray-500 px-4 py-2 text-white hover:bg-gray-900"
                 >
-                  {category}
+                  {label}
                 </button>
               ))}
             </div>
