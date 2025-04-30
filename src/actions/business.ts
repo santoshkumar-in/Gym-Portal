@@ -12,7 +12,7 @@ import {
   BUSINESS,
   BUSINESS_USER,
   BUSINESS_PACKAGES,
-  MEDIAS,
+  MEDIA,
   SUBSCRIBER,
   SUBSCRIPTION,
   SUBSCRIBER_ATTENDANCE,
@@ -32,6 +32,34 @@ import {
 } from "@/types/zod-errors";
 import { apiClient } from "@/helpers/api";
 import { ROLE_SUBSCRIBER } from "@/enums";
+
+const defaultGallery = [
+  {
+    imageId: "131",
+    url: "https://images.unsplash.com/photo-1616279967983-ec413476e824?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "zumba",
+  },
+  {
+    imageId: "132",
+    url: "https://images.unsplash.com/photo-1508215885820-4585e56135c8?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "yoga",
+  },
+  {
+    imageId: "133",
+    url: "https://images.unsplash.com/photo-1603734220970-25a0b335ca01?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "cardio",
+  },
+  {
+    imageId: "134",
+    url: "https://images.unsplash.com/photo-1561214078-f3247647fc5e?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "aerobics",
+  },
+  {
+    imageId: "135",
+    url: "https://images.unsplash.com/photo-1600878585887-c2b9530999a1?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "gym",
+  },
+];
 
 export const getAllUsers = async (
   businessId: string,
@@ -515,94 +543,35 @@ export const addOrUpdatePackage = cache(
 );
 
 export const getMedias = cache(
-  (
+  async (
     businessId: string,
   ): Promise<{
     success: boolean;
-    data?: MEDIAS;
-    message?: string;
-    businessId?: string;
+    data?: MEDIA[];
   }> => {
-    return new Promise(function (resolve) {
-      resolve({
-        success: true,
-        businessId,
-        data: [
-          {
-            id: "131",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1616279967983-ec413476e824?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "zumba",
+    try {
+      const data = await apiClient(
+        `/api/info/business/details-part2/${businessId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
           },
-          {
-            id: "132",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1508215885820-4585e56135c8?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "yoga",
-          },
-          {
-            id: "133",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1603734220970-25a0b335ca01?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "cardio",
-          },
-          {
-            id: "134",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1561214078-f3247647fc5e?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "aerobics",
-          },
-          {
-            id: "135",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1600878585887-c2b9530999a1?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "gym",
-          },
-          {
-            id: "136",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1603734220970-25a0b335ca01?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "zumba",
-          },
-          {
-            id: "137",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1599595815336-affbc70dbf60?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "yoga",
-          },
-          {
-            id: "138",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "cardio",
-          },
-          {
-            id: "139",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "aerobics",
-          },
-          {
-            id: "140",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "gym",
-          },
-          {
-            id: "141",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=2626&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "zumba",
-          },
-          {
-            id: "142",
-            type: "image",
-            url: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=240&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            category: "aerobics",
-          },
-        ],
+        },
+      );
+
+      let galleryImages: MEDIA[] = [];
+      data.categories.forEach(({ images }: { images: MEDIA[] }) => {
+        galleryImages = [...images, ...galleryImages];
       });
-    });
+      return { success: true, data: galleryImages || defaultGallery };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return { success: true, data: defaultGallery };
+      // return {
+      //   success: false,
+      // };
+    }
   },
 );
 

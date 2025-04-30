@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import LightGallery from "lightgallery/react";
-//import Image from "next/image";
+import Image from "next/image";
 import Masonry from "masonry-layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
@@ -46,6 +46,21 @@ interface Props {
 function Gallery({ medias, deleteMode }: Props) {
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("");
+
+  useEffect(() => {
+    const container = document.querySelector(".fitnxt-masonry-gallery");
+    if (container) {
+      // Initialize Masonry
+      const msnry = new Masonry(container, {
+        itemSelector: ".gallery-item",
+        columnWidth: ".grid-sizer",
+        percentPosition: true,
+      });
+      if (msnry.layout) {
+        msnry.layout();
+      }
+    }
+  }, [medias]);
 
   useEffect(() => {
     // Ensure the DOM element exists
@@ -98,7 +113,7 @@ function Gallery({ medias, deleteMode }: Props) {
         {medias.map((media) => {
           return (
             <a
-              key={media.id}
+              key={media.imageId}
               className="gallery-item mb-1"
               data-src={media.url}
               data-sub-html={`<p>${media.caption}</p>`}
@@ -106,17 +121,18 @@ function Gallery({ medias, deleteMode }: Props) {
               <div className="relative">
                 {deleteMode && (
                   <span
-                    onClick={(e) => onDeleteClick(e, media.id)}
+                    onClick={(e) => onDeleteClick(e, media.imageId)}
                     className="z-9s absolute right-1 top-1 cursor-pointer p-1 text-white"
                   >
                     <FontAwesomeIcon icon={faTrashCan} />
                   </span>
                 )}
-                <img
-                  alt={media.caption}
+                <Image
+                  alt={media.caption || ""}
                   className="img-responsive"
                   src={media.url}
                   width={240}
+                  height={400}
                 />
               </div>
             </a>

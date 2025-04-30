@@ -44,8 +44,7 @@ export type BUSINESS_PACKAGE = {
 export type MEDIAS = MEDIA[];
 
 export type MEDIA = {
-  id: string;
-  type: string;
+  imageId: string;
   url: string;
   category?: string;
   caption?: string;
