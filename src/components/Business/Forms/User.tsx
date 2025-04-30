@@ -48,6 +48,7 @@ const UserForm = ({ businessId, userId = "" }: Props) => {
 
     const formData = new FormData(e.currentTarget);
     const res = await addOrUpdateUser(formData);
+    console.log("Response datakhushi:", res );
     const { success, errors } = res;
 
     if (errors || !success) {

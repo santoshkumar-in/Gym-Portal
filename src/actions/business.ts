@@ -33,48 +33,43 @@ import {
 import { apiClient } from "@/helpers/api";
 import { ROLE_SUBSCRIBER } from "@/enums";
 
-export const getAllUsers = cache(
-  async (
-    businessId: string,
-    bodyParams: { [k: string]: unknown },
-  ): Promise<{
-    currentPage: number;
-    perPage: number;
-    total: number;
-    success: boolean;
-    data?: BUSINESS_USER[];
-    message?: string;
-  }> => {
-    try {
-      console.log(
-        "Sending request with bodyParams:",
-        JSON.stringify(bodyParams),
-      );
+export const getAllUsers = async (
+  businessId: string,
+  bodyParams: { [k: string]: unknown },
+): Promise<{
+  currentPage: number;
+  perPage: number;
+  total: number;
+  success: boolean;
+  data?: BUSINESS_USER[];
+  message?: string;
+}> => {
+  try {
+    console.log("Sending request with bodyParams:", JSON.stringify(bodyParams));
 
-      const data = await apiClient(
-        // `/api/admin/business/${businessId}/get-all-users`,
-        `/api/admin/business/${businessId}/get-all-users?perPage=100&currentPage=1`,
-        {
-          method: "POST",
-          // body: JSON.stringify(bodyParams),
-          headers: {
-            "Content-Type": "application/json",
-          },
+    const data = await apiClient(
+      `/api/admin/business/${businessId}/get-all-users?perPage=100&currentPage=1`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
-      return data;
-    } catch (error) {
-      console.error("Fetch error:", error);
-      return {
-        currentPage: 0,
-        perPage: 0,
-        total: 0,
-        success: false,
-        message: "Error",
-      };
-    }
-  },
-);
+        cache: "no-store",
+      },
+    );
+    return data;
+    
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return {
+      currentPage: 0,
+      perPage: 0,
+      total: 0,
+      success: false,
+      message: "Error",
+    };
+  }
+};
 
 export const getSingleOperator = cache(
   async (
@@ -97,7 +92,6 @@ export const getSingleOperator = cache(
       if (!response) {
         throw new Error(result.message || "Failed to fetch operator details");
       }
-
       return { success: true, data: result };
     } catch (error) {
       console.error("Fetch error:", error);
@@ -254,7 +248,14 @@ export const addBusinessServices = cache(
           "Content-Type": "application/json",
         },
       });
-      return await response;
+
+      const result = await response;
+      if (response.error) {
+        throw new Error(result.message || "Failed to add service");
+      }
+
+      return { success: !result.error, message: result.message };
+
     } catch (error) {
       console.error("Fetch error:", error);
       return {
@@ -296,8 +297,7 @@ export const deleteBusinessServices = cache(
   },
 );
 
-export const getBusinessServices = cache(
-  async (
+export const getBusinessServices = async (
     businessId: string,
     bodyParams: { [k: string]: unknown },
   ): Promise<{
@@ -333,8 +333,7 @@ export const getBusinessServices = cache(
         message: "Error",
       };
     }
-  },
-);
+  };
 
 export const getAllServices = cache(
   async (): Promise<{

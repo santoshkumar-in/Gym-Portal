@@ -23,7 +23,8 @@ const ServiceForm = ({ businessId }: Props) => {
     }
 
     try {
-      await addBusinessServices(businessId, selectedServiceIds);
+      const response = await addBusinessServices(businessId, selectedServiceIds);
+      console.log("Response data:", response);
       toastSuccess("Services added successfully");
     } catch (error) {
       console.error("Failed to add services", error);
