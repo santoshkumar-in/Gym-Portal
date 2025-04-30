@@ -20,7 +20,7 @@ const ServiceSelection = ({
   const getServices = async () => {
     try {
       const { data, success } = await getAllServices();
-      console.log(data, success);
+      // console.log(data, success);
       if (success) {
         setCategories(data as MASTER_SERVICE_CATEGORY[]);
       }

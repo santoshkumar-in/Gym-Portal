@@ -5,9 +5,9 @@ import Modal from "@/components/Modal";
 // import Pagination from "@/components/Pagination";
 import { toastSuccess, toastError } from "@/helpers/toast";
 import { deleteBusinessOperator, getAllUsers } from "@/actions/business";
-import { BUSINESS_USER } from "@/types/business";
 import Users from "@/components/Business/Users";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
+import { useDataStore } from "@/store/useDataStore";
 
 const tableFilters = [
   {
@@ -29,7 +29,6 @@ const BusinessUsers = ({
 }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("");
-  const [users, setUsers] = useState<BUSINESS_USER[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
   const [paginationData, setPaginationData] = useState<{ [k: string]: number }>(
     { currentPage: 1, perPage: 10, total: 0 },
@@ -39,7 +38,8 @@ const BusinessUsers = ({
     [k: string]: unknown;
   }>({ searchTerm: "", status: "" });
 
-  console.log(users);
+  const { data, setData, clearData, removeUser } = useDataStore();
+
 
   useEffect(() => {
     const getBusinessId = async () => {
@@ -62,10 +62,9 @@ const BusinessUsers = ({
     getData(bodyParams);
   }, [businessId]);
 
-  // console.log(paginationData)
-  // console.log(paginationData)
 
   const getData = async (params: { [s: string]: unknown }) => {
+    clearData();
     try {
       const res = await getAllUsers(businessId, params);
       console.log(res);
@@ -78,11 +77,13 @@ const BusinessUsers = ({
       }));
 
       if (Array.isArray(res.data)) {
-        setUsers(res.data);
+        setData(res.data);
       } else {
         console.error("Wrong data format", res.data);
+        clearData();
       }
     } catch (error) {
+      clearData();
       console.error("Failed to fetch users", error);
     }
   };
@@ -102,9 +103,9 @@ const BusinessUsers = ({
         toastError(response.message || "Failed to delete user");
       } else {
         toastSuccess("User deleted successfully");
-        setUsers((prev) => prev.filter((user) => user.userId !== selected));
+        // getData({ businessId, ...currentSearchAndFilters });
+        removeUser(selected);
         console.log(response.message);
-        getData({ businessId });
       }
     } catch (error) {
       toastError("Error deleting user");
@@ -191,7 +192,7 @@ const BusinessUsers = ({
       <Users
         onStatusChange={handleStatusChange}
         onDelete={handleDelete}
-        users={users}
+        users={data}
         businessId={businessId}
       />
       {/* <Pagination

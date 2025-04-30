@@ -10,6 +10,7 @@ import {
 import BusinessServices from "@/components/Business/Services";
 import SearchAndFilterBar from "@/components/Business/SearchAndFilter";
 import { BUSINESS_SERVICE } from "@/types/business";
+import { useServiceStore } from "@/store/useServiceStore";
 
 const tableFilters = [
   {
@@ -27,7 +28,6 @@ const tableFilters = [
 const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [services, setServices] = useState<BUSINESS_SERVICE[]>([]);
   const [businessId, setBusinessId] = useState<string>("");
 
 
@@ -37,6 +37,8 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
     searchTerm: "",
     status: "",
   });
+
+  const { data, setData,removeService } = useServiceStore();
 
   useEffect(() => {
     const fetchBusinessId = async () => {
@@ -53,6 +55,7 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
   }, [businessId, currentSearchAndFilters]);
 
   const fetchServices = async () => {
+    // clearData(); // Clear previous data if needed
     try {
       const { success, data, message } =
         await getBusinessServices(businessId, {
@@ -60,13 +63,15 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
           status: currentSearchAndFilters.status,
         });
 
-      if (success) {
-        setServices(data as BUSINESS_SERVICE[]);
+      if (success && data) {
+        setData(data as BUSINESS_SERVICE[]);
       } else {
         console.error("Unexpected response format", message);
+        toastError(message || "Failed to fetch services");
       }
     } catch (error) {
       console.error("Failed to fetch services", error);
+      toastError("An error occurred while fetching services");
     }
   };
 
@@ -82,18 +87,13 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
     }
 
     try {
-      const { success, message } = await deleteBusinessServices(
-        businessId,
-        selected,
-      );
+      const { success, message } = await deleteBusinessServices(businessId, selected);
+
       if (success) {
         toastSuccess("Service deleted successfully");
+        removeService(selected);
         setShowDeletePrompt(false);
         setSelected(null);
-        setServices((prev) =>
-          prev.filter((service) => service.serviceMappingId !== selected),
-        );
-        fetchServices();
       } else {
         toastError(message || "Failed to delete service");
       }
@@ -121,12 +121,12 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
         enableSearch={true}
         createNewUrl={`/business/${businessId}/services/add`}
         // services={true}
-        {...({ services: true } as { services: boolean })} 
+        {...({ services: true } as { services: boolean })}
       // added for conditonally not show filter or search in service page instand of creating new search component for service , need to figure out how we can do this by creating a new component or by showing condetonaly.
       />
       <BusinessServices
         onDelete={handleDelete}
-        services={services}
+        services={data}
         businessId={businessId}
       />
       <Modal modalIsOpen={showDeletePrompt}>
@@ -185,3 +185,6 @@ const Services = ({ params }: { params: Promise<{ businessId: string }> }) => {
 };
 
 export default Services;
+
+
+
