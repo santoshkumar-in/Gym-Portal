@@ -58,7 +58,6 @@ export const getAllUsers = async (
       },
     );
     return data;
-    
   } catch (error) {
     console.error("Fetch error:", error);
     return {
@@ -255,7 +254,6 @@ export const addBusinessServices = cache(
       }
 
       return { success: !result.error, message: result.message };
-
     } catch (error) {
       console.error("Fetch error:", error);
       return {
@@ -298,42 +296,42 @@ export const deleteBusinessServices = cache(
 );
 
 export const getBusinessServices = async (
-    businessId: string,
-    bodyParams: { [k: string]: unknown },
-  ): Promise<{
-    currentPage: number;
-    perPage: number;
-    total: number;
-    success: boolean;
-    data?: BUSINESS_SERVICE[];
-    message?: string;
-  }> => {
-    try {
-      const data = await apiClient(`/api/admin/get-business-services`, {
-        method: "POST",
-        body: JSON.stringify({ businessId, ...bodyParams }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return {
-        success: true,
-        data: data.services || [],
-        perPage: 0,
-        currentPage: 0,
-        total: 0,
-      };
-    } catch (error) {
-      console.error("Fetch error:", error);
-      return {
-        currentPage: 0,
-        perPage: 0,
-        total: 0,
-        success: false,
-        message: "Error",
-      };
-    }
-  };
+  businessId: string,
+  bodyParams: { [k: string]: unknown },
+): Promise<{
+  currentPage: number;
+  perPage: number;
+  total: number;
+  success: boolean;
+  data?: BUSINESS_SERVICE[];
+  message?: string;
+}> => {
+  try {
+    const data = await apiClient(`/api/admin/get-business-services`, {
+      method: "POST",
+      body: JSON.stringify({ businessId, ...bodyParams }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return {
+      success: true,
+      data: data.services || [],
+      perPage: 0,
+      currentPage: 0,
+      total: 0,
+    };
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return {
+      currentPage: 0,
+      perPage: 0,
+      total: 0,
+      success: false,
+      message: "Error",
+    };
+  }
+};
 
 export const getAllServices = cache(
   async (): Promise<{
@@ -1032,3 +1030,39 @@ export const createSubscriber = cache(
     }
   },
 );
+
+export const createSubscription = async (params: {
+  [k: string]: string | number;
+}): Promise<{
+  success: boolean;
+  message?: string;
+}> => {
+  try {
+    const response = await apiClient(`/api/service/subscribe-package`, {
+      method: "POST",
+      body: JSON.stringify(params),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response;
+    if (response.error) {
+      throw new Error(result.message || "Failed to create subscription");
+    }
+
+    return { success: !result.error, message: result.message };
+  } catch (e) {
+    let message = "";
+    if (typeof e === "string") {
+      message = e.toUpperCase();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    toastError(message || "Error while creating subscription");
+    return {
+      success: false,
+      message,
+    };
+  }
+};

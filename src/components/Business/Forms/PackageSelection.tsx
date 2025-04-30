@@ -158,12 +158,6 @@ const PackageSelection = ({ businessId, onSelectPackage }: Props) => {
           );
         })}
       </Slider>
-      <h4>Selected Package</h4>
-      <p>
-        {selectedPackage.packageId
-          ? selectedPackage.packageName + " : INR " + selectedPackage.price
-          : "None"}
-      </p>
     </div>
   );
 };

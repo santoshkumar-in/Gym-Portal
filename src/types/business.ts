@@ -28,7 +28,7 @@ export type BUSINESS_PACKAGE = {
   packageName: string;
   price: number;
   discount: number;
-  sellingPrice?: number;
+  sellingPrice: number;
   minPrice?: number;
   validityDays?: string;
   validityId?: string;

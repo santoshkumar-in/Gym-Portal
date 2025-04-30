@@ -1,14 +1,21 @@
 "use client";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import cn from "classnames";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
-import { getUserByMobile, createSubscriber } from "@/actions/business";
+import {
+  getUserByMobile,
+  createSubscriber,
+  createSubscription,
+} from "@/actions/business";
 import { formatDate } from "@/helpers";
 import { SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
 import PackageSelection from "./PackageSelection";
 import StepProgress from "./StepProgress";
 import { SubscriberSchemaError } from "@/types/zod-errors";
+import { toastSuccess } from "@/helpers/toast";
+
 interface SubscriptionFormProps {
   businessId: string;
 }
@@ -16,11 +23,14 @@ interface SubscriptionFormProps {
 const steps = [
   { name: "Select Subscriber", number: 1 },
   { name: "Select Package", number: 2 },
-  { name: "Subscribe", number: 3 },
+  { name: "Price & Date", number: 3 },
+  { name: "Subscribe", number: 4 },
 ];
 
 const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const router = useRouter();
+
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
     {} as BUSINESS_PACKAGE,
   );
@@ -35,8 +45,11 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     weight: 0,
   });
 
-  const [fetchingSubscriber, setFetchingSubscriber] = useState(false);
+  const [fetchingSubscriber, setFetchingSubscriber] = useState<boolean>(false);
   const [subscriberDOB, setSubscriberDOB] = useState<Date>(new Date());
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [newPrice, setNewPrice] = useState<number>(0);
+  const [showPriceError, setShowPriceError] = useState<boolean>(false);
 
   const [form1Errors, setForm1Errors] = useState<SubscriberSchemaError>(
     {} as SubscriberSchemaError,
@@ -86,14 +99,21 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     });
   };
 
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewPrice(Number(e.target.value));
+    if (Number(e.target.value) < Number(selectedPackage.sellingPrice)) {
+      setShowPriceError(true);
+    } else {
+      setShowPriceError(false);
+    }
+  };
+
   const handleSubmitStep1 = async (e: FormEvent) => {
     e.preventDefault();
-
     if (subscriberDetails.userId) {
       setStep(2);
       return;
     }
-
     const formData = new FormData();
     Object.entries(subscriberDetails).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -106,7 +126,7 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
     formData.append("dob", formatDate(subscriberDOB));
 
     const { success, data, errors } = await createSubscriber(formData);
-console.log(errors,success)
+    console.log(errors, success);
     if (errors || !success) {
       setForm1Errors(errors || ({} as SubscriberSchemaError));
       console.log("Form Data to submit:", errors);
@@ -118,16 +138,32 @@ console.log(errors,success)
     setStep(2);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit3 = (e: FormEvent) => {
     e.preventDefault();
+    if (!showPriceError) {
+      setStep(4);
+    }
+  };
+
+  const handleSubmit4 = async () => {
     const formData = {
-      businessId,
-      subscriberId: subscriberDetails.userId,
+      userId: subscriberDetails.userId,
       packageId: selectedPackage.packageId,
-      price: selectedPackage.price,
+      extraDiscount: selectedPackage.price - newPrice,
+      payMode: "CASH",
+      payStatus: "PAID",
+      startDate: formatDate(startDate),
     };
-    console.log("Form Data to submit:", formData);
-    setStep(2);
+
+    const { success } = await createSubscription(
+      formData as {
+        [k: string]: string | number;
+      },
+    );
+    if (success) {
+      toastSuccess("Package Subscribed Successfully");
+      router.push(`/business/${businessId}/subscriber`);
+    }
   };
 
   return (
@@ -370,7 +406,10 @@ console.log(errors,success)
           <div className="my-8">
             <PackageSelection
               businessId={businessId}
-              onSelectPackage={(pack) => setSelectedPackage(pack)}
+              onSelectPackage={(pack) => {
+                setSelectedPackage(pack);
+                setNewPrice(pack.sellingPrice);
+              }}
             />
           </div>
 
@@ -393,18 +432,7 @@ console.log(errors,success)
       )}
 
       {step === 3 && (
-        <form onSubmit={handleSubmit}>
-          <input
-            type="hidden"
-            name="subscriberId"
-            value={subscriberDetails.userId}
-          />
-          <input
-            type="hidden"
-            name="packageId"
-            value={selectedPackage.packageId}
-          />
-
+        <form onSubmit={handleSubmit3}>
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium text-black dark:text-white">
               Price
@@ -412,16 +440,22 @@ console.log(errors,success)
             <input
               name="price"
               type="number"
+              onChange={handlePriceChange}
               defaultValue={selectedPackage?.price}
               className="w-full rounded border px-4 py-2 dark:bg-form-input dark:text-white"
             />
+            {showPriceError && (
+              <p className="pt-1 text-xs text-red-500">
+                Price can&apos;t be less than INR {selectedPackage.sellingPrice}
+              </p>
+            )}
           </div>
 
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium text-black dark:text-white">
               Start Date
             </label>
-            <DatePickerOne name="startDate" />
+            <DatePickerOne onChange={(d) => setStartDate(d as Date)} />
           </div>
 
           <div className="flex justify-between">
@@ -443,6 +477,71 @@ console.log(errors,success)
             </button>
           </div>
         </form>
+      )}
+
+      {step === 4 && (
+        <div>
+          <table className="w-full py-8 text-left">
+            <tr className="border-b border-gray-300">
+              <th className="py-3">
+                <h4 className="font-bold">User</h4>
+              </th>
+              <td className="py-3">{`${subscriberDetails.fullName || "NA"}, ${subscriberDetails.mobile || "NA"}`}</td>
+            </tr>
+            <tr className="border-b border-gray-300">
+              <th className="py-3">
+                <h4 className="font-bold">Package</h4>
+              </th>
+              <td className="py-3">
+                {selectedPackage.packageName}
+                <ul className="list-disc pl-3 pt-2 text-[12px]">
+                  {selectedPackage.services.map(({ serviceName }) => (
+                    <li key={serviceName}> {serviceName}</li>
+                  ))}
+                </ul>
+              </td>
+            </tr>
+            <tr className="border-b border-gray-300">
+              <th className="py-3">
+                {" "}
+                <h4 className="font-bold">Price</h4>
+              </th>
+              <td className="py-3">
+                <span>
+                  {`INR ${newPrice}`}{" "}
+                  {selectedPackage.price > newPrice && (
+                    <s>{selectedPackage.price}</s>
+                  )}
+                </span>
+              </td>
+            </tr>
+            <tr className="border-b border-gray-300">
+              <th className="py-3">
+                <h4 className="font-bold">Start date</h4>
+              </th>
+              <td className="py-3">{formatDate(startDate)}</td>
+            </tr>
+          </table>
+
+          <div className="mt-8 flex justify-between">
+            <button
+              type="button"
+              onClick={() => {
+                setStep(3);
+              }}
+              className="rounded bg-gray-600 px-6 py-2 font-medium text-white"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit4}
+              className="rounded bg-primary px-6 py-2 font-medium text-white"
+            >
+              Subscribe
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
