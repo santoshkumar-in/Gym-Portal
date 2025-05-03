@@ -1,70 +1,50 @@
+
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getPackages,
-  addOrUpdatePackage,
-  getValidities,
-  getBusinessAllServices,
-} from "@/actions/business";
+import { getPackages, addOrUpdatePackage, getValidities, getBusinessAllServices, } from "@/actions/business";
 import SwitcherThree from "@/components/Switchers/SwitcherThree";
 import FitNxtReactSelect from "@/components/Business/SearchAndFilter/ReactSelect";
 import FitNxtMultiReactSelect from "@/components/Business/SearchAndFilter/ReactSelectMultiSelect";
 import { BUSINESS_PACKAGE, FILTER_DD_TYPE } from "@/types/business";
 import { toastSuccess, toastError } from "@/helpers/toast";
-import cn from "classnames";
 import { BusinessPackageSchemaError } from "@/types/zod-errors";
+import cn from "classnames";
 
 interface Props {
   businessId: string;
   packageId?: string;
 }
-const PackageForm = ({ businessId, packageId = "" }: Props) => {
-  console.log("llll" + packageId);
-  const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>(
-    {} as BUSINESS_PACKAGE,
-  );
 
+const PackageForm = ({ businessId, packageId = "" }: Props) => {
+  const [selectedPackage, setSelectedPackage] = useState<BUSINESS_PACKAGE>({} as BUSINESS_PACKAGE,);
   const [validityOptions, setValidityOptions] = useState<FILTER_DD_TYPE[]>([]);
   const [servicesOptions, setServicesOptions] = useState<FILTER_DD_TYPE[]>([]);
-
-  const [selectedValidity, setSelectedValidity] =
-    useState<FILTER_DD_TYPE | null>(null);
-  const [selectedServices, setSelectedServices] = useState<FILTER_DD_TYPE[]>(
-    [],
-  );
-
-  const [formErrors, setFormErrors] = useState<BusinessPackageSchemaError>(
-    {} as BusinessPackageSchemaError,
-  );
-
+  const [selectedValidity, setSelectedValidity] = useState<FILTER_DD_TYPE | null>(null);
+  const [selectedServices, setSelectedServices] = useState<FILTER_DD_TYPE[]>([]);
+  const [formErrors, setFormErrors] = useState<BusinessPackageSchemaError>({} as BusinessPackageSchemaError,);
   const [popular, setPopular] = useState<boolean>(false);
   const router = useRouter();
 
+  // Load existing package if editing
   useEffect(() => {
     async function getData() {
       const { data: packages = [] } = await getPackages(businessId);
       const found = packages.find((p) => p.packageId === packageId);
       if (found) {
         setSelectedPackage(found);
-
-        const selected = found.services?.map(
-          ({ serviceMappingId: value, serviceName: label }) => {
-            return {
-              value,
-              label,
-            };
-          },
-        );
+        setPopular(found.popular || false);
+        const selected = found.services?.map(({ serviceMappingId: value, serviceName: label }) => ({ value, label })) || [];
         setSelectedServices(selected);
       }
     }
+
     if (packageId) {
       getData();
     } else {
       setSelectedPackage({
         businessId,
-        packageId: "wertyuiop",
+        packageId: "",
         packageName: "",
         price: 100,
         discount: 10,
@@ -81,76 +61,73 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
   useEffect(() => {
     async function getData() {
       const { data = [] } = await getValidities();
-      const options = data.map(({ id, value }) => {
-        return {
-          value: id,
-          label: value,
-        };
-      });
+      const options = data.map(({ id, value }) => ({ value: id, label: value }));
       setValidityOptions(options);
     }
     getData();
   }, []);
 
   useEffect(() => {
-    const selected = validityOptions?.find(
-      ({ value }) => value === selectedPackage.validityId,
-    );
+    const selected = validityOptions.find(({ value }) => value === selectedPackage.validityId);
     if (selected) {
       setSelectedValidity(selected);
     }
-  }, [selectedPackage, validityOptions]);
+  }, [validityOptions, selectedPackage]);
 
   useEffect(() => {
-    async function getData() {
+    async function getServices() {
       const { data = [] } = await getBusinessAllServices(businessId);
-      const options = data.map(
-        ({ serviceMappingId: value, serviceName: label }) => {
-          return {
-            value,
-            label,
-          };
-        },
-      );
+      const options = data.map(({ serviceMappingId: value, serviceName: label }) => ({ value, label }));
       setServicesOptions(options);
     }
-    getData();
+    getServices();
   }, [businessId]);
 
   const handlePopularFiledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPopular(e.target.checked);
   };
 
-  const handleFormSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const newFormData = new FormData();
-    const services = [];
-    for (const [key, value] of formData) {
-      if (key !== "availableServices") {
-        newFormData.append(key, value);
-      } else {
-        services.push(value);
-      }
-    }
-    newFormData.append("availableServices", JSON.stringify(services));
+
+    const packageName = formData.get("packageName")?.toString() || "";
+    const price = formData.get("price")?.toString() || "0";
+    const discount = formData.get("discount")?.toString() || "0";
+    const minPrice = formData.get("minPrice")?.toString() || "0";
+    const subscriptionLimit = formData.get("subscriptionLimit")?.toString() || "0";
+    const validityId = selectedValidity?.value || "";
+
+    newFormData.append("businessId", businessId);
+    if (packageId) newFormData.append("packageId", packageId);
+    newFormData.append("packageName", packageName);
+    newFormData.append("price", price);
+    newFormData.append("discount", discount);
+    newFormData.append("minPrice", minPrice);
+    newFormData.append("subscriptionLimit", subscriptionLimit);
+    newFormData.append("validityId", validityId);
     newFormData.append("popular", popular ? "1" : "0");
 
+    if (selectedServices.length > 0) {
+      selectedServices.forEach((service) => {
+        newFormData.append("availableServices", service.value);
+      });
+    }
+
     const { success, errors } = await addOrUpdatePackage(newFormData);
-    console.log("Form Data to submit:", success);
-    console.log(success, errors);
-    if (errors || !success) {
-      setFormErrors(errors || ({} as BusinessPackageSchemaError));
+
+    if (!success || errors) {
+      setFormErrors(errors || {} as BusinessPackageSchemaError);
+      toastError("Validation failed. Please check the fields.");
       console.log("Form Data to submit:", errors);
       return;
     }
-    if (success) {
-      toastSuccess("Package Added/updated Successfully");
-      router.push(`/business/${businessId}`);
-    } else {
-      toastError("Error while adding/updating package");
-    }
-  };
 
-  console.log(selectedValidity, selectedServices);
+    toastSuccess("Package Added/Updated Successfully");
+    router.push(`/business/${businessId}`);
+  };
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -159,7 +136,7 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
           Add/Edit Details
         </h3>
       </div>
-      <form action={handleFormSubmit}>
+      <form onSubmit={handleSubmit}>
         <input type="hidden" name="businessId" value={businessId} />
         {packageId && (
           <input type="hidden" name="packageId" value={packageId} />
@@ -306,9 +283,9 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 Validity
               </label>
               <FitNxtReactSelect
-                onChange={() => null}
+                onChange={(val) => setSelectedValidity(val)}
                 allOptions={validityOptions}
-                placeholder="Validity"
+                placeholder="Select Validity"
                 name="validityId"
                 defaultValue={selectedValidity}
               />
@@ -323,9 +300,9 @@ const PackageForm = ({ businessId, packageId = "" }: Props) => {
                 Services
               </label>
               <FitNxtMultiReactSelect
-                onChange={() => null}
+                onChange={(val) => setSelectedServices([...val])}
                 allOptions={servicesOptions}
-                placeholder="Services"
+                placeholder="Select Services"
                 name="availableServices"
                 defaultValue={selectedServices}
               />

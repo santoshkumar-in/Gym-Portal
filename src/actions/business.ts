@@ -500,8 +500,7 @@ export const addOrUpdatePackage = cache(
       // availableServices: formData.get("availableServices"),
       availableServices: formData.getAll("availableServices"),
     };
-    console.log("services " + fieldList.availableServices);
-    console.log("package" + fieldList.packageId);
+
     const validatedFields = BusinessPackageSchema.safeParse(fieldList);
 
     // If any form fields are invalid, return early
@@ -513,7 +512,7 @@ export const addOrUpdatePackage = cache(
         message: "Validation Error",
       };
     }
-    console.log("validated", validatedFields.data);
+    // console.log("validated", validatedFields.data);
 
     try {
       const data = await apiClient(`/api/admin/create-package`, {
