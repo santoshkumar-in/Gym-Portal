@@ -55,6 +55,7 @@ export type MEDIA = {
 export type SUBSCRIBER = {
   businessid?: string;
   userName?: string;
+  username?: string;
   email?: string;
   mobile?: number;
   isd?: string;
