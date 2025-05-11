@@ -8,9 +8,11 @@ import {
   getUserByMobile,
   createSubscriber,
   createSubscription,
+  getPaymentMode,
+  getPaymentStatuses,
 } from "@/actions/business";
 import { formatDate } from "@/helpers";
-import { SUBSCRIBER, BUSINESS_PACKAGE } from "@/types/business";
+import { SUBSCRIBER, BUSINESS_PACKAGE, FILTER_DD_TYPE } from "@/types/business";
 import PackageSelection from "./PackageSelection";
 import StepProgress from "./StepProgress";
 import { SubscriberSchemaError } from "@/types/zod-errors";
@@ -50,10 +52,57 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [newPrice, setNewPrice] = useState<number>(0);
   const [showPriceError, setShowPriceError] = useState<boolean>(false);
+  const [paymentStatuses, setPaymentStatuses] = useState<FILTER_DD_TYPE[]>(
+    [] as FILTER_DD_TYPE[],
+  );
+  const [paymentModes, setPaymentModes] = useState<FILTER_DD_TYPE[]>(
+    [] as FILTER_DD_TYPE[],
+  );
 
   const [form1Errors, setForm1Errors] = useState<SubscriberSchemaError>(
     {} as SubscriberSchemaError,
   );
+
+  const [selectedPaymentMode, setSelectedPaymentMode] =
+    useState<FILTER_DD_TYPE>({} as FILTER_DD_TYPE);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] =
+    useState<FILTER_DD_TYPE>({} as FILTER_DD_TYPE);
+
+  useEffect(() => {
+    async function getPaymentModesOptions() {
+      const { success, data = [] } = await getPaymentMode();
+      if (success) {
+        const payModes = data.map(({ id: value, value: label }) => {
+          return { value, label };
+        });
+        const payCash = payModes.find(({ label }) => label === "Cash");
+
+        setPaymentModes(payModes as FILTER_DD_TYPE[]);
+        setSelectedPaymentMode(payCash as FILTER_DD_TYPE);
+      } else {
+        setPaymentModes([] as FILTER_DD_TYPE[]);
+        setSelectedPaymentMode({} as FILTER_DD_TYPE);
+      }
+    }
+    async function getPaymentStatusOptions() {
+      const { success, data = [] } = await getPaymentStatuses();
+      if (success) {
+        const payStatuses = data.map(({ id: value, value: label }) => {
+          return { value, label };
+        });
+        const payReceived = payStatuses.find(
+          ({ label }) => label === "Recieved",
+        );
+        setPaymentStatuses(payStatuses as FILTER_DD_TYPE[]);
+        setSelectedPaymentStatus(payReceived as FILTER_DD_TYPE);
+      } else {
+        setPaymentStatuses([] as FILTER_DD_TYPE[]);
+        setSelectedPaymentStatus({} as FILTER_DD_TYPE);
+      }
+    }
+    getPaymentModesOptions();
+    getPaymentStatusOptions();
+  }, []);
 
   useEffect(() => {
     async function getData() {
@@ -67,7 +116,7 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
           setSubscriberDetails({
             userId: data.userId,
             fullName: data.fullName,
-            userName: data.userName,
+            userName: data.username,
             mobile: data.mobile,
             email: data.email,
             userGender: data.userGender || "M",
@@ -150,11 +199,10 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
       userId: subscriberDetails.userId,
       packageId: selectedPackage.packageId,
       extraDiscount: selectedPackage.price - newPrice,
-      payMode: "CASH",
-      payStatus: "PAID",
+      payMode: selectedPaymentMode.value,
+      payStatus: selectedPaymentStatus.value,
       startDate: formatDate(startDate),
     };
-
     const { success } = await createSubscription(
       formData as {
         [k: string]: string | number;
@@ -355,7 +403,7 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
                   <input
                     name="userName"
                     type="text"
-                    readOnly={subscriberDetails.userId !== ""}
+                    disabled={subscriberDetails.userId !== ""}
                     value={subscriberDetails.userName}
                     onChange={handleSubscriberFieldChange}
                     placeholder="Username"
@@ -482,45 +530,79 @@ const MultiStepSubscriptionForm = ({ businessId }: SubscriptionFormProps) => {
       {step === 4 && (
         <div>
           <table className="w-full py-8 text-left">
-            <tr className="border-b border-gray-300">
-              <th className="py-3">
-                <h4 className="font-bold">User</h4>
-              </th>
-              <td className="py-3">{`${subscriberDetails.fullName || "NA"}, ${subscriberDetails.mobile || "NA"}`}</td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <th className="py-3">
-                <h4 className="font-bold">Package</h4>
-              </th>
-              <td className="py-3">
-                {selectedPackage.packageName}
-                <ul className="list-disc pl-3 pt-2 text-[12px]">
-                  {selectedPackage.services.map(({ serviceName }) => (
-                    <li key={serviceName}> {serviceName}</li>
-                  ))}
-                </ul>
-              </td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <th className="py-3">
-                {" "}
-                <h4 className="font-bold">Price</h4>
-              </th>
-              <td className="py-3">
-                <span>
-                  {`INR ${newPrice}`}{" "}
-                  {selectedPackage.price > newPrice && (
-                    <s>{selectedPackage.price}</s>
-                  )}
-                </span>
-              </td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <th className="py-3">
-                <h4 className="font-bold">Start date</h4>
-              </th>
-              <td className="py-3">{formatDate(startDate)}</td>
-            </tr>
+            <tbody>
+              <tr className="border-b border-gray-300">
+                <th className="py-3">
+                  <h4 className="font-bold">User</h4>
+                </th>
+                <td className="py-3">{`${subscriberDetails.fullName || "NA"}, ${subscriberDetails.mobile || "NA"}`}</td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="py-3">
+                  <h4 className="font-bold">Package</h4>
+                </th>
+                <td className="py-3">
+                  {selectedPackage.packageName}
+                  <ul className="list-disc pl-3 pt-2 text-[12px]">
+                    {selectedPackage.services.map(({ serviceName }) => (
+                      <li key={serviceName}> {serviceName}</li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="py-3">
+                  {" "}
+                  <h4 className="font-bold">Price</h4>
+                </th>
+                <td className="py-3">
+                  <span>
+                    {`INR ${newPrice}`}{" "}
+                    {selectedPackage.price > newPrice && (
+                      <s>{selectedPackage.price}</s>
+                    )}
+                  </span>
+                </td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="py-3">
+                  <h4 className="font-bold">Start date</h4>
+                </th>
+                <td className="py-3">{formatDate(startDate)}</td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="py-3">
+                  <h4 className="font-bold">Payment Mode</h4>
+                </th>
+                <td className="py-3">
+                  <FitNxtReactSelect
+                    onChange={(v) =>
+                      setSelectedPaymentMode(v as FILTER_DD_TYPE)
+                    }
+                    allOptions={paymentModes}
+                    placeholder="Select Payment mode"
+                    name="payMode"
+                    defaultValue={selectedPaymentMode}
+                  />
+                </td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="py-3">
+                  <h4 className="font-bold">Payment Status</h4>
+                </th>
+                <td className="py-3">
+                  <FitNxtReactSelect
+                    onChange={(v) =>
+                      setSelectedPaymentStatus(v as FILTER_DD_TYPE)
+                    }
+                    allOptions={paymentStatuses}
+                    placeholder="Select Payment status"
+                    name="payStatus"
+                    defaultValue={selectedPaymentStatus}
+                  />
+                </td>
+              </tr>
+            </tbody>
           </table>
 
           <div className="mt-8 flex justify-between">

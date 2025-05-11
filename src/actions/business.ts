@@ -454,6 +454,48 @@ export const getValidities = cache(
   },
 );
 
+export const getPaymentStatuses = cache(
+  async (): Promise<{
+    success: boolean;
+    data?: MASTER_VALIDITY[] | [];
+    message?: string;
+  }> => {
+    try {
+      const data = await apiClient(`/api/master/payment-status`, {
+        method: "GET",
+      });
+      return { success: true, data };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
+export const getPaymentMode = cache(
+  async (): Promise<{
+    success: boolean;
+    data?: MASTER_VALIDITY[] | [];
+    message?: string;
+  }> => {
+    try {
+      const data = await apiClient(`/api/master/payment-mode`, {
+        method: "GET",
+      });
+      return { success: true, data };
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return {
+        success: false,
+        message: "Error",
+      };
+    }
+  },
+);
+
 export const getBusinessAllServices = cache(
   async (
     businessId: string,
